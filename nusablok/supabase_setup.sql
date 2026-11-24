@@ -32,13 +32,13 @@ create table if not exists public.nb_siswa (
 
 create table if not exists public.nb_progres (
   username   text not null references public.nb_siswa(username) on delete cascade,
-  misi       text not null check (misi ~ '^(ipa|ips|mat|ing|man)-[1-6]-([1-5]|g[0-9]{1,9})$'),
+  misi       text not null check (misi ~ '^(ipa|ips|mat|ing|man)-[1-6]-([1-5]|g[0-9]{1,9}|k[1-9])$'),
   bintang    smallint not null check (bintang between 1 and 3),
   diperbarui timestamptz not null default now(),
   primary key (username, misi)
 );
 
--- Instalasi lama: lebarkan aturan kode misi agar misi buatan guru (…-g12) boleh disimpan.
+-- Instalasi lama: lebarkan aturan kode misi agar misi buatan guru (…-g12) dan misi Kumpulkan Barang (…-k1) boleh disimpan.
 do $$
 declare c text;
 begin
@@ -49,7 +49,7 @@ begin
     execute format('alter table public.nb_progres drop constraint %I', c);
   end loop;
   alter table public.nb_progres add constraint nb_progres_misi_check
-    check (misi ~ '^(ipa|ips|mat|ing|man)-[1-6]-([1-5]|g[0-9]{1,9})$');
+    check (misi ~ '^(ipa|ips|mat|ing|man)-[1-6]-([1-5]|g[0-9]{1,9}|k[1-9])$');
 end $$;
 
 -- Misi tambahan yang ditulis guru. Tiap (mapel, level) punya 10 slot (0-9) = 10 NPC emas di pulau misi guru.
@@ -75,13 +75,54 @@ create table if not exists public.nb_pengaturan (
 insert into public.nb_pengaturan (kunci, nilai) values ('pendaftaran', 'buka')
 on conflict (kunci) do nothing;
 
+-- Koleksi pemain (buku ikan & harta): {"i":{"mas":3,...},"h":{"koin":1,...}}. Hanya bisa naik, tidak turun.
+create table if not exists public.nb_koleksi (
+  username   text primary key references public.nb_siswa(username) on delete cascade,
+  data       jsonb not null default '{}'::jsonb
+             check (jsonb_typeof(data) = 'object' and char_length(data::text) <= 2000),
+  diperbarui timestamptz not null default now()
+);
+
+-- Prestasi (achievement) yang sudah diraih tiap pemain.
+create table if not exists public.nb_prestasi (
+  username text not null references public.nb_siswa(username) on delete cascade,
+  kode     text not null check (kode ~ '^[a-z0-9_]{3,24}$'),
+  waktu    timestamptz not null default now(),
+  primary key (username, kode)
+);
+
+-- Item langka yang berhasil didapat tiap pemain (per mapel).
+create table if not exists public.nb_langka (
+  username text not null references public.nb_siswa(username) on delete cascade,
+  mapel    text not null check (mapel in ('ipa','ips','mat','ing','man')),
+  jumlah   integer not null default 1 check (jumlah >= 1),
+  pertama  timestamptz not null default now(),
+  terakhir timestamptz not null default now(),
+  primary key (username, mapel)
+);
+
+-- Pengumuman untuk SEMUA pemain ("Budi mendapatkan Kristal Kehidupan!"). Hanya 200 terakhir yang disimpan.
+create table if not exists public.nb_umum (
+  id     bigint generated always as identity primary key,
+  jenis  text not null check (jenis in ('langka','legenda')),
+  mapel  text not null default '' check (mapel in ('','ipa','ips','mat','ing','man')),
+  nama   text not null check (char_length(nama) between 1 and 30),
+  level  smallint not null check (level between 1 and 6),
+  dibuat timestamptz not null default now()
+);
+
 -- ---------- Keamanan tabel ----------
 -- Tabel tidak bisa dibaca/ditulis langsung dari browser; semua lewat fungsi di bawah.
 alter table public.nb_siswa      enable row level security;
 alter table public.nb_progres    enable row level security;
 alter table public.nb_pengaturan enable row level security;
 alter table public.nb_misi_guru  enable row level security;
-revoke all on table public.nb_siswa, public.nb_progres, public.nb_pengaturan, public.nb_misi_guru from anon, authenticated;
+alter table public.nb_koleksi    enable row level security;
+alter table public.nb_prestasi   enable row level security;
+alter table public.nb_langka     enable row level security;
+alter table public.nb_umum       enable row level security;
+revoke all on table public.nb_siswa, public.nb_progres, public.nb_pengaturan, public.nb_misi_guru,
+                    public.nb_koleksi, public.nb_prestasi, public.nb_langka, public.nb_umum from anon, authenticated;
 
 -- ---------- Fungsi pembantu (tidak bisa dipanggil dari browser) ----------
 -- Memeriksa username + PIN. Salah PIN 5 kali -> akun dikunci 5 menit.
@@ -219,7 +260,7 @@ declare
   v jsonb := public.nb_verifikasi(p_username, p_pin);
 begin
   if not (v ->> 'ok')::boolean then return v; end if;
-  if p_misi is null or p_misi !~ '^(ipa|ips|mat|ing|man)-[1-6]-([1-5]|g[0-9]{1,9})$' then
+  if p_misi is null or p_misi !~ '^(ipa|ips|mat|ing|man)-[1-6]-([1-5]|g[0-9]{1,9}|k[1-9])$' then
     return jsonb_build_object('ok', false, 'pesan', 'Kode misi tidak dikenal.');
   end if;
   if p_bintang is null or p_bintang not between 1 and 3 then
@@ -228,6 +269,7 @@ begin
   if split_part(p_misi, '-', 2)::int > (v ->> 'kelas')::int then
     return jsonb_build_object('ok', false, 'pesan', 'Misi ini belum untuk levelmu.');
   end if;
+  -- (Misi Kumpulkan Barang berkode …-k1 hanya bonus; tidak dihitung untuk naik level.)
   -- Misi buatan guru: harus masih ada, aktif, dan cocok dengan mapel + level pada kodenya.
   if split_part(p_misi, '-', 3) like 'g%' then
     if not exists (select 1 from public.nb_misi_guru g
@@ -585,6 +627,188 @@ begin
 end;
 $$;
 
+-- ---------- Koleksi, prestasi, item langka, pengumuman ----------
+-- Mengambil koleksi + jumlah item langka + daftar prestasi milik pemain.
+create or replace function public.nb_koleksi_ambil(p_username text, p_pin text)
+returns jsonb
+language plpgsql security definer set search_path = public, extensions
+as $$
+declare
+  v jsonb := public.nb_verifikasi(p_username, p_pin);
+  v_u text;
+begin
+  if not (v ->> 'ok')::boolean then return v; end if;
+  v_u := v ->> 'username';
+  return jsonb_build_object('ok', true,
+    'data', coalesce((select k.data from public.nb_koleksi k where k.username = v_u), '{}'::jsonb),
+    'langka', coalesce((select jsonb_object_agg(l.mapel, l.jumlah) from public.nb_langka l where l.username = v_u), '{}'::jsonb),
+    'prestasi', coalesce((select jsonb_agg(p.kode order by p.waktu) from public.nb_prestasi p where p.username = v_u), '[]'::jsonb));
+end;
+$$;
+
+-- Menyimpan koleksi. Angka tiap jenis hanya boleh naik (diambil yang terbesar dari data lama dan baru).
+create or replace function public.nb_koleksi_simpan(p_username text, p_pin text, p_data jsonb)
+returns jsonb
+language plpgsql security definer set search_path = public, extensions
+as $$
+declare
+  v jsonb := public.nb_verifikasi(p_username, p_pin);
+  v_u text;
+  v_lama jsonb;
+  v_g text;
+  v_in jsonb;
+  v_old jsonb;
+  v_gab jsonb;
+  v_hasil jsonb := '{}'::jsonb;
+begin
+  if not (v ->> 'ok')::boolean then return v; end if;
+  v_u := v ->> 'username';
+  if p_data is null or jsonb_typeof(p_data) <> 'object' or char_length(p_data::text) > 2000 then
+    return jsonb_build_object('ok', false, 'pesan', 'Data koleksi tidak valid.');
+  end if;
+  select k.data into v_lama from public.nb_koleksi k where k.username = v_u;
+  v_lama := coalesce(v_lama, '{}'::jsonb);
+
+  foreach v_g in array array['i', 'h'] loop
+    v_in := coalesce(p_data -> v_g, '{}'::jsonb);
+    if jsonb_typeof(v_in) <> 'object' then
+      return jsonb_build_object('ok', false, 'pesan', 'Data koleksi tidak valid.');
+    end if;
+    if (select count(*) from jsonb_object_keys(v_in)) > 30
+       or exists (select 1 from jsonb_each(v_in) e
+                   where e.key !~ '^[a-z0-9_]{1,16}$'
+                      or jsonb_typeof(e.value) <> 'number'
+                      or e.value::text !~ '^[0-9]{1,5}$') then
+      return jsonb_build_object('ok', false, 'pesan', 'Data koleksi tidak valid.');
+    end if;
+    v_old := coalesce(v_lama -> v_g, '{}'::jsonb);
+    select coalesce(jsonb_object_agg(x.k, x.mx), '{}'::jsonb) into v_gab
+      from (select t.k, max(t.n) as mx
+              from (select e.key as k, (e.value::text)::bigint as n from jsonb_each(v_in) e
+                    union all
+                    select e.key, (e.value::text)::bigint from jsonb_each(v_old) e) t
+             group by t.k) x;
+    v_hasil := v_hasil || jsonb_build_object(v_g, v_gab);
+  end loop;
+
+  if char_length(v_hasil::text) > 2000 then
+    return jsonb_build_object('ok', false, 'pesan', 'Koleksi terlalu besar.');
+  end if;
+  insert into public.nb_koleksi (username, data) values (v_u, v_hasil)
+  on conflict (username) do update set data = excluded.data, diperbarui = now();
+  return jsonb_build_object('ok', true, 'data', v_hasil);
+end;
+$$;
+
+-- Mencatat prestasi biasa (dihitung di game). Prestasi item langka tidak bisa dicatat lewat sini.
+create or replace function public.nb_prestasi_catat(p_username text, p_pin text, p_kode text)
+returns jsonb
+language plpgsql security definer set search_path = public, extensions
+as $$
+declare
+  v jsonb := public.nb_verifikasi(p_username, p_pin);
+  v_u text;
+  v_baru boolean := false;
+begin
+  if not (v ->> 'ok')::boolean then return v; end if;
+  v_u := v ->> 'username';
+  if p_kode is null or p_kode !~ '^[a-z0-9_]{3,24}$' or p_kode ~ '^(langka_|legenda)' then
+    return jsonb_build_object('ok', false, 'pesan', 'Kode prestasi tidak valid.');
+  end if;
+  if (select count(*) from public.nb_prestasi p where p.username = v_u) < 60 then
+    insert into public.nb_prestasi (username, kode) values (v_u, p_kode) on conflict do nothing;
+    v_baru := found;
+  end if;
+  return jsonb_build_object('ok', true, 'baru', v_baru);
+end;
+$$;
+
+-- Pemain menyelesaikan Tantangan Legendaris: item langka masuk, pengumuman dikirim ke semua pemain.
+create or replace function public.nb_langka_dapat(p_username text, p_pin text, p_mapel text)
+returns jsonb
+language plpgsql security definer set search_path = public, extensions
+as $$
+declare
+  v jsonb := public.nb_verifikasi(p_username, p_pin);
+  v_u text;
+  v_terakhir timestamptz;
+  v_jumlah int;
+  v_baru jsonb := '[]'::jsonb;
+  v_legenda boolean := false;
+  v_kode text;
+  v_maks bigint;
+begin
+  if not (v ->> 'ok')::boolean then return v; end if;
+  v_u := v ->> 'username';
+  if p_mapel is null or p_mapel not in ('ipa', 'ips', 'mat', 'ing', 'man') then
+    return jsonb_build_object('ok', false, 'pesan', 'Item tidak dikenal.');
+  end if;
+  select max(l.terakhir) into v_terakhir from public.nb_langka l where l.username = v_u;
+  if v_terakhir is not null and v_terakhir > now() - interval '60 seconds' then
+    return jsonb_build_object('ok', false, 'pesan', 'Tunggu sebentar sebelum tantangan berikutnya.');
+  end if;
+
+  insert into public.nb_langka (username, mapel) values (v_u, p_mapel)
+  on conflict (username, mapel) do update set jumlah = public.nb_langka.jumlah + 1, terakhir = now()
+  returning jumlah into v_jumlah;
+
+  v_kode := 'langka_' || p_mapel;
+  insert into public.nb_prestasi (username, kode) values (v_u, v_kode) on conflict do nothing;
+  if found then v_baru := v_baru || to_jsonb(v_kode); end if;
+
+  insert into public.nb_umum (jenis, mapel, nama, level)
+  values ('langka', p_mapel, v ->> 'nama', (v ->> 'kelas')::int);
+
+  if (select count(*) from public.nb_langka l where l.username = v_u) >= 5 then
+    insert into public.nb_prestasi (username, kode) values (v_u, 'legenda') on conflict do nothing;
+    if found then
+      v_legenda := true;
+      v_baru := v_baru || to_jsonb('legenda'::text);
+      insert into public.nb_umum (jenis, mapel, nama, level)
+      values ('legenda', '', v ->> 'nama', (v ->> 'kelas')::int);
+    end if;
+  end if;
+
+  select max(u.id) into v_maks from public.nb_umum u;
+  delete from public.nb_umum u where u.id <= v_maks - 200;
+  update public.nb_siswa set terakhir = now() where username = v_u;
+  return jsonb_build_object('ok', true, 'jumlah', v_jumlah, 'legenda', v_legenda, 'prestasi', v_baru);
+end;
+$$;
+
+-- Dibaca SEMUA pemain tiap ~20 detik: pengumuman baru ("... mendapatkan item langka!").
+--   p_sejak = -1 -> hanya minta penanda terakhir (tanpa berita) saat pertama masuk
+--   p_sejak =  0 -> 20 berita terakhir (untuk tab Berita)
+--   p_sejak >  0 -> berita yang lebih baru dari id itu (maksimal 15)
+create or replace function public.nb_umum_baru(p_sejak bigint)
+returns jsonb
+language plpgsql stable security definer set search_path = public, extensions
+as $$
+declare
+  v_maks bigint;
+  v_rows jsonb;
+  v_akhir bigint;
+begin
+  select coalesce(max(u.id), 0) into v_maks from public.nb_umum u;
+  if p_sejak is null or p_sejak < 0 then
+    return jsonb_build_object('ok', true, 'terakhir', v_maks, 'berita', '[]'::jsonb);
+  end if;
+  if p_sejak = 0 then
+    select coalesce(jsonb_agg(jsonb_build_object('id', t.id, 'jenis', t.jenis, 'mapel', t.mapel, 'nama', t.nama,
+             'level', t.level, 'waktu', (extract(epoch from t.dibuat) * 1000)::bigint) order by t.id), '[]'::jsonb)
+      into v_rows
+      from (select * from public.nb_umum u order by u.id desc limit 20) t;
+  else
+    select coalesce(jsonb_agg(jsonb_build_object('id', t.id, 'jenis', t.jenis, 'mapel', t.mapel, 'nama', t.nama,
+             'level', t.level, 'waktu', (extract(epoch from t.dibuat) * 1000)::bigint) order by t.id), '[]'::jsonb)
+      into v_rows
+      from (select * from public.nb_umum u where u.id > p_sejak order by u.id asc limit 15) t;
+  end if;
+  select coalesce(max((r ->> 'id')::bigint), v_maks) into v_akhir from jsonb_array_elements(v_rows) r;
+  return jsonb_build_object('ok', true, 'terakhir', v_akhir, 'berita', v_rows);
+end;
+$$;
+
 -- ---------- Izin: hanya fungsi game yang boleh dipanggil dari browser ----------
 revoke all on function public.nb_norm_soal(jsonb)                from public, anon, authenticated;
 revoke all on function public.nb_misi_simpan_inti(bigint, jsonb) from public, anon, authenticated;
@@ -616,6 +840,18 @@ grant execute on function public.nb_misi_daftar(integer)                       t
 grant execute on function public.nb_guru_misi_daftar(text)                     to anon, authenticated;
 grant execute on function public.nb_guru_misi_simpan(text, bigint, jsonb)      to anon, authenticated;
 grant execute on function public.nb_guru_misi_hapus(text, bigint)              to anon, authenticated;
+
+revoke all on function public.nb_koleksi_ambil(text, text)            from public;
+revoke all on function public.nb_koleksi_simpan(text, text, jsonb)    from public;
+revoke all on function public.nb_prestasi_catat(text, text, text)    from public;
+revoke all on function public.nb_langka_dapat(text, text, text)       from public;
+revoke all on function public.nb_umum_baru(bigint)                    from public;
+
+grant execute on function public.nb_koleksi_ambil(text, text)         to anon, authenticated;
+grant execute on function public.nb_koleksi_simpan(text, text, jsonb) to anon, authenticated;
+grant execute on function public.nb_prestasi_catat(text, text, text)  to anon, authenticated;
+grant execute on function public.nb_langka_dapat(text, text, text)    to anon, authenticated;
+grant execute on function public.nb_umum_baru(bigint)                 to anon, authenticated;
 
 -- Minta Supabase membaca ulang daftar fungsi agar langsung bisa dipanggil game.
 notify pgrst, 'reload schema';
