@@ -1,0 +1,1679 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Penjaga Kode Nusantara</title>
+<meta name="description" content="Game petualangan belajar coding untuk siswa SD kelas 1 sampai 6.">
+<meta name="theme-color" content="#1a2160">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--nila:#1a2160;--nila2:#252d7c;--nila3:#0e1340;--kunyit:#ffc233;--kunyit2:#b88100;--kertas:#f5f7ff;--tinta:#1b2154;--daun:#14a06a;--bara:#e5484d;--accent:#ffc233;--ground:#eaf3c9;
+ --batik:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72'%3E%3Cg fill='none' stroke='%23ffffff' stroke-opacity='.07' stroke-width='1.6'%3E%3Cellipse cx='36' cy='18' rx='9' ry='18'/%3E%3Cellipse cx='36' cy='54' rx='9' ry='18'/%3E%3Cellipse cx='18' cy='36' rx='18' ry='9'/%3E%3Cellipse cx='54' cy='36' rx='18' ry='9'/%3E%3C/g%3E%3C/svg%3E")}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;font-family:'Fredoka','Trebuchet MS',ui-rounded,'Segoe UI',system-ui,sans-serif;font-size:17px;line-height:1.45;color:#fff;background:var(--nila) var(--batik);min-height:100vh;touch-action:manipulation}
+button,input,select,textarea{font:inherit}
+h1,h2,h3{line-height:1.15;margin:0 0 .4em}
+h1{font-size:1.9rem}h2{font-size:1.35rem}h3{font-size:1.15rem}
+p{margin:0 0 .7em}
+:focus-visible{outline:3px solid #fff;outline-offset:2px}
+.screen{min-height:100vh;padding-bottom:40px}
+.wrap{max-width:1000px;margin:0 auto;padding:14px}
+.wrap.narrow{max-width:460px}
+.muted{color:rgba(255,255,255,.72)}.card .muted{color:#5b6290}
+.small{font-size:.9rem}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:10px 0}
+.center{text-align:center}.center .row{justify-content:center}
+
+/* tombol */
+.btn{border:0;border-radius:14px;padding:11px 18px;min-height:46px;font-weight:600;background:var(--kunyit);color:#2b1d00;box-shadow:0 4px 0 var(--kunyit2);cursor:pointer;transition:transform .06s,box-shadow .06s}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--kunyit2)}
+.btn:disabled{opacity:.55;cursor:default}
+.btn.sec{background:#e4e9ff;color:var(--tinta);box-shadow:0 4px 0 #8f9ce0}
+.btn.sec:active{box-shadow:0 1px 0 #8f9ce0}
+.btn.sec.on{background:var(--daun);color:#fff;box-shadow:0 4px 0 #0b6c46}
+.btn.ghost{background:transparent;color:#fff;box-shadow:none;border:2px solid rgba(255,255,255,.35)}
+.btn.ghost.dark{color:var(--tinta);border-color:#b8c0ee}
+.btn.small{min-height:38px;padding:6px 12px;font-size:.92rem}
+.btn.wide{width:100%;margin-top:8px}
+.link{background:none;border:0;color:#cfd6ff;text-decoration:underline;cursor:pointer;padding:6px}
+.card .link{color:#4452b8}
+.card{background:var(--kertas);color:var(--tinta);border-radius:20px;padding:18px;box-shadow:0 6px 0 var(--nila3)}
+
+/* topbar */
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;background:rgba(10,14,60,.55);position:sticky;top:0;z-index:5;backdrop-filter:blur(6px)}
+.who-me{display:flex;align-items:center;gap:10px}
+.who-me b{display:block}.who-me span:not(.me-av){display:block;font-size:.85rem;opacity:.8}
+.me-av{font-size:1.8rem;background:rgba(255,255,255,.12);border-radius:50%;width:46px;height:46px;display:grid;place-items:center}
+.top-r{display:flex;gap:8px;align-items:center}
+.total{font-weight:700;color:var(--kunyit);font-size:1.1rem}
+.mtitle{flex:1;min-width:0;text-align:center}.mtitle b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.mtitle span{font-size:.82rem;opacity:.8}
+
+/* masuk */
+.brand{text-align:center;padding:18px 0 8px}
+.brand-kodi{font-size:5rem;filter:drop-shadow(0 6px 0 rgba(0,0,0,.25));animation:float 3.2s ease-in-out infinite}
+.brand p{opacity:.85;margin:0}
+.form{display:flex;flex-direction:column;gap:12px}
+.form label{display:flex;flex-direction:column;gap:4px;font-weight:600}
+.form small{font-weight:400;color:#5b6290}
+.form input,.form select,.modal input,.modal select{border:3px solid #b8c0ee;border-radius:12px;padding:10px 12px;min-height:46px;background:#fff;color:var(--tinta)}
+.form input:focus,.modal input:focus{border-color:var(--nila2);outline:none}
+fieldset{border:0;padding:0;margin:0}legend{font-weight:600;margin-bottom:6px}
+.avatars{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+.av input{position:absolute;opacity:0;pointer-events:none}
+.av span{display:grid;place-items:center;font-size:1.7rem;height:52px;border-radius:14px;background:#e4e9ff;border:3px solid transparent;cursor:pointer}
+.av input:checked+span{border-color:var(--nila2);background:#fff;transform:scale(1.06)}
+.av input:focus-visible+span{outline:3px solid var(--nila2)}
+.msg{min-height:1.4em;font-size:.95rem}
+.form .msg{color:var(--bara);font-weight:600}
+.msg.bad{background:#ffe3e3;color:#8a1c1c;padding:10px 12px;border-radius:12px;font-weight:600}
+.msg.ok{background:#dcf7ea;color:#0b6c46;padding:10px 12px;border-radius:12px;font-weight:600}
+.msg.hint{background:#fff3cf;color:#6b4a00;padding:10px 12px;border-radius:12px}
+.foot{text-align:center}
+.notice{background:rgba(255,194,51,.16);border:2px dashed rgba(255,194,51,.6);border-radius:14px;padding:10px 12px;font-size:.92rem}
+
+/* peta utama */
+.hero{display:flex;gap:18px;align-items:center;padding:12px 4px 18px;flex-wrap:wrap}
+.hero-crystal{flex:0 0 auto;animation:float 4s ease-in-out infinite}
+.hero-text{flex:1;min-width:240px}
+.crystal .shard.on{filter:drop-shadow(0 0 6px rgba(255,255,255,.55))}
+.bar{height:12px;background:rgba(255,255,255,.16);border-radius:99px;overflow:hidden;margin:8px 0 12px}
+.bar i{display:block;height:100%;background:var(--kunyit);border-radius:99px}
+.bar.sm{height:9px;background:rgba(27,33,84,.14);margin:8px 0 6px}
+.worlds{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:16px}
+.wcard{background:var(--kertas);color:var(--tinta);border-radius:20px;overflow:hidden;box-shadow:0 6px 0 var(--nila3)}
+.wcard.locked{filter:grayscale(.85);opacity:.75}
+.wband{background:var(--accent);display:flex;justify-content:space-between;align-items:center;padding:10px 16px;color:#fff;font-weight:700}
+.wemoji{font-size:2.4rem;filter:drop-shadow(0 3px 0 rgba(0,0,0,.2))}
+.wbody{padding:14px 16px 16px}
+.wbody p{margin:0 0 4px;color:#5b6290}
+.tier{font-size:.85rem;font-weight:700;padding:3px 10px;border-radius:99px}
+.t-emas{background:#ffe9a8;color:#6b4a00}.t-perak{background:#e1e6f7;color:#38406e}.t-perunggu{background:#f6d2b5;color:#693a14}
+
+/* dunia */
+.wtitle{display:flex;gap:12px;align-items:center;margin:6px 0 4px}
+.wtitle h1{margin:0}.wtitle p{margin:0;opacity:.85}
+.chap{margin:22px 0}
+.chap h2{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.badge{font-size:.8rem;background:var(--daun);padding:2px 10px;border-radius:99px}
+.nodes{display:flex;flex-wrap:wrap;gap:clamp(8px,2.4vw,14px);margin-top:10px}
+.node{width:clamp(54px,16vw,74px);height:clamp(54px,16vw,74px);padding:0;border-radius:50%;border:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;background:rgba(255,255,255,.12);color:#fff;font-size:1.2rem;cursor:pointer;box-shadow:0 5px 0 rgba(0,0,0,.25)}
+.node b{font-size:1.15rem;line-height:1.1}
+.node .stars{font-size:.7rem;letter-spacing:-1px}
+.node.open{background:#fff;color:var(--tinta);animation:pulse 1.8s infinite}
+.node.done{background:var(--accent);color:#fff}
+.node.lock{opacity:.5;cursor:default}
+.node.open .star{color:#c9cdea}.node .star.on{color:var(--kunyit)}
+.node.done .star{color:rgba(255,255,255,.55)}.node.done .star.on{color:#fff}
+.stars{display:inline-flex;gap:1px}
+.star{color:rgba(255,255,255,.28)}.star.on{color:var(--kunyit)}
+.stars.big{font-size:2.6rem;margin:6px 0}
+.stars.big .star.on{animation:starpop .5s both}
+.stars.big .star:nth-child(2).on{animation-delay:.12s}.stars.big .star:nth-child(3).on{animation-delay:.24s}
+.card .star{color:#cfd4ee}.card .star.on{color:#f5a800}
+
+/* cerita */
+.cut{display:flex;flex-direction:column;background:linear-gradient(170deg,var(--accent),var(--nila) 70%);cursor:pointer}
+.cut-top{padding:12px;text-align:right}
+.cut-stage{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:16px;padding:10px 18px;max-width:640px;margin:0 auto;width:100%}
+.speaker{font-size:7rem;animation:float 3s ease-in-out infinite;filter:drop-shadow(0 8px 0 rgba(0,0,0,.25))}
+.talk{width:100%;font-size:1.2rem;position:relative}
+.talk .who{font-weight:700;color:var(--nila2);margin-bottom:4px}
+.talk p{margin:0}
+.cut-bottom{display:flex;justify-content:space-between;align-items:center;padding:16px 18px;max-width:640px;margin:0 auto;width:100%}
+.dots{display:flex;gap:7px}.dots i{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.35)}.dots i.on{background:#fff;transform:scale(1.3)}
+.ending h1{margin-top:6px}.big-emoji{font-size:4.5rem}
+.endlist{list-style:none;padding:0;margin:8px 0 14px;text-align:left}
+.endlist li{padding:8px 12px;border-radius:12px;margin:6px 0;background:#e9edff}
+.endlist li.now{background:#ffe9a8;outline:3px solid var(--kunyit)}
+.endlist small{display:block;color:#5b6290;margin-left:2rem}
+
+/* misi */
+.bubble{display:flex;gap:12px;align-items:flex-start;background:#fff;color:var(--tinta);border-radius:18px;padding:12px 14px;box-shadow:0 5px 0 var(--nila3);margin:6px 0 14px}
+.bub-e{font-size:2.2rem;line-height:1}.bubble p{margin:2px 0 0}
+.play{display:grid;gap:16px}
+.play.split{grid-template-columns:1fr}
+@media(min-width:840px){.play.split{grid-template-columns:minmax(300px,460px) 1fr;align-items:start}}
+.left.wide{max-width:680px;margin:0 auto;width:100%}
+.goal{margin:0 0 8px;font-weight:600}
+.q{font-size:1.2rem;font-weight:600}
+.board{position:relative;display:grid;grid-template-columns:repeat(var(--cols),1fr);aspect-ratio:var(--cols)/var(--rows);width:100%;max-width:calc(var(--cols)*72px);margin:0 auto;background:var(--ground);border:5px solid var(--nila3);border-radius:16px;container-type:inline-size;overflow:hidden}
+.cell{display:flex;align-items:center;justify-content:center;position:relative;border:1px solid rgba(0,0,0,.09);font-size:clamp(20px,6vw,38px);font-size:calc(100cqw/var(--cols)*.58)}
+.cell.goal{background:rgba(255,194,51,.35)}
+.coin{display:inline-block;animation:bob 1.6s ease-in-out infinite}.coin.got{opacity:0;transform:scale(.2);transition:all .25s}
+.mark{display:grid;place-items:center;width:62%;height:62%;border-radius:50%;background:var(--nila2);color:#fff;font-weight:700;font-size:.62em}
+.boom{position:absolute;inset:0;display:grid;place-items:center;animation:starpop .35s both}
+.kodi{position:absolute;left:calc(var(--c)*100%/var(--cols));top:calc(var(--r)*100%/var(--rows));width:calc(100%/var(--cols));height:calc(100%/var(--rows));display:flex;align-items:center;justify-content:center;transition:left .3s,top .3s;font-size:calc(100cqw/var(--cols)*.62);z-index:2;pointer-events:none}
+.kodi-e{filter:drop-shadow(0 3px 0 rgba(0,0,0,.25))}
+.dirb{position:absolute;right:2%;bottom:2%;width:34%;height:34%;border-radius:50%;background:var(--nila2);color:#fff;font-size:calc(100cqw/var(--cols)*.2);display:grid;place-items:center;transition:transform .25s}
+.kodi.bump{animation:bump .4s}
+.palette{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.pal{border:0;border-radius:14px;min-height:50px;padding:6px 12px;display:flex;align-items:center;gap:6px;font-weight:600;color:#fff;cursor:pointer;box-shadow:0 4px 0 rgba(0,0,0,.28)}
+.pal:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(0,0,0,.28)}
+.pi{font-size:1.25rem}
+.c-go{background:#3b7bf0}.c-turn{background:#8a5cf0}
+.b-rep{background:#f0a020;color:#2b1d00}.b-if{background:#14a06a}.b-while{background:#e0457b}.b-fn{background:#0f8fa8}
+.pal.blockk{color:#fff}.pal.b-rep{color:#2b1d00}
+.progbox,.chips{background:rgba(10,14,60,.45);border-radius:16px;padding:10px;min-height:96px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;align-content:flex-start}
+.chip{border:0;border-radius:12px;width:48px;height:48px;font-size:1.4rem;color:#fff;cursor:pointer;box-shadow:0 3px 0 rgba(0,0,0,.28)}
+.chip.run,.blk.run{outline:4px solid #fff;transform:scale(1.06)}
+.empty{opacity:.7;font-size:.95rem;padding:4px}
+.zone{border-radius:12px;min-height:44px;padding:4px}
+.zone.rootz{min-height:84px}
+.zone.on{outline:3px dashed var(--kunyit);background:rgba(255,194,51,.12)}
+.blk{display:flex;align-items:center;gap:8px;border-radius:12px;padding:8px 10px;margin:5px 0;color:#fff;font-weight:600;position:relative}
+.blk.c-go{background:#3b7bf0}.blk.c-turn{background:#8a5cf0}
+.blk.cont{display:block;padding:6px 8px}
+.blk.cont.b-rep{color:#2b1d00}
+.bh{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:2px 2px 4px;position:relative}
+.bh.sub{border-top:2px solid rgba(255,255,255,.35);margin-top:6px;padding-top:6px}
+.x{margin-left:auto;border:0;background:rgba(0,0,0,.22);color:#fff;width:32px;height:32px;border-radius:9px;cursor:pointer}
+.stepper{display:inline-flex;align-items:center;gap:6px;background:rgba(0,0,0,.18);padding:2px 6px;border-radius:10px}
+.stepper button{border:0;width:30px;height:30px;border-radius:8px;background:#fff;color:var(--tinta);font-weight:700;cursor:pointer}
+.cond{border:0;border-radius:10px;padding:6px 8px;min-height:36px;background:#fff;color:var(--tinta);font-weight:600;max-width:100%}
+.zone.inner{background:rgba(0,0,0,.14);margin:2px 0 2px 12px;border-left:6px solid rgba(255,255,255,.4)}
+.code{width:100%;font-family:ui-monospace,Menlo,Consolas,'Courier New',monospace;font-size:1rem;line-height:1.55;background:var(--nila3);color:#eaeeff;border:3px solid #3b46a8;border-radius:14px;padding:12px;resize:vertical;min-height:210px;tab-size:2}
+.ctrl{margin-top:10px}
+.codeblock{background:var(--nila3);color:#eaeeff;border-radius:14px;padding:12px 14px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:1rem;overflow:auto;margin:0 0 12px;white-space:pre}
+.lines{display:flex;flex-direction:column;gap:4px;margin:8px 0}
+.codeline{display:flex;gap:10px;align-items:center;text-align:left;border:3px solid transparent;border-radius:10px;background:var(--nila3);color:#eaeeff;padding:6px 10px;cursor:pointer;min-height:40px}
+.codeline .ln{opacity:.5;width:1.6em;text-align:right;font-family:ui-monospace,monospace}
+.codeline code{font-family:ui-monospace,Menlo,Consolas,monospace;white-space:pre}
+.codeline.wrong{border-color:var(--bara);animation:shake .3s}.codeline.right{border-color:var(--daun);background:#0b4d36}
+.opts{display:flex;flex-wrap:wrap;gap:12px;margin:12px 0}
+.opts.col{flex-direction:column}.opts.col .opt{text-align:left}
+.opt{font-size:1.1rem;min-width:64px}
+.opt.wrong{background:#ffd5d5;color:#8a1c1c;box-shadow:0 4px 0 #d98c8c;animation:shake .3s}
+.opt.right{background:#c9f2de;color:#0b6c46;box-shadow:0 4px 0 #58b590}
+.seq{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0;font-size:2rem}
+.tok{min-width:52px;height:56px;border-radius:14px;background:#fff;color:var(--tinta);display:grid;place-items:center;padding:0 8px;box-shadow:0 4px 0 var(--nila3);font-weight:700}
+.tok.blank{background:#ffe9a8;border:3px dashed #b88100}.tok.blank.ok{background:#c9f2de;border:0}
+.slots{list-style:none;padding:0;margin:10px 0;display:flex;flex-direction:column;gap:8px}
+.pool{display:flex;flex-direction:column;gap:8px;margin:12px 0}
+.ord{display:flex;align-items:center;gap:10px;width:100%;text-align:left;border:0;border-radius:14px;padding:10px 12px;min-height:50px;font-weight:600;color:var(--tinta)}
+.ord b{display:grid;place-items:center;min-width:30px;height:30px;border-radius:50%;background:var(--nila2);color:#fff}
+.ord.empty{background:rgba(255,255,255,.12);color:rgba(255,255,255,.6);border:2px dashed rgba(255,255,255,.35)}
+.ord.filled{background:#fff;cursor:pointer;box-shadow:0 4px 0 var(--nila3)}
+.ord.filled.ok{background:#c9f2de}.ord.filled.no{background:#ffd5d5}
+.ord.pick{background:var(--kunyit);cursor:pointer;box-shadow:0 4px 0 var(--kunyit2)}
+
+/* modal, toast, tabel */
+.overlay{position:fixed;inset:0;background:rgba(8,11,45,.78);display:grid;place-items:center;padding:16px;z-index:50;overflow:auto}
+.modal{width:100%;max-width:440px;animation:rise .25s both}
+.modal .note{background:#ffe9a8;color:#6b4a00;border-radius:12px;padding:8px 10px;font-weight:600}
+.modal .row{justify-content:center}.modal label{display:flex;flex-direction:column;gap:4px;font-weight:600}
+.pop{animation:starpop .5s both}
+.toast{position:fixed;left:50%;bottom:18px;transform:translate(-50%,30px);background:#fff;color:var(--tinta);padding:10px 16px;border-radius:14px;box-shadow:0 5px 0 var(--nila3);opacity:0;transition:all .25s;z-index:60;max-width:90vw;text-align:center;pointer-events:none}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+.tablecard{overflow:hidden}
+.tscroll{overflow:auto}
+table{border-collapse:collapse;width:100%;min-width:640px}
+th,td{padding:8px 10px;text-align:left;border-bottom:2px solid #e1e5f8}
+th{color:#4452b8}
+.acts{display:flex;gap:6px}
+
+@keyframes float{50%{transform:translateY(-8px)}}
+@keyframes pulse{0%{box-shadow:0 5px 0 rgba(0,0,0,.25),0 0 0 0 rgba(255,255,255,.55)}70%{box-shadow:0 5px 0 rgba(0,0,0,.25),0 0 0 14px rgba(255,255,255,0)}100%{box-shadow:0 5px 0 rgba(0,0,0,.25),0 0 0 0 rgba(255,255,255,0)}}
+@keyframes starpop{0%{transform:scale(.2) rotate(-25deg);opacity:0}70%{transform:scale(1.25) rotate(6deg)}100%{transform:scale(1) rotate(0);opacity:1}}
+@keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+@keyframes bump{30%{transform:translate(6px,0)}60%{transform:translate(-3px,0)}}
+@keyframes bob{50%{transform:translateY(-4px)}}
+@keyframes rise{from{transform:translateY(18px);opacity:0}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+@media(max-width:520px){h1{font-size:1.6rem}.speaker{font-size:5.5rem}}
+
+</style>
+</head>
+<body>
+<div id="app"><p style="padding:24px">Memuat petualangan...</p></div>
+<noscript><p style="padding:24px">Game ini membutuhkan JavaScript.</p></noscript>
+<script src="config.js"></script>
+<script>
+/* Pengaturan Supabase ada di config.js (satu folder dengan index.html).
+   Tanpa config.js atau dengan nilai kosong, game berjalan dalam mode coba (data di perangkat saja). */
+const CONFIG = Object.assign({ SUPABASE_URL: '', SUPABASE_ANON_KEY: '', KODE_GURU_DEMO: 'guru' }, window.KG_CONFIG || {});
+</script>
+<script>
+/* ===== engine.js ===== */
+/* ===== MESIN KODE (interpreter, parser, solver) ===== */
+(function (root) {
+  'use strict';
+  const DV = { N: [-1, 0], E: [0, 1], S: [1, 0], W: [0, -1] };
+  const RIGHT = { N: 'E', E: 'S', S: 'W', W: 'N' };
+  const LEFT = { N: 'W', W: 'S', S: 'E', E: 'N' };
+  const ABS = { atas: 'N', bawah: 'S', kiri: 'W', kanan: 'E' };
+  const REL = ['maju', 'belok_kiri', 'belok_kanan'];
+  const CONDS = ['depan_kosong', 'depan_rintangan', 'kiri_kosong', 'kanan_kosong', 'di_tujuan'];
+  const LIMIT_OPS = 4000, LIMIT_ACTIONS = 400;
+
+  function cmdsFor(style) { return style === 'abs' ? Object.keys(ABS) : REL.slice(); }
+
+  function parseMap(map) {
+    const rows = map.length, cols = map[0].length;
+    const cells = [], coins = [], marks = {};
+    let start = null, goal = null;
+    for (let r = 0; r < rows; r++) {
+      if (map[r].length !== cols) throw new Error('Peta tidak rata di baris ' + r);
+      cells.push([]);
+      for (let c = 0; c < cols; c++) {
+        const ch = map[r][c];
+        if (ch === 'S') { start = { r, c }; cells[r].push('.'); }
+        else if (ch === 'G') { goal = { r, c }; cells[r].push('.'); }
+        else if (ch === '*') { coins.push({ r, c }); cells[r].push('.'); }
+        else if (ch === '#') cells[r].push('#');
+        else if (/[A-D]/.test(ch)) { marks[ch] = { r, c }; cells[r].push('.'); }
+        else cells[r].push('.');
+      }
+    }
+    return { rows, cols, cells, start, goal, coins, marks };
+  }
+
+  /* ---------- Parser teks ---------- */
+  function tokenize(src) {
+    const toks = [];
+    String(src).split('\n').forEach((ln, i) => {
+      ln = ln.replace(/\/\/.*$/, '').replace(/[();,]/g, ' ').replace(/\{/g, ' { ').replace(/\}/g, ' } ');
+      ln.toLowerCase().split(/\s+/).filter(Boolean).forEach(t => toks.push({ t, line: i + 1 }));
+    });
+    // gabungkan "belok kiri" -> belok_kiri
+    const out = [];
+    for (let i = 0; i < toks.length; i++) {
+      if (toks[i].t === 'belok' && toks[i + 1] && (toks[i + 1].t === 'kiri' || toks[i + 1].t === 'kanan')) {
+        out.push({ t: 'belok_' + toks[i + 1].t, line: toks[i].line }); i++;
+      } else if (toks[i].t === 'jika' && toks[i + 1] && toks[i + 1].t === 'tidak') {
+        out.push({ t: 'lain', line: toks[i].line }); i++;
+      } else out.push(toks[i]);
+    }
+    return out;
+  }
+
+  let UID = 1;
+  function parseProgram(src, style) {
+    const toks = tokenize(src); let p = 0;
+    const valid = cmdsFor(style);
+    const calls = []; const defs = {};
+    function fail(msg, tk) { const e = new Error(msg); e.line = tk ? tk.line : (toks.length ? toks[toks.length - 1].line : 1); throw e; }
+    function peek() { return toks[p]; }
+    function expect(t, what) {
+      const tk = toks[p];
+      if (!tk) fail('Kurang tanda ' + (what || t) + ' di akhir program.');
+      if (tk.t !== t) fail('Baris ' + tk.line + ': seharusnya ada ' + (what || t) + ', tetapi ada "' + tk.t + '".', tk);
+      p++; return tk;
+    }
+    function block() {
+      expect('{', 'tanda {');
+      const list = [];
+      while (p < toks.length && toks[p].t !== '}') list.push(stmt());
+      if (p >= toks.length) fail('Kurang tanda } untuk menutup blok.');
+      p++; return list;
+    }
+    function cond() {
+      let neg = false;
+      if (peek() && peek().t === 'bukan') { neg = true; p++; }
+      const tk = toks[p++];
+      if (!tk) fail('Kurang kondisi setelah jika/selama.');
+      if (CONDS.indexOf(tk.t) < 0) fail('Baris ' + tk.line + ': kondisi "' + tk.t + '" tidak dikenal. Pilih: ' + CONDS.join(', ') + '.', tk);
+      return { cond: tk.t, neg };
+    }
+    function stmt() {
+      const tk = toks[p++]; const w = tk.t;
+      if (w === 'ulangi') {
+        const nt = toks[p++];
+        if (!nt || !/^\d+$/.test(nt.t)) fail('Baris ' + tk.line + ': setelah "ulangi" harus ada angka, misalnya: ulangi 3 kali { ... }', tk);
+        const n = parseInt(nt.t, 10);
+        if (n < 1 || n > 99) fail('Baris ' + tk.line + ': jumlah ulangi harus 1 sampai 99.', tk);
+        if (peek() && peek().t === 'kali') p++;
+        return { id: UID++, op: 'rep', n, body: block(), line: tk.line };
+      }
+      if (w === 'jika') {
+        const c = cond(); const then = block(); let els = null;
+        if (peek() && peek().t === 'lain') { p++; els = block(); }
+        return { id: UID++, op: 'if', cond: c.cond, neg: c.neg, then, else: els, line: tk.line };
+      }
+      if (w === 'selama') {
+        const c = cond();
+        return { id: UID++, op: 'while', cond: c.cond, neg: c.neg, body: block(), line: tk.line };
+      }
+      if (w === 'fungsi') {
+        const nt = toks[p++];
+        if (!nt || !/^[a-z_][a-z0-9_]*$/.test(nt.t)) fail('Baris ' + tk.line + ': setelah "fungsi" harus ada nama, misalnya: fungsi lompat { ... }', tk);
+        if (valid.indexOf(nt.t) >= 0 || ['ulangi', 'jika', 'selama', 'lain', 'kali', 'fungsi', 'bukan'].indexOf(nt.t) >= 0) fail('Baris ' + tk.line + ': nama "' + nt.t + '" sudah dipakai, pilih nama lain.', tk);
+        const body = block(); defs[nt.t] = true;
+        return { id: UID++, op: 'def', name: nt.t, body, line: tk.line };
+      }
+      if (w === '{' || w === '}') fail('Baris ' + tk.line + ': tanda "' + w + '" tidak pada tempatnya.', tk);
+      if (valid.indexOf(w) >= 0) return { id: UID++, op: 'cmd', name: w, line: tk.line };
+      if (w === 'kali' || w === 'lain' || w === 'bukan') fail('Baris ' + tk.line + ': kata "' + w + '" tidak pada tempatnya.', tk);
+      if (ABS[w] && style !== 'abs') fail('Baris ' + tk.line + ': perintah "' + w + '" tidak ada di misi ini. Gunakan: ' + valid.join(', ') + '.', tk);
+      calls.push({ name: w, line: tk.line });
+      return { id: UID++, op: 'call', name: w, line: tk.line };
+    }
+    const prog = [];
+    while (p < toks.length) prog.push(stmt());
+    for (const c of calls) if (!defs[c.name]) { const e = new Error('Baris ' + c.line + ': perintah "' + c.name + '" tidak dikenal. Perintah yang ada: ' + valid.join(', ') + '.'); e.line = c.line; throw e; }
+    return prog;
+  }
+
+  /* ---------- Ukuran program & teks ---------- */
+  function sizeOf(list) {
+    let n = 0;
+    for (const x of list || []) {
+      n++;
+      if (x.op === 'rep' || x.op === 'while' || x.op === 'def') n += sizeOf(x.body);
+      if (x.op === 'if') n += sizeOf(x.then) + sizeOf(x.else);
+    }
+    return n;
+  }
+
+  function usesOps(list, set) {
+    set = set || new Set();
+    for (const x of list || []) {
+      set.add(x.op);
+      if (x.body) usesOps(x.body, set);
+      if (x.then) usesOps(x.then, set);
+      if (x.else) usesOps(x.else, set);
+    }
+    return set;
+  }
+
+  /* ---------- Interpreter ---------- */
+  // mission: {map, style, dir}. Mengembalikan {events, status, final, coinsLeft}
+  function run(mission, prog) {
+    const M = parseMap(mission.map);
+    const style = mission.style || 'rel';
+    let r = M.start.r, c = M.start.c, dir = mission.dir || 'E';
+    const got = new Set(); const events = [];
+    const defs = {};
+    let ops = 0, actions = 0, status = null, depth = 0;
+    const key = (a, b) => a + ',' + b;
+    function ahead() { const d = DV[dir]; return { r: r + d[0], c: c + d[1] }; }
+    function free(p) { return p.r >= 0 && p.c >= 0 && p.r < M.rows && p.c < M.cols && M.cells[p.r][p.c] !== '#'; }
+    function test(cd, neg) {
+      let v = false;
+      if (cd === 'depan_kosong') v = free(ahead());
+      else if (cd === 'depan_rintangan') v = !free(ahead());
+      else if (cd === 'kiri_kosong' || cd === 'kanan_kosong') { const d2 = DV[cd === 'kiri_kosong' ? LEFT[dir] : RIGHT[dir]]; v = free({ r: r + d2[0], c: c + d2[1] }); }
+      else if (cd === 'di_tujuan') v = !!M.goal && r === M.goal.r && c === M.goal.c;
+      return neg ? !v : v;
+    }
+    function emit(type, node) { events.push({ type, r, c, dir, node: node ? node.id : null, line: node ? node.line : null, got: got.size }); }
+    function act(name, node) {
+      if (++actions > LIMIT_ACTIONS) { status = 'limit'; return; }
+      let nd = null;
+      if (style === 'abs') { nd = { r: r + DV[ABS[name]][0], c: c + DV[ABS[name]][1] }; dir = ABS[name]; }
+      else if (name === 'maju') nd = ahead();
+      else if (name === 'belok_kiri') { dir = LEFT[dir]; emit('turn', node); return; }
+      else if (name === 'belok_kanan') { dir = RIGHT[dir]; emit('turn', node); return; }
+      if (!free(nd)) {
+        const out = nd.r < 0 || nd.c < 0 || nd.r >= M.rows || nd.c >= M.cols;
+        status = out ? 'crash_edge' : 'crash_block';
+        events.push({ type: 'crash', r, c, dir, tr: nd.r, tc: nd.c, node: node ? node.id : null, line: node ? node.line : null, got: got.size });
+        return;
+      }
+      r = nd.r; c = nd.c;
+      M.coins.forEach((q, i) => { if (q.r === r && q.c === c) got.add(i); });
+      emit('move', node);
+    }
+    function exec(list) {
+      for (const n of list) {
+        if (status) return;
+        if (++ops > LIMIT_OPS) { status = 'limit'; return; }
+        if (n.op === 'cmd') act(n.name, n);
+        else if (n.op === 'rep') { for (let i = 0; i < n.n && !status; i++) exec(n.body); }
+        else if (n.op === 'if') { if (test(n.cond, n.neg)) exec(n.then); else if (n.else) exec(n.else); }
+        else if (n.op === 'while') { let g = 0; while (!status && test(n.cond, n.neg)) { if (++g > 500) { status = 'limit'; break; } exec(n.body); if (n.body.length === 0) { status = 'limit'; break; } } }
+        else if (n.op === 'call') { if (++depth > 30) { status = 'limit'; depth--; return; } exec(defs[n.name] || []); depth--; }
+      }
+    }
+    (function collect(list) { for (const n of list) if (n.op === 'def') defs[n.name] = n.body; })(prog);
+    exec(prog.filter(n => n.op !== 'def'));
+    const atGoal = !!M.goal && r === M.goal.r && c === M.goal.c;
+    let letter = null;
+    for (const k in M.marks) if (M.marks[k].r === r && M.marks[k].c === c) letter = k;
+    if (!status) {
+      if (M.goal) {
+        if (!atGoal) status = 'not_at_goal';
+        else if (got.size < M.coins.length) status = 'missing_coins';
+        else status = 'win';
+      } else status = 'done';
+    }
+    return { events, status, final: { r, c, dir }, letter, coinsLeft: M.coins.length - got.size, size: sizeOf(prog), M };
+  }
+
+  /* ---------- Solver BFS untuk program datar ---------- */
+  function solveFlat(mission, maxDepth) {
+    const M = parseMap(mission.map); const style = mission.style || 'rel';
+    const cmds = cmdsFor(style); maxDepth = maxDepth || 40;
+    const full = (1 << M.coins.length) - 1;
+    const coinAt = {}; M.coins.forEach((q, i) => { coinAt[q.r + ',' + q.c] = i; });
+    const s0 = { r: M.start.r, c: M.start.c, d: mission.dir || 'E', m: 0, path: [] };
+    const seen = new Set([s0.r + ',' + s0.c + ',' + s0.d + ',0']);
+    let frontier = [s0];
+    for (let depth = 0; depth <= maxDepth; depth++) {
+      const next = [];
+      for (const s of frontier) {
+        if (M.goal && s.r === M.goal.r && s.c === M.goal.c && s.m === full && s.path.length > 0) return s.path;
+        for (const cm of cmds) {
+          let r = s.r, c = s.c, d = s.d, m = s.m;
+          if (style === 'abs') { d = ABS[cm]; r += DV[d][0]; c += DV[d][1]; }
+          else if (cm === 'maju') { r += DV[d][0]; c += DV[d][1]; }
+          else if (cm === 'belok_kiri') d = LEFT[d]; else d = RIGHT[d];
+          if (r < 0 || c < 0 || r >= M.rows || c >= M.cols || M.cells[r][c] === '#') continue;
+          const ci = coinAt[r + ',' + c]; if (ci !== undefined) m |= (1 << ci);
+          const k = r + ',' + c + ',' + d + ',' + m;
+          if (seen.has(k)) continue; seen.add(k);
+          next.push({ r, c, d, m, path: s.path.concat(cm) });
+        }
+      }
+      frontier = next;
+    }
+    return null;
+  }
+
+  function starsFor(size, par) {
+    if (size <= par) return 3;
+    if (size <= Math.ceil(par * 1.5) + 1) return 2;
+    return 1;
+  }
+
+  // Acak deterministik (untuk urutan pilihan yang tetap)
+  function hashStr(s) { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+  function shuffleSeed(arr, seed) {
+    let a = arr.map((v, i) => ({ v, i })); let h = hashStr(String(seed));
+    function rnd() { h ^= h << 13; h >>>= 0; h ^= h >>> 17; h ^= h << 5; h >>>= 0; return h / 4294967296; }
+    for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); const t = a[i]; a[i] = a[j]; a[j] = t; }
+    return a; // [{v, i}] i = indeks asli
+  }
+
+  root.KG_ENGINE = { DV, RIGHT, LEFT, ABS, REL, CONDS, cmdsFor, parseMap, tokenize, parseProgram, sizeOf, usesOps, run, solveFlat, starsFor, shuffleSeed, hashStr };
+  if (typeof module !== 'undefined') module.exports = root.KG_ENGINE;
+})(typeof window !== 'undefined' ? window : globalThis);
+
+/* ===== story.js ===== */
+/* ===== CERITA: Petualangan Nusantara - Penjaga Kode ===== */
+const KG_STORY = {
+  judul: 'Penjaga Kode Nusantara',
+  who: { kodi: '🤖', glitch: '👾', narator: '📜' },
+  prolog: [
+    ['narator', 'Dahulu kala, di tengah lautan Nusantara, ada Kristal Kode yang bercahaya. Cahayanya membuat semua orang berpikir runtut dan saling membantu.'],
+    ['glitch', 'Hihihi! Aku Glitch, si kabut kacau! Aku benci perintah yang rapi. Pecah, pecah, pecahlah kristal!'],
+    ['narator', 'PRANG! Kristal Kode pecah menjadi enam pecahan dan terbang ke enam wilayah Nusantara. Kabut kacau menyelimuti negeri.'],
+    ['kodi', 'Halo, {nama}! Aku Kodi, robot penjaga kristal. Aku hanya mengerti perintah yang jelas dan berurutan. Aku butuh seorang Penjaga Kode sepertimu!'],
+    ['kodi', 'Susun perintah dengan tepat, kumpulkan bintang, dan temukan semua pecahan kristal. Ayo berangkat!']
+  ],
+  dunia: [
+    {
+      id: 1, kelas: 1, nama: 'Tanah Jawa', tempat: 'Desa dan Candi Cahaya', warna: '#d98b2b', tanah: '#eaf3c9',
+      helper: { emoji: '🦌', nama: 'Si Kancil' },
+      tema: { obs: '🌳', goal: '🏯', coin: '💎' },
+      intro: [
+        ['narator', 'Perjalanan pertama dimulai di Tanah Jawa, tempat sawah hijau, gamelan, dan candi tua berdiri.'],
+        ['helper', 'Selamat datang, {nama}! Aku Si Kancil. Kabut Glitch membuat semua kegiatan di desa jadi acak-acakan.'],
+        ['kodi', 'Pecahan kristal pertama ada di Candi Cahaya. Ayo kita rapikan urutannya satu per satu!']
+      ],
+      bab: [
+        { judul: 'Pagi di Desa', emoji: '🐓', n: 5, intro: 'Ayam jantan berkokok, tapi kegiatan pagi warga tertukar-tukar. Bantu menyusunnya!' },
+        { judul: 'Jalan ke Candi', emoji: '🛤️', n: 5, intro: 'Jalan setapak menuju candi penuh pohon. Tunjukkan arah yang benar pada Kodi.' },
+        { judul: 'Pola Batik', emoji: '🎨', n: 5, intro: 'Para pembatik kehilangan polanya. Temukan bagian yang hilang!' },
+        { judul: 'Kumpul Serpihan', emoji: '💎', n: 5, intro: 'Serpihan kristal berserakan di jalan. Kumpulkan semuanya sebelum sampai tujuan.' },
+        { judul: 'Penjaga Candi', emoji: '🏯', n: 5, intro: 'Kabut tebal menjaga Candi Cahaya. Gunakan semua yang sudah kamu pelajari!' }
+      ],
+      ending: {
+        emas: [['narator', 'Pecahan kristal pertama bersinar EMAS! Seluruh candi berkilau dan kabut Glitch lenyap dari Tanah Jawa.'], ['helper', 'Hebat sekali, {nama}! Langkahmu rapi dan efisien. Gamelan pun dibunyikan untukmu!'], ['kodi', 'Pecahan pertama aman. Berikutnya: Sumatra!']],
+        perak: [['narator', 'Pecahan kristal pertama bersinar PERAK. Candi kembali terang, hanya tersisa sedikit kabut.'], ['helper', 'Bagus, {nama}! Kalau kamu mau mengulang beberapa misi, cahayanya bisa jadi emas.'], ['kodi', 'Pecahan pertama aman. Berikutnya: Sumatra!']],
+        perunggu: [['narator', 'Pecahan kristal pertama bersinar PERUNGGU. Kabut Glitch masih mengintip di sudut candi.'], ['helper', 'Kamu berhasil sampai akhir, {nama}! Coba ulang misi bintang satu agar cahayanya makin terang.'], ['kodi', 'Pecahan pertama aman. Berikutnya: Sumatra!']]
+      }
+    },
+    {
+      id: 2, kelas: 2, nama: 'Rimba Sumatra', tempat: 'Rimba dan Rumah Gadang', warna: '#c8412f', tanah: '#f6e4cf',
+      helper: { emoji: '🐯', nama: 'Si Loreng' },
+      tema: { obs: '🌴', goal: '🏠', coin: '💎' },
+      intro: [
+        ['narator', 'Kodi dan {nama} menyeberangi laut menuju Sumatra: rimba lebat, danau luas, dan rumah gadang beratap runcing.'],
+        ['helper', 'Grrr... eh, halo! Aku Si Loreng. Jalan di rimba ini berbelok-belok, dan Glitch menukar semua papan arah.'],
+        ['kodi', 'Sekarang aku bisa belok kiri dan kanan. Mari kita temukan pecahan kedua!']
+      ],
+      bab: [
+        { judul: 'Rimba yang Berbelok', emoji: '🌴', n: 5, intro: 'Papan arah tertukar. Kodi harus belajar maju dan berbelok.' },
+        { judul: 'Cari Kesalahan', emoji: '🔍', n: 5, intro: 'Glitch menyelipkan kesalahan di perintah. Temukan dan perbaiki!' },
+        { judul: 'Pola Songket', emoji: '🧵', n: 5, intro: 'Penenun songket butuh pola yang berulang. Perhatikan polanya baik-baik.' },
+        { judul: 'Ulangi, Ulangi!', emoji: '🔁', n: 5, intro: 'Capek mengetik perintah sama berkali-kali? Pakai blok ulangi!' },
+        { judul: 'Penjaga Rumah Gadang', emoji: '🏠', n: 5, intro: 'Rumah gadang dijaga kabut Glitch. Pakai perulangan dengan cerdas.' }
+      ],
+      ending: {
+        emas: [['narator', 'Pecahan kedua bersinar EMAS! Atap rumah gadang berkilau dan seluruh rimba bersorak.'], ['helper', 'Luar biasa, {nama}! Perulanganmu singkat dan tepat. Aku akan mengaum untukmu!'], ['kodi', 'Dua pecahan sudah terkumpul. Selanjutnya: Kalimantan!']],
+        perak: [['narator', 'Pecahan kedua bersinar PERAK. Rimba kembali tenang.'], ['helper', 'Kerja bagus, {nama}! Coba cari perintah yang lebih singkat untuk menaikkan cahayanya.'], ['kodi', 'Dua pecahan sudah terkumpul. Selanjutnya: Kalimantan!']],
+        perunggu: [['narator', 'Pecahan kedua bersinar PERUNGGU. Beberapa jalan masih berkabut.'], ['helper', 'Kamu tidak menyerah, {nama}! Itu yang terpenting. Ulangi misi bintang satu kalau mau.'], ['kodi', 'Dua pecahan sudah terkumpul. Selanjutnya: Kalimantan!']]
+      }
+    },
+    {
+      id: 3, kelas: 3, nama: 'Hutan Kalimantan', tempat: 'Sungai dan Rumah Panjang', warna: '#1f9d63', tanah: '#d6efd9',
+      helper: { emoji: '🦧', nama: 'Si Utan' },
+      tema: { obs: '🌲', goal: '⛺', coin: '💎' },
+      intro: [
+        ['narator', 'Perahu kecil membawa mereka menyusuri sungai besar Kalimantan. Hutan hujan tropis membentang sejauh mata memandang.'],
+        ['helper', 'Uuk uuk! Aku Si Utan, penjaga hutan. Pohon-pohon bergerak sendiri karena ulah Glitch!'],
+        ['kodi', 'Kita perlu perintah yang bisa memeriksa keadaan. Ayo pakai blok jika!']
+      ],
+      bab: [
+        { judul: 'Sungai Berliku', emoji: '🛶', n: 5, intro: 'Sungai berkelok-kelok. Perulangan akan sangat membantu.' },
+        { judul: 'Ulangi di Dalam Ulangi', emoji: '🔁', n: 5, intro: 'Kadang satu perulangan belum cukup. Taruh perulangan di dalam perulangan!' },
+        { judul: 'Jika Ada Rintangan', emoji: '🌲', n: 5, intro: 'Pohon bisa muncul tiba-tiba. Biarkan Kodi memeriksa dulu sebelum melangkah.' },
+        { judul: 'Tebak Jalan', emoji: '🔮', n: 5, intro: 'Sebelum dijalankan, bisakah kamu menebak ke mana Kodi akan berhenti?' },
+        { judul: 'Penjaga Rumah Panjang', emoji: '⛺', n: 5, intro: 'Rumah panjang terlihat di ujung sungai. Selesaikan ujian terakhir hutan ini.' }
+      ],
+      ending: {
+        emas: [['narator', 'Pecahan ketiga bersinar EMAS! Hutan hujan berkilau hijau dan burung enggang menari di udara.'], ['helper', 'Uuk uuk, hebat, {nama}! Kamu membaca jalan lebih cepat daripada aku.'], ['kodi', 'Tiga pecahan sudah di tangan. Selanjutnya: Sulawesi!']],
+        perak: [['narator', 'Pecahan ketiga bersinar PERAK. Hutan hampir pulih sepenuhnya.'], ['helper', 'Bagus, {nama}! Satu dua perintah lagi yang lebih ringkas, dan cahayanya jadi emas.'], ['kodi', 'Tiga pecahan sudah di tangan. Selanjutnya: Sulawesi!']],
+        perunggu: [['narator', 'Pecahan ketiga bersinar PERUNGGU. Hutan masih sedikit berkabut.'], ['helper', 'Perjalananmu panjang, {nama}, dan kamu sampai juga! Ulangi misi untuk bintang lebih banyak.'], ['kodi', 'Tiga pecahan sudah di tangan. Selanjutnya: Sulawesi!']]
+      }
+    },
+    {
+      id: 4, kelas: 4, nama: 'Pesisir Sulawesi', tempat: 'Laut dan Tongkonan', warna: '#1b8fc9', tanah: '#d9eef8',
+      helper: { emoji: '🐦', nama: 'Si Maleo' },
+      tema: { obs: '🌊', goal: '⛵', coin: '💎' },
+      intro: [
+        ['narator', 'Kapal pinisi berlayar membawa Kodi dan {nama} ke Sulawesi. Ombak biru dan pegunungan menyambut mereka.'],
+        ['helper', 'Halo, aku Si Maleo! Ombaknya suka berubah-ubah. Kita harus memilih perintah sesuai keadaan.'],
+        ['kodi', 'Waktunya belajar memutuskan: jika begini, lakukan itu, jika tidak, lakukan yang lain!']
+      ],
+      bab: [
+        { judul: 'Jika dan Lain', emoji: '🔀', n: 5, intro: 'Dua pilihan, satu keputusan. Kodi memilih sesuai keadaan.' },
+        { judul: 'Selama Layar Terkembang', emoji: '⛵', n: 5, intro: 'Layar pinisi terus melaju selama angin masih bertiup. Pakai blok selama!' },
+        { judul: 'Hitung dan Simpan', emoji: '🧮', n: 5, intro: 'Komputer bisa mengingat angka. Pahami cara kerja variabel.' },
+        { judul: 'Tebak dan Perbaiki', emoji: '🛠️', n: 5, intro: 'Prediksi hasil program, lalu perbaiki program yang rusak.' },
+        { judul: 'Penjaga Tongkonan', emoji: '🏔️', n: 5, intro: 'Rumah adat Tongkonan menunggu di puncak. Gabungkan semua kemampuanmu.' }
+      ],
+      ending: {
+        emas: [['narator', 'Pecahan keempat bersinar EMAS! Laut berkilau dan pinisi mengibarkan layarnya.'], ['helper', 'Cuit cuit! Keputusanmu selalu tepat, {nama}!'], ['kodi', 'Empat pecahan sudah terkumpul. Selanjutnya: Bali dan Nusa Tenggara!']],
+        perak: [['narator', 'Pecahan keempat bersinar PERAK. Ombak kembali tenang.'], ['helper', 'Bagus sekali, {nama}! Coba ringkaskan beberapa programmu untuk emas.'], ['kodi', 'Empat pecahan sudah terkumpul. Selanjutnya: Bali dan Nusa Tenggara!']],
+        perunggu: [['narator', 'Pecahan keempat bersinar PERUNGGU. Masih ada ombak nakal di kejauhan.'], ['helper', 'Kamu sampai di pantai terakhir, {nama}! Ulang misi bintang satu agar cahayanya makin terang.'], ['kodi', 'Empat pecahan sudah terkumpul. Selanjutnya: Bali dan Nusa Tenggara!']]
+      }
+    },
+    {
+      id: 5, kelas: 5, nama: 'Bali dan Nusa Tenggara', tempat: 'Pura dan Pulau Komodo', warna: '#e0457b', tanah: '#fbe0e8',
+      helper: { emoji: '🦎', nama: 'Si Moko' },
+      tema: { obs: '🌋', goal: '🏝️', coin: '💎' },
+      intro: [
+        ['narator', 'Dari Sulawesi, perjalanan berlanjut ke Bali dan pulau-pulau Nusa Tenggara. Gunung berapi, pura, dan naga Komodo menanti.'],
+        ['helper', 'Salam, aku Si Moko si komodo! Di sini perintah tidak lagi disusun dari blok. Kita mengetik kode sendiri!'],
+        ['kodi', 'Kamu sudah siap, {nama}. Ketik dengan teliti, karena satu huruf salah bisa membingungkan Kodi!']
+      ],
+      bab: [
+        { judul: 'Ketik Perintah Pertama', emoji: '⌨️', n: 5, intro: 'Mulai mengetik kode! Satu perintah per baris.' },
+        { judul: 'Ulangi dengan Kata', emoji: '🔁', n: 5, intro: 'Perulangan sekarang ditulis dengan kata: ulangi 3 kali { ... }' },
+        { judul: 'Jika dan Lain dengan Kata', emoji: '🔀', n: 5, intro: 'Buat Kodi memutuskan sendiri dengan jika dan lain.' },
+        { judul: 'Fungsi: Tarian Berurutan', emoji: '💃', n: 5, intro: 'Gerakan tari yang sering dipakai bisa diberi nama. Itulah fungsi!' },
+        { judul: 'Penjaga Pura', emoji: '🛕', n: 5, intro: 'Pura tua di tepi laut. Selesaikan ujian terakhir pulau-pulau ini.' }
+      ],
+      ending: {
+        emas: [['narator', 'Pecahan kelima bersinar EMAS! Pura bercahaya dan para penari melompat riang.'], ['helper', 'Kodemu bersih dan singkat, {nama}. Aku tidak akan lupa!'], ['kodi', 'Lima pecahan sudah terkumpul. Tinggal satu lagi: Maluku dan Papua!']],
+        perak: [['narator', 'Pecahan kelima bersinar PERAK. Pura kembali tenang.'], ['helper', 'Kerja bagus, {nama}! Coba pakai fungsi dan perulangan lebih sering untuk emas.'], ['kodi', 'Lima pecahan sudah terkumpul. Tinggal satu lagi: Maluku dan Papua!']],
+        perunggu: [['narator', 'Pecahan kelima bersinar PERUNGGU. Masih ada bayangan kabut di dekat pantai.'], ['helper', 'Mengetik kode itu sulit, tapi kamu bertahan, {nama}! Ulangi misi bintang satu kalau mau.'], ['kodi', 'Lima pecahan sudah terkumpul. Tinggal satu lagi: Maluku dan Papua!']]
+      }
+    },
+    {
+      id: 6, kelas: 6, nama: 'Maluku dan Papua', tempat: 'Pulau Rempah dan Puncak Terakhir', warna: '#7b4fd1', tanah: '#e6dcf7',
+      helper: { emoji: '🦜', nama: 'Si Cendi' },
+      tema: { obs: '⛰️', goal: '🏔️', coin: '💎' },
+      intro: [
+        ['narator', 'Di ujung timur Nusantara, pulau rempah dan pegunungan tinggi menjaga pecahan terakhir. Di sanalah Glitch bersembunyi.'],
+        ['helper', 'Kwek! Aku Si Cendi, burung cenderawasih. Glitch sudah marah besar. Kabutnya paling tebal di puncak!'],
+        ['kodi', 'Ini ujian terakhir, {nama}. Perulangan bersarang, fungsi, logika: pakai semuanya!']
+      ],
+      bab: [
+        { judul: 'Ulangi Bersarang', emoji: '🪆', n: 5, intro: 'Perulangan di dalam perulangan. Pola rumit jadi mudah kalau ditulis rapi.' },
+        { judul: 'Selama dan Jika', emoji: '🧭', n: 5, intro: 'Gabungkan selama dan jika agar Kodi menemukan jalan sendiri.' },
+        { judul: 'Fungsi Penolong', emoji: '🧰', n: 5, intro: 'Pecah masalah besar menjadi fungsi-fungsi kecil.' },
+        { judul: 'Logika dan Perbaiki Kode', emoji: '🧠', n: 5, intro: 'Berpikir seperti ahli komputer: logika, angka biner, dan mencari kesalahan.' },
+        { judul: 'Puncak Terakhir', emoji: '🏔️', n: 5, intro: 'Glitch menunggu di puncak. Semua ujian sebelumnya membawamu ke sini!' }
+      ],
+      ending: {
+        emas: [['narator', 'Pecahan keenam bersinar EMAS! Kabut di puncak terakhir menghilang dalam sekejap.'], ['helper', 'Kwek kwek! Kamu penjaga kode sejati, {nama}!'], ['kodi', 'Enam pecahan lengkap! Saatnya menyatukan Kristal Kode...']],
+        perak: [['narator', 'Pecahan keenam bersinar PERAK. Kabut Glitch tinggal tipis.'], ['helper', 'Hampir sempurna, {nama}! Ulangi beberapa misi untuk cahaya emas.'], ['kodi', 'Enam pecahan lengkap! Saatnya menyatukan Kristal Kode...']],
+        perunggu: [['narator', 'Pecahan keenam bersinar PERUNGGU. Glitch kabur sambil bersungut-sungut.'], ['helper', 'Kamu menaklukkan puncak terakhir, {nama}! Cahayanya bisa lebih terang kalau kamu ulang beberapa misi.'], ['kodi', 'Enam pecahan lengkap! Saatnya menyatukan Kristal Kode...']]
+      }
+    }
+  ],
+  // Ending akhir ditentukan oleh persentase bintang dari semua misi di semua dunia
+  akhir: {
+    garuda: {
+      judul: 'Garuda Emas', emoji: '🦅', syarat: '85% bintang atau lebih',
+      isi: [
+        ['narator', 'Enam pecahan menyatu. Kristal Kode utuh kembali dan bersinar lebih terang dari yang pernah ada!'],
+        ['glitch', 'Tidak mungkin! Perintahmu terlalu rapi... Aku... aku menyerah! Bolehkah aku belajar jadi baik?'],
+        ['kodi', 'Cahaya emas itu berubah menjadi Garuda raksasa yang terbang melintasi seluruh Nusantara.'],
+        ['narator', 'Sejak hari itu, {nama} dikenang sebagai Garuda Kode, penjaga logika terhebat sepanjang masa.'],
+        ['kodi', 'Terima kasih, {nama}. Kamu pahlawan sejati. Sampai petualangan berikutnya!']
+      ]
+    },
+    penjaga: {
+      judul: 'Penjaga Kristal', emoji: '💎', syarat: '60% bintang atau lebih',
+      isi: [
+        ['narator', 'Enam pecahan menyatu. Kristal Kode bersinar terang, meski masih ada retakan kecil di tepinya.'],
+        ['glitch', 'Kamu menang kali ini! Tapi aku masih bersembunyi di sudut-sudut kode. Hihihi...'],
+        ['kodi', 'Retakan kecil itu pengingat: kode yang bagus selalu bisa dibuat lebih baik.'],
+        ['narator', 'Seluruh Nusantara memberi hormat pada {nama}, Penjaga Kristal yang gigih.'],
+        ['kodi', 'Ulangi misi untuk menambah bintang, dan kita bisa menutup retakan itu bersama.']
+      ]
+    },
+    penjelajah: {
+      judul: 'Penjelajah Pemberani', emoji: '🧭', syarat: '35% bintang atau lebih',
+      isi: [
+        ['narator', 'Enam pecahan berhasil dikumpulkan. Kristal Kode menyala, tapi cahayanya masih redup.'],
+        ['glitch', 'Hmph, kamu cuma beruntung! Kabutku masih menyelimuti banyak tempat!'],
+        ['kodi', 'Kamu sudah menjelajah seluruh Nusantara, {nama}. Itu pencapaian besar!'],
+        ['narator', 'Para petualang memuji keberanian {nama}. Tapi masih banyak sudut yang menunggu dijelajahi.'],
+        ['kodi', 'Kembali ke dunia-dunia lama, selesaikan misi yang belum, dan nyalakan Kristal Kode sepenuhnya!']
+      ]
+    },
+    sahabat: {
+      judul: 'Sahabat Kodi', emoji: '🤝', syarat: 'kurang dari 35% bintang',
+      isi: [
+        ['narator', 'Kristal Kode baru menyala sedikit. Perjalanan {nama} baru saja dimulai.'],
+        ['glitch', 'Hehehe, masih banyak kekacauan yang bisa kubuat!'],
+        ['kodi', 'Jangan khawatir, {nama}. Setiap penjaga kode hebat mulai dari nol. Aku akan menemanimu.'],
+        ['narator', 'Kodi dan {nama} resmi menjadi sahabat. Setiap misi yang selesai membuat Kristal Kode makin terang.'],
+        ['kodi', 'Ayo kembali ke peta dan kumpulkan lebih banyak bintang. Aku percaya padamu!']
+      ]
+    }
+  },
+  gelar: [
+    [0, 'Calon Penjaga Kode'], [10, 'Penjaga Kode Muda'], [30, 'Penjelajah Kode'],
+    [70, 'Penyusun Algoritma'], [130, 'Pemburu Bug'], [220, 'Ahli Kode Nusantara'], [360, 'Garuda Kode']
+  ]
+};
+
+
+/* ===== m_common.js ===== */
+/* ===== PEMBUAT MISI ===== */
+const KG_M = {};
+const G = (t, s, map, o) => Object.assign({ type: 'grid', t, s, map }, o || {});            // puzzle grid
+const O = (t, s, q, items, o) => Object.assign({ type: 'order', t, s, q, items }, o || {});   // urutkan
+const P = (t, s, q, seq, opts, ans, o) => Object.assign({ type: 'pattern', t, s, q, seq, opts, ans }, o || {}); // pola
+const C = (t, s, q, opts, ans, o) => Object.assign({ type: 'choice', t, s, q, opts, ans }, o || {});    // pilihan
+const D = (t, s, q, map, lines, bug, fix, o) => Object.assign({ type: 'debug', t, s, q, map, lines, bug, fix }, o || {}); // cari kesalahan
+const R = (t, s, q, map, code, o) => Object.assign({ type: 'predict', t, s, q, map, code }, o || {});  // prediksi
+const BL = (extra) => Object.assign({ mode: 'blocks', allow: ['ulangi'] }, extra || {});
+const TX = (extra) => Object.assign({ mode: 'text' }, extra || {});
+
+/* ===== m_k1.js ===== */
+/* ===== KELAS 1 - Tanah Jawa (panah arah) ===== */
+KG_M.k1 = [
+  // Bab 1: Pagi di Desa
+  O('Pagi yang rapi', 'Ayam jantan sudah berkokok! Urutkan kegiatan pagi Kodi.', 'Susun kegiatan pagi dari yang pertama sampai yang terakhir.', ['Bangun tidur', 'Mandi', 'Memakai seragam', 'Berangkat ke sekolah'], { hint: 'Apa yang kamu lakukan paling pertama setelah mata terbuka?' }),
+  O('Gosok gigi', 'Kabut Glitch mengacaukan urutan menggosok gigi!', 'Urutkan langkah menggosok gigi.', ['Ambil sikat gigi', 'Beri pasta gigi', 'Gosok gigi', 'Berkumur'], { hint: 'Pasta gigi dipakai sebelum menggosok.' }),
+  G('Langkah pertama', 'Kodi mau ke gerbang desa. Tekan panah untuk menyusun perintahnya.', ['S..G', '....'], { hint: 'Gerbang ada di kanan. Berapa kali Kodi harus ke kanan?' }),
+  G('Turun ke bawah', 'Gerbang desa pindah ke bawah! Kodi harus turun juga.', ['S...', '...G'], { hint: 'Kodi harus ke kanan dan ke bawah. Urutannya boleh bebas.' }),
+  G('Ada pohon!', 'Pohon besar menghalangi jalan. Kodi tidak bisa menembusnya.', ['S#.G', '....'], { hint: 'Cari jalan memutar lewat baris bawah.' }),
+  // Bab 2: Jalan ke Candi
+  G('Jalan memutar', 'Si Kancil menunjuk jalan lain menuju candi. Cari rute yang aman.', ['S...', '.##.', '...G'], { hint: 'Ada dua jalan yang sama pendek. Pilih salah satu!' }),
+  G('Pagar pohon', 'Barisan pohon berdiri di tengah jalan.', ['S.#.', '..#.', '...G'], { hint: 'Turun dulu sampai bawah, baru ke kanan.' }),
+  G('Jalan berliku', 'Jalannya mulai berliku. Teliti ya!', ['S..#', '.#..', '.#.G', '....'], { hint: 'Coba lewat atas: kanan, kanan, lalu turun.' }),
+  C('Apa itu algoritma?', 'Si Kancil bertanya sebuah teka-teki untukmu.', 'Urutan langkah yang jelas untuk menyelesaikan tugas disebut...', ['Algoritma', 'Dongeng', 'Lagu'], 0, { explain: 'Algoritma adalah langkah-langkah berurutan, seperti resep masakan atau perintah untuk Kodi.', hint: 'Resep masakan punya langkah-langkah yang berurutan.' }),
+  G('Jalan ular', 'Jalan menuju candi berkelok seperti ular.', ['S..#G', '.#.#.', '.#...', '...#.'], { hint: 'Ikuti jalan: kanan dua kali, turun dua kali, lalu kanan dan naik.' }),
+  // Bab 3: Pola Batik
+  P('Batik merah biru', 'Pembatik membuat pola bulat merah dan biru.', 'Bulatan apa yang hilang?', ['🔴', '🔵', '🔴', '🔵', '🔴', '?'], ['🔴', '🔵', '🟢'], '🔵', { hint: 'Polanya bergantian: merah, biru, merah, ...' }),
+  P('Batik bunga', 'Pembatik membuat pola bunga cantik.', 'Gambar apa yang hilang?', ['🌸', '🌸', '🌼', '🌸', '🌸', '🌼', '🌸', '🌸', '?'], ['🌸', '🌼', '🍃'], '🌼', { hint: 'Dua bunga merah muda, lalu satu bunga kuning.' }),
+  P('Batik bintang bulan', 'Langit malam di atas candi penuh pola.', 'Gambar apa yang hilang?', ['⭐', '🌙', '🌙', '⭐', '🌙', '🌙', '⭐', '?'], ['⭐', '🌙', '☀️'], '🌙', { hint: 'Satu bintang, lalu dua bulan.' }),
+  P('Batik angka', 'Para pembatik menghitung kain mereka.', 'Angka berapa yang hilang?', ['2', '4', '6', '8', '?'], ['9', '10', '12'], '10', { hint: 'Setiap angka bertambah 2.' }),
+  G('Serpihan pertama', 'Ada serpihan kristal berkilau di jalan! Ambil sambil menuju tujuan.', ['S.*.', '...G'], { hint: 'Lewati kotak 💎 di jalanmu, lalu menuju tujuan.' }),
+  // Bab 4: Kumpul Serpihan
+  G('Serpihan di jalan', 'Serpihan kristal tersebar. Ambil semuanya!', ['S.*.', '.#..', '...G'], { hint: 'Kumpulkan 💎 dulu, baru ke tujuan.' }),
+  G('Dua serpihan', 'Dua serpihan kristal bersinar di sawah.', ['S*..', '....', '..*G'], { hint: 'Kanan, turun dua kali, lalu kanan dua kali.' }),
+  G('Serpihan di tikungan', 'Serpihan tersembunyi di balik pohon.', ['S.#.', '*.#G', '..*.'], { hint: 'Ambil yang di bawah dulu, lanjut ke kanan.' }),
+  G('Tiga serpihan', 'Tiga serpihan! Kadang kita harus mundur sebentar.', ['S*.*.', '.#.#.', '..*.G'], { hint: 'Setelah ambil 💎 di kanan atas, mundur satu langkah lalu turun.' }),
+  C('Kodi salah jalan', 'Kodi menabrak pohon! Si Kancil bertanya...', 'Perintah Kodi salah dan ia menabrak pohon. Apa yang sebaiknya kamu lakukan?', ['Mencari bagian yang salah, lalu memperbaikinya', 'Menyerah dan pulang', 'Menekan tombol sembarangan'], 0, { explain: 'Mencari dan memperbaiki kesalahan disebut debugging. Semua programmer melakukannya!', hint: 'Kalau ada yang salah, kita cari tahu di mana salahnya.' }),
+  // Bab 5: Penjaga Candi
+  D('Cari yang salah (1)', 'Glitch menyelipkan satu perintah salah. Temukan!', 'Kodi mau ke bendera 🏯 tetapi tidak sampai. Ketuk perintah yang salah.', ['S..', '.#.', '..G'], ['kanan', 'kiri', 'bawah', 'bawah'], 1, 'kanan', { hint: 'Ikuti perintah dengan jarimu di peta. Di mana Kodi mulai salah?' }),
+  D('Cari yang salah (2)', 'Glitch menyelipkan perintah salah lagi!', 'Ketuk perintah yang membuat Kodi menabrak pohon.', ['S..#', '..#.', '...G'], ['bawah', 'bawah', 'kanan', 'atas', 'kanan'], 3, 'kanan', { hint: 'Ikuti perintah satu per satu. Kodi menabrak pohon di langkah ke berapa?' }),
+  G('Gerbang pertama', 'Penjaga candi memberi ujian: ambil serpihan sebelum masuk.', ['S.#..', '..#.*', '....G'], { hint: 'Lewati bawah dinding pohon, ambil 💎, lalu ke tujuan.' }),
+  G('Dua serpihan terakhir', 'Dua serpihan lagi di halaman candi.', ['S.*.#', '.#.#.', '.#*..', '...#G'], { hint: 'Ke kanan, turun melewati dua 💎, lalu ke tujuan.' }),
+  G('Penjaga Candi Cahaya', 'Glitch menunggu di dalam candi! Kumpulkan dua serpihan, lalu sampai ke tujuan.', ['S.*..', '####.', 'G.*..'], { hint: 'Jalannya ular: kanan sampai ujung, turun, lalu kiri sampai tujuan.' })
+];
+
+/* ===== m_k2.js ===== */
+/* ===== KELAS 2 - Rimba Sumatra (maju & belok, mulai perulangan) ===== */
+KG_M.k2 = [
+  // Bab 1: Rimba yang Berbelok
+  G('Maju terus', 'Papan arah menunjuk lurus. Kodi cukup maju.', ['S..G', '....'], { dir: 'E', hint: 'Perintah "maju" membuat Kodi melangkah ke arah yang dihadapinya.' }),
+  G('Belok kanan', 'Jalan setapak berbelok ke kanan. Kodi harus belok dulu.', ['S..', '...', '..G'], { dir: 'E', hint: 'Maju dua kali, belok kanan, lalu maju dua kali.' }),
+  G('Belok kiri', 'Kodi menghadap ke bawah. Gerbang rimba ada di sebelah kirinya.', ['S.G', '...'], { dir: 'S', hint: 'Saat Kodi menghadap ke bawah, sisi kirinya adalah arah kanan layar.' }),
+  G('Dua tikungan', 'Sungai kecil memaksa Kodi berbelok dua kali.', ['S.#.', '..#G', '....'], { dir: 'E', hint: 'Kodi harus turun, ke kanan, lalu naik. Setiap arah baru butuh belok.' }),
+  G('Serpihan di rimba', 'Serpihan kristal tertinggal di semak. Ambil ya!', ['S.*.', '#.#.', '..G.'], { dir: 'E', hint: 'Lewati 💎 di atas, lalu putar ke bawah.' }),
+  // Bab 2: Cari Kesalahan
+  D('Salah belok', 'Si Loreng menemukan perintah yang keliru.', 'Kodi mau ke bendera, tetapi salah belok. Ketuk perintah yang salah.', ['S..', '...', '..G'], ['maju', 'maju', 'belok_kiri', 'maju', 'maju'], 2, 'belok_kanan', { dir: 'E', hint: 'Setelah maju dua kali, Kodi harus ke bawah. Kanan atau kiri?' }),
+  O('Menyeberang jalan', 'Si Loreng mengajarkan cara menyeberang jalan dengan aman.', 'Urutkan langkah menyeberang jalan dengan benar.', ['Berhenti di tepi jalan', 'Lihat kanan dan kiri', 'Menyeberang saat jalanan aman', 'Sampai di seberang'], { hint: 'Lihat dulu, baru jalan!' }),
+  D('Belokan tertukar', 'Glitch menukar sebuah belokan.', 'Kodi menabrak tepi peta. Ketuk perintah yang salah.', ['S..#', '.#..', '...G'], ['belok_kanan', 'maju', 'maju', 'belok_kanan', 'maju', 'maju', 'maju'], 3, 'belok_kiri', { dir: 'E', hint: 'Setelah turun, Kodi harus menghadap ke kanan. Itu kiri atau kanan?' }),
+  C('Arah akhir Kodi', 'Si Loreng menguji kemampuanmu membaca perintah.', 'Kodi menghadap kanan. Ia menjalankan: maju, maju, belok_kanan, maju. Kodi menghadap ke mana sekarang?', ['Atas', 'Bawah', 'Kiri', 'Kanan'], 1, { explain: 'Dari menghadap kanan, belok kanan membuat Kodi menghadap bawah. Perintah maju tidak mengubah arah.', hint: 'Bayangkan dirimu menghadap kanan, lalu berbelok ke kananmu.' }),
+  G('Jalan berbelit', 'Akar-akar pohon membuat jalan berbelit.', ['S.*.', '.#..', '...G'], { dir: 'E', hint: 'Maju sampai melewati 💎, lalu belok ke bawah dan ke tujuan.' }),
+  // Bab 3: Pola Songket
+  P('Songket merah biru', 'Penenun songket menyusun benang berwarna.', 'Kotak apa yang hilang?', ['🟥', '🟦', '🟦', '🟥', '🟦', '🟦', '🟥', '?'], ['🟥', '🟦', '🟩'], '🟦', { hint: 'Satu merah, lalu dua biru, berulang.' }),
+  P('Songket angka ganjil', 'Angka-angka ditenun di kain songket.', 'Angka berapa yang hilang?', ['1', '3', '5', '7', '?'], ['8', '9', '10'], '9', { hint: 'Setiap angka bertambah 2.' }),
+  P('Hutan dan harimau', 'Si Loreng bermain tebak pola.', 'Siapa yang hilang?', ['🌴', '🌴', '🐯', '🌴', '🌴', '🐯', '🌴', '🌴', '?'], ['🌴', '🐯', '🦜'], '🐯', { hint: 'Dua pohon, lalu satu harimau.' }),
+  C('Cara singkat', 'Kodi lelah menekan tombol maju berkali-kali.', 'Kodi harus maju 6 kali. Cara mana yang paling singkat?', ['Menulis perintah maju sebanyak enam kali', 'ulangi 6 kali { maju }', 'belok_kiri belok_kiri'], 1, { explain: 'Perulangan (ulangi) membuat kode lebih singkat. Kita tulis maju sekali, lalu suruh Kodi mengulangnya.', hint: 'Pilih cara yang menulis perintah maju hanya sekali.' }),
+  G('Ulangi pertamaku', 'Selamat! Kamu menemukan blok ulangi. Pakai untuk jalan yang panjang ini.', ['S.....G', '.......'], BL({ dir: 'E', sol: 'ulangi 6 kali { maju }', hint: 'Ambil blok Ulangi, atur angka 6, lalu masukkan blok Maju ke dalamnya.' })),
+  // Bab 4: Ulangi, Ulangi!
+  G('Tikungan siku', 'Jalan lurus, lalu belok, lalu lurus lagi.', ['S...', '....', '....', '...G'], BL({ dir: 'E', sol: 'ulangi 3 kali { maju } belok_kanan ulangi 3 kali { maju }', hint: 'Dua perulangan maju, dengan satu belok di antaranya.' })),
+  G('Tangga batu', 'Tangga batu naik turun menuju rumah gadang.', ['S.##', '...#', '#...', '##.G'], BL({ dir: 'E', sol: 'ulangi 3 kali { maju belok_kanan maju belok_kiri }', hint: 'Satu pola kecil: maju, belok kanan, maju, belok kiri. Ulangi tiga kali!' })),
+  G('Cincin serpihan', 'Serpihan kristal tersusun melingkar di taman.', ['S.*', '.#.', 'G.*'], BL({ dir: 'E', sol: 'ulangi 3 kali { maju maju belok_kanan }', hint: 'Maju dua kali lalu belok kanan, ulangi tiga kali.' })),
+  G('Jalan berbentuk U', 'Jalan di tepi jurang berbentuk huruf U.', ['S....', '####.', 'G....'], BL({ dir: 'E', sol: 'ulangi 4 kali { maju } belok_kanan ulangi 2 kali { maju } belok_kanan ulangi 4 kali { maju }', hint: 'Tiga perulangan: 4 kali, 2 kali, 4 kali. Di antaranya belok kanan.' })),
+  G('Lorong panjang', 'Lorong sempit ini panjang sekali. Hemat perintahmu!', ['S#.', '.#.', '*#.', '.#.', '*#.', '.#.', 'G#.'], BL({ dir: 'S', sol: 'ulangi 6 kali { maju }', hint: 'Kodi menghadap bawah. Satu perulangan cukup!' })),
+  // Bab 5: Penjaga Rumah Gadang
+  C('Hitung langkah', 'Penjaga rumah gadang memberi teka-teki kode.', 'Berapa kali Kodi melangkah maju saat menjalankan kode ini? (belok tidak dihitung)', ['2', '3', '6'], 1, { code: 'ulangi 3 kali {\n  maju\n  belok_kanan\n}', explain: 'Perulangan berjalan 3 kali. Setiap putaran ada 1 maju, jadi 3 langkah maju.', hint: 'Di dalam perulangan ada satu maju. Perulangannya berjalan berapa kali?' }),
+  D('Perulangan yang kurang', 'Kabut Glitch memotong salah satu perulangan.', 'Kodi berhenti sebelum sampai tujuan. Ketuk baris yang salah.', ['S...', '....', '...G'], ['ulangi 3 kali {', '  maju', '}', 'belok_kanan', 'ulangi 1 kali {', '  maju', '}'], 4, 'ulangi 2 kali {', { dir: 'E', hint: 'Kodi harus turun dua kotak. Berapa kali ia perlu maju?' }),
+  G('Kotak serpihan', 'Serpihan kristal di dua sudut halaman.', ['S..*', '.##.', '.##.', 'G..*'], BL({ dir: 'E', sol: 'ulangi 3 kali { maju maju maju belok_kanan }', hint: 'Satu sisi kotak: maju tiga kali lalu belok kanan. Ulangi tiga kali.' })),
+  G('Tangga panjang', 'Tangga di rumah gadang lebih panjang dan lebar.', ['S..####', '##...##', '####...', '######G'], BL({ dir: 'E', sol: 'ulangi 3 kali { maju maju belok_kanan maju belok_kiri }', hint: 'Pola: maju maju, belok kanan, maju, belok kiri. Ulangi tiga kali.' })),
+  G('Penjaga Rumah Gadang', 'Glitch menunggu di atap rumah gadang! Satu perulangan cerdas bisa mengalahkannya.', ['S...*', '.###.', '.###.', '.###.', 'G...*'], BL({ dir: 'E', sol: 'ulangi 3 kali { maju maju maju maju belok_kanan }', hint: 'Satu sisi: maju empat kali lalu belok kanan. Ulangi tiga kali.' }))
+];
+
+/* ===== m_k3.js ===== */
+/* ===== KELAS 3 - Hutan Kalimantan (blok: ulangi bersarang, jika) ===== */
+const K3J = { mode: 'blocks', allow: ['ulangi', 'jika'], need: ['if'] };
+KG_M.k3 = [
+  // Bab 1: Sungai Berliku
+  G('Susur sungai', 'Perahu kecil menyusuri sungai lurus. Kumpulkan serpihan di sepanjang jalan.', ['S.*.*.G', '.......'], BL({ dir: 'E', sol: 'ulangi 6 kali { maju }', hint: 'Satu perulangan cukup: ulangi 6 kali maju.' })),
+  G('Tikungan sungai', 'Sungai berbelok tajam ke selatan.', ['S....', '.....', '.....', '....G'], BL({ dir: 'E', sol: 'ulangi 4 kali { maju } belok_kanan ulangi 3 kali { maju }', hint: 'Ke kanan 4 langkah, belok kanan, lalu 3 langkah.' })),
+  G('Zig-zag sungai', 'Sungai berkelok-kelok seperti tangga.', ['S.###', '#..##', '##..#', '###..', '####G'], BL({ dir: 'E', sol: 'ulangi 4 kali { maju belok_kanan maju belok_kiri }', hint: 'Pola kecil: maju, belok kanan, maju, belok kiri. Ulangi 4 kali.' })),
+  G('Sungai berbentuk U', 'Sungai melingkar di tepi hutan.', ['S....*', '#####.', 'G....*'], BL({ dir: 'E', sol: 'ulangi 5 kali { maju } belok_kanan ulangi 2 kali { maju } belok_kanan ulangi 5 kali { maju }', hint: 'Tiga ulangi: 5 kali, 2 kali, 5 kali, dengan belok kanan di antaranya.' })),
+  G('Zig-zag ke selatan', 'Kali ini Kodi menghadap ke bawah. Hati-hati dengan kiri dan kanan!', ['S####', '..###', '#..##', '##..#', '###.G'], BL({ dir: 'S', sol: 'ulangi 4 kali { maju belok_kiri maju belok_kanan }', hint: 'Menghadap bawah: belok kiri artinya ke kanan layar.' })),
+  // Bab 2: Ulangi di Dalam Ulangi
+  G('Persegi dua kali', 'Utan menunjukkan trik: perulangan boleh di dalam perulangan!', ['S..*', '.##.', '.##.', '...G'], BL({ dir: 'E', sol: 'ulangi 2 kali { ulangi 3 kali { maju } belok_kanan }', hint: 'Satu sisi = ulangi 3 kali maju, lalu belok kanan. Ulangi sisi itu 2 kali.' })),
+  G('Tangga lebar', 'Tangga batu ini lebar dan panjang. Perulangan bersarang akan menolong!', ['S..####', '##.####', '##...##', '####.##', '####...', '######.', '######G'], BL({ dir: 'E', sol: 'ulangi 3 kali { ulangi 2 kali { maju } belok_kanan ulangi 2 kali { maju } belok_kiri }', hint: 'Satu anak tangga: maju 2, belok kanan, maju 2, belok kiri. Ulangi 3 kali.' })),
+  G('Tiga serpihan', 'Tiga serpihan menunggu di pojok kolam.', ['S.*', 'G#.', '*.*'], BL({ dir: 'E', sol: 'ulangi 3 kali { ulangi 2 kali { maju } belok_kanan } maju', hint: 'Putari kolam: maju 2, belok kanan, tiga kali. Lalu maju sekali lagi.' })),
+  C('Hitung perulangan', 'Utan menguji kemampuanmu menghitung.', 'Berapa kali "maju" dijalankan oleh kode ini?', ['5', '6', '8'], 1, { code: 'ulangi 2 kali {\n  ulangi 3 kali {\n    maju\n  }\n}', explain: 'Perulangan luar berjalan 2 kali. Setiap kali, perulangan dalam menjalankan maju 3 kali. Jadi 2 x 3 = 6.', hint: 'Setiap putaran luar, maju dijalankan 3 kali. Ada berapa putaran luar?' }),
+  D('Belokan yang keliru', 'Glitch mengacak satu belokan di kode perulangan.', 'Kodi menabrak tepi peta. Ketuk baris yang salah.', ['S.*', '.#.', '..G'], ['ulangi 2 kali {', '  ulangi 2 kali {', '    maju', '  }', '  belok_kiri', '}'], 4, '  belok_kanan', { dir: 'E', hint: 'Kodi harus berputar searah jarum jam (ke kanan) mengelilingi kolam.' }),
+  // Bab 3: Jika Ada Rintangan
+  G('Periksa dulu', 'Panjang lorong ini tidak diketahui. Biarkan Kodi memeriksa sebelum melangkah.', ['S....G', '......'], Object.assign({}, K3J, { dir: 'E', sol: 'ulangi 10 kali { jika depan_kosong { maju } }', hint: 'Ulangi 10 kali: jika depan kosong, maju. Kodi berhenti sendiri di ujung.' })),
+  G('Belok di ujung', 'Kodi belok kanan hanya saat ada rintangan di depan.', ['S....', '####.', '####.', '####.', 'G....'], Object.assign({}, K3J, { dir: 'E', sol: 'ulangi 12 kali { jika depan_rintangan { belok_kanan } maju }', hint: 'Jalannya 12 langkah. Di dalam ulangi: jika ada rintangan, belok kanan; lalu maju.' })),
+  C('Memahami blok jika', 'Utan menunjuk blok jika yang kamu pakai tadi.', 'Apa arti "jika depan_rintangan { belok_kanan }"?', ['Kodi belok kanan hanya jika ada rintangan di depannya', 'Kodi selalu belok kanan', 'Kodi tidak pernah bergerak'], 0, { explain: 'Blok jika memeriksa keadaan dulu. Isinya hanya dijalankan kalau keadaannya benar.', hint: 'Kata "jika" artinya "kalau". Kalau apa?' }),
+  G('Belok di ujung (kiri)', 'Kali ini Kodi mulai dari kanan dan menghadap ke kiri.', ['....S', '.####', '.####', '.####', '....G'], Object.assign({}, K3J, { dir: 'W', sol: 'ulangi 12 kali { jika depan_rintangan { belok_kiri } maju }', hint: 'Sama seperti tadi, tetapi berbelok ke kiri.' })),
+  G('Pagar serpihan', 'Pagar hutan berbentuk persegi panjang, penuh serpihan di sudutnya.', ['S....*', '#####.', '#####.', 'G....*'], Object.assign({}, K3J, { dir: 'E', sol: 'ulangi 13 kali { jika depan_rintangan { belok_kanan } maju }', hint: 'Hitung langkah maju: 5 + 3 + 5 = 13.' })),
+  // Bab 4: Tebak Jalan
+  R('Tebakan pertama', 'Si Utan menyembunyikan huruf di peta. Tebak ke mana Kodi berhenti!', 'Kodi menghadap kanan. Di huruf apa Kodi berhenti setelah menjalankan kode?', ['S..A', '.B..', 'C..D'], 'ulangi 3 kali {\n  maju\n}', { dir: 'E', hint: 'Hitung langkah satu per satu dengan jarimu di peta.' }),
+  R('Tebakan belokan', 'Kali ini ada belokan.', 'Di huruf apa Kodi berhenti?', ['S...', '.AB.', '..C.'], 'maju\nbelok_kanan\nmaju\nbelok_kiri\nmaju', { dir: 'E', hint: 'Jangan lupa arah menghadap Kodi berubah setelah belok.' }),
+  R('Tebakan perulangan', 'Perulangan bersarang menunggu.', 'Di huruf apa Kodi berhenti?', ['S.A.', '.B..', '..C.'], 'ulangi 2 kali {\n  maju\n  maju\n  belok_kanan\n}', { dir: 'E', hint: 'Satu putaran: maju 2, belok kanan. Ada 2 putaran.' }),
+  D('Jika yang salah', 'Satu belokan di kode ini salah arah.', 'Kodi keluar dari jalan. Ketuk baris yang salah.', ['S....', '####.', '####.', '####.', 'G....'], ['ulangi 12 kali {', '  jika depan_rintangan {', '    belok_kiri', '  }', '  maju', '}'], 2, '    belok_kanan', { dir: 'E', hint: 'Jalannya berbelok ke kanan (searah jarum jam).' }),
+  C('Membaca kode jika', 'Tebakan terakhir sebelum bab ini selesai.', 'Kodi menghadap kanan dan ada pohon tepat di depannya. Apa yang terjadi saat kode ini dijalankan?', ['Kodi belok kanan, lalu maju', 'Kodi menabrak pohon', 'Kodi diam saja'], 0, { code: 'jika depan_rintangan {\n  belok_kanan\n}\nmaju', explain: 'Ada rintangan, jadi Kodi belok kanan. Lalu perintah maju selalu dijalankan, ke arah yang baru.', hint: 'Periksa dulu: apakah syarat "depan_rintangan" benar?' }),
+  // Bab 5: Penjaga Rumah Panjang
+  R('Tebak di ujung sungai', 'Rumah panjang makin dekat. Tebak dulu sebelum menjalankan!', 'Di huruf apa Kodi berhenti?', ['S...A', '####.', '####B', '####.', 'D...C'], 'ulangi 8 kali {\n  jika depan_rintangan {\n    belok_kanan\n  }\n  maju\n}', { dir: 'E', hint: 'Hitung 8 putaran. Setiap putaran, Kodi maju satu kali.' }),
+  G('Kebun padi', 'Petani meminta Kodi memanen padi di seluruh kebun, baris demi baris.', ['S...*', '*....', '....*', '*....', '....G'], BL({ dir: 'E', sol: 'ulangi 2 kali { ulangi 4 kali { maju } belok_kanan maju belok_kanan ulangi 4 kali { maju } belok_kiri maju belok_kiri } ulangi 4 kali { maju }', hint: 'Satu pasang baris: maju 4, belok kanan, maju, belok kanan, maju 4, belok kiri, maju, belok kiri. Ulangi 2 kali, lalu satu baris terakhir.' })),
+  C('Urutan arah', 'Utan memutar-mutar Kodi.', 'Kodi menghadap kanan. Setelah kode ini, Kodi menghadap ke mana?', ['Atas', 'Bawah', 'Kiri'], 0, { code: 'ulangi 3 kali {\n  maju\n  belok_kanan\n}', explain: 'Kanan, belok kanan jadi bawah, belok kanan jadi kiri, belok kanan jadi atas. Tiga kali belok kanan: atas.', hint: 'Putar kanan satu per satu: kanan, bawah, kiri, ...' }),
+  D('Tangga yang rusak', 'Glitch merusak tangga di depan rumah panjang.', 'Satu baris salah arah. Ketuk baris itu.', ['S..####', '##.####', '##...##', '####.##', '####...', '######.', '######G'], ['ulangi 3 kali {', '  ulangi 2 kali {', '    maju', '  }', '  belok_kiri', '  ulangi 2 kali {', '    maju', '  }', '  belok_kiri', '}'], 4, '  belok_kanan', { dir: 'E', hint: 'Tangga turun ke bawah-kanan: belok kanan dulu, lalu belok kiri.' }),
+  G('Penjaga Rumah Panjang', 'Glitch ada di dalam rumah panjang! Gunakan blok jika untuk menyusuri pagarnya.', ['S.....*', '######.', '######*', '######.', 'G.....*'], Object.assign({}, K3J, { dir: 'E', sol: 'ulangi 16 kali { jika depan_rintangan { belok_kanan } maju }', hint: 'Hitung langkah maju: 6 + 4 + 6 = 16.' }))
+];
+
+/* ===== m_k4.js ===== */
+/* ===== KELAS 4 - Pesisir Sulawesi (jika-lain, selama, variabel) ===== */
+const K4A = { mode: 'blocks', allow: ['ulangi', 'jika', 'jikalain', 'selama'] };
+KG_M.k4 = [
+  // Bab 1: Jika dan Lain
+  G('Dua pilihan', 'Ombak berubah-ubah. Kodi memilih: maju kalau bisa, kalau tidak belok.', ['S...', '###.', '###.', '###G'], Object.assign({}, K4A, { dir: 'E', need: ['if'], sol: 'ulangi 7 kali { jika depan_kosong { maju } lain { belok_kanan } }', hint: 'Hitung semuanya: 6 kali maju dan 1 kali belok. Jadi 7 putaran.' })),
+  G('Tepi pulau', 'Pantai pulau ini berbentuk persegi panjang.', ['S....', '####.', '####.', '####.', 'G....'], Object.assign({}, K4A, { dir: 'E', need: ['if'], sol: 'ulangi 14 kali { jika depan_kosong { maju } lain { belok_kanan } }', hint: '12 kali maju dan 2 kali belok. Total 14 putaran.' })),
+  G('Mengitari dari kanan', 'Kali ini Kodi berkeliling dari sisi kanan pulau.', ['....S', '.####', '.####', '.####', '....G'], Object.assign({}, K4A, { dir: 'W', need: ['if'], sol: 'ulangi 14 kali { jika depan_kosong { maju } lain { belok_kiri } }', hint: 'Sama seperti tadi, tetapi berbelok kiri.' })),
+  C('Memahami jika-lain', 'Si Maleo bertanya tentang blok baru.', 'Kode: jika depan_kosong { maju } lain { belok_kanan }. Di depan Kodi ada batu. Apa yang dilakukan Kodi?', ['Maju', 'Belok kanan', 'Belok kiri'], 1, { explain: 'Blok jika-lain punya dua jalur. Kalau syaratnya benar, kerjakan bagian jika. Kalau salah, kerjakan bagian lain.', hint: 'Apakah depan Kodi kosong? Tidak. Jadi bagian mana yang dijalankan?' }),
+  R('Tebak jika-lain', 'Si Maleo menyembunyikan huruf di pantai.', 'Di huruf apa Kodi berhenti?', ['S...A', '####.', '####B', '####.', 'D...C'], 'ulangi 7 kali {\n  jika depan_kosong {\n    maju\n  } lain {\n    belok_kanan\n  }\n}', { dir: 'E', hint: 'Hitung 7 putaran: ada yang maju, ada yang belok.' }),
+  // Bab 2: Selama Layar Terkembang
+  G('Sampai ujung', 'Pinisi berlayar selama jalan di depan masih kosong.', ['S....G', '......'], Object.assign({}, K4A, { dir: 'E', need: ['while'], sol: 'selama depan_kosong { maju }', hint: 'Tidak perlu menghitung! Selama depan kosong, maju terus sampai ujung.' })),
+  G('Berhenti di tujuan', 'Kodi akan berhenti sendiri begitu sampai di tujuan.', ['S....', '####.', '####.', '####.', 'G....'], Object.assign({}, K4A, { dir: 'E', need: ['while'], sol: 'selama bukan di_tujuan { jika depan_kosong { maju } lain { belok_kanan } }', hint: 'Tanpa menghitung: selama belum di tujuan, jika depan kosong maju, kalau tidak belok kanan.' })),
+  G('Dua dinding', 'Kodi berlari sampai menyentuh dinding, belok, lalu berlari lagi.', ['S...', '....', '....', '...G'], Object.assign({}, K4A, { dir: 'E', need: ['while'], sol: 'selama depan_kosong { maju } belok_kanan selama depan_kosong { maju }', hint: 'Dua blok selama, dengan belok kanan di antaranya.' })),
+  G('Persegi serpihan', 'Kodi berlari di keempat sisi lapangan mengumpulkan serpihan.', ['S..*', '....', '....', 'G..*'], Object.assign({}, K4A, { dir: 'E', need: ['while'], sol: 'ulangi 3 kali { selama depan_kosong { maju } belok_kanan }', hint: 'Satu sisi: selama depan kosong maju, lalu belok kanan. Ulangi tiga kali.' })),
+  D('Belok yang salah', 'Layar pinisi tersangkut karena satu perintah salah.', 'Kodi tidak bisa bergerak di sisi kedua. Ketuk baris yang salah.', ['S...', '....', '....', '...G'], ['selama depan_kosong {', '  maju', '}', 'belok_kiri', 'selama depan_kosong {', '  maju', '}'], 3, 'belok_kanan', { dir: 'E', hint: 'Di ujung kanan, Kodi harus turun. Belok kiri membuatnya menghadap atas.' }),
+  // Bab 3: Hitung dan Simpan
+  C('Variabel skor', 'Si Maleo menghitung kerang dengan variabel bernama skor.', 'Berapa nilai yang dicetak oleh kode ini?', ['5', '6', '8'], 1, { code: 'skor = 0\nulangi 3 kali {\n  skor = skor + 2\n}\ncetak skor', explain: 'Skor mulai dari 0, lalu ditambah 2 sebanyak 3 kali: 2, 4, 6.', hint: 'Skor bertambah 2 di setiap putaran. Ada 3 putaran.' }),
+  C('Langkah berkurang', 'Variabel juga bisa berkurang.', 'Berapa nilai yang dicetak?', ['2', '3', '7'], 1, { code: 'langkah = 5\nlangkah = langkah - 2\ncetak langkah', explain: '5 dikurangi 2 sama dengan 3.', hint: 'Hitung dari atas ke bawah, satu baris demi satu baris.' }),
+  C('Apa itu variabel?', 'Pelaut Bugis menjelaskan tentang kotak penyimpan.', 'Apa itu variabel?', ['Tempat menyimpan nilai yang bisa berubah', 'Sebuah tombol di papan ketik', 'Perintah untuk berbelok'], 0, { explain: 'Variabel seperti kotak bernama. Isinya boleh diganti kapan saja.', hint: 'Bayangkan kotak yang diberi nama dan bisa diisi ulang.' }),
+  C('Jangan tertipu', 'Si Maleo memberi soal jebakan!', 'Berapa nilai b yang dicetak?', ['4', '7', '1'], 1, { code: 'a = 4\nb = a + 3\na = 1\ncetak b', explain: 'b dihitung saat a masih 4, jadi b = 7. Mengubah a sesudahnya tidak mengubah b.', hint: 'b dihitung pada baris kedua. Berapa a saat itu?' }),
+  C('Menghitung bintang', 'Pelaut itu menghitung bintang di langit malam.', 'Berapa nilai yang dicetak?', ['4', '8', '16'], 1, { code: 'bintang = 0\nulangi 4 kali {\n  bintang = bintang + 1\n}\nbintang = bintang + bintang\ncetak bintang', explain: 'Setelah perulangan, bintang = 4. Lalu 4 + 4 = 8.', hint: 'Cari dulu nilai bintang setelah perulangan selesai.' }),
+  // Bab 4: Tebak dan Perbaiki
+  R('Tebak selama', 'Layar pinisi mengembang! Tebak ke mana Kodi berlayar.', 'Di huruf apa Kodi berhenti?', ['S..A', '.B..', '..C.', '...D'], 'selama depan_kosong {\n  maju\n}\nbelok_kanan\nselama depan_kosong {\n  maju\n}', { dir: 'E', hint: 'Selama depan kosong, Kodi terus maju sampai tepi peta.' }),
+  R('Tebak jika-lain 2', 'Satu lagi tebakan dari Si Maleo.', 'Di huruf apa Kodi berhenti?', ['S...A', '####.', '####B', '####.', 'D...C'], 'ulangi 5 kali {\n  jika depan_kosong {\n    maju\n  } lain {\n    belok_kanan\n  }\n}', { dir: 'E', hint: 'Empat putaran pertama Kodi maju. Apa yang terjadi di putaran kelima?' }),
+  D('Selama yang macet', 'Glitch mengubah satu arah di kode ini.', 'Kodi keluar jalur. Ketuk baris yang salah.', ['S....', '####.', '####.', '####.', 'G....'], ['selama bukan di_tujuan {', '  jika depan_kosong {', '    maju', '  } lain {', '    belok_kiri', '  }', '}'], 4, '    belok_kanan', { dir: 'E', hint: 'Jalan pesisir ini berbelok ke kanan (searah jarum jam).' }),
+  C('Mengapa tidak berhenti?', 'Kapal pinisi berputar-putar tanpa henti!', 'Mengapa kode ini tidak pernah selesai?', ['Kodi hanya berputar, jadi depannya tidak pernah menjadi tidak kosong', 'Kodi tidak punya tombol maju', 'Kodinya terlalu pendek'], 0, { code: 'selama depan_kosong {\n  belok_kanan\n}', explain: 'Belok tidak memindahkan Kodi. Selama depannya kosong, perulangan terus berputar. Ini disebut perulangan tanpa akhir.', hint: 'Apakah belok membuat Kodi berpindah tempat?' }),
+  C('Perulangan tanpa akhir', 'Si Maleo mengingatkan bahaya perulangan yang lupa berhenti.', 'Agar selama tidak berputar selamanya, apa yang harus terjadi di dalam perulangan?', ['Syaratnya suatu saat menjadi salah', 'Harus ada lebih dari 10 perintah', 'Kodi harus belok kiri'], 0, { explain: 'Perulangan selama berhenti saat syaratnya salah. Pastikan isinya membuat syarat itu berubah.', hint: 'Kapan blok selama berhenti?' }),
+  // Bab 5: Penjaga Tongkonan
+  C('Memilih blok', 'Penjaga Tongkonan memberi teka-teki terakhir.', 'Kodi harus berjalan sampai ujung lorong yang panjangnya tidak diketahui. Blok mana yang paling cocok?', ['ulangi 10 kali', 'selama depan_kosong', 'jika depan_kosong'], 1, { explain: 'Selama dipakai kalau kita tidak tahu berapa kali harus mengulang. Ia terus berjalan sampai syaratnya salah.', hint: 'Kita tidak tahu panjang lorongnya, jadi menghitung tidak bisa.' }),
+  G('Pantai serpihan', 'Serpihan kristal tersebar di tepi pulau. Ambil semuanya lalu berhenti di tujuan.', ['....S', '.####', '*####', '.####', '..*.G'], Object.assign({}, K4A, { dir: 'W', need: ['while'], sol: 'selama bukan di_tujuan { jika depan_kosong { maju } lain { belok_kiri } }', hint: 'Kodi menghadap kiri dan berkeliling berlawanan arah jarum jam.' })),
+  R('Tebak dua dinding', 'Tebak lagi sebelum menyalakan Kodi.', 'Di huruf apa Kodi berhenti?', ['S..A', '....', '....', 'D..C'], 'selama depan_kosong {\n  maju\n}\nbelok_kanan\nselama depan_kosong {\n  maju\n}\nbelok_kanan\nselama depan_kosong {\n  maju\n}', { dir: 'E', hint: 'Kodi berlari ke tepi, belok, berlari ke tepi, belok, berlari lagi.' }),
+  G('Tangga selama', 'Jalan menuju Tongkonan berundak. Berlarilah sampai dinding berikutnya.', ['S..#', '##.#', '##.G', '####'], Object.assign({}, K4A, { dir: 'E', need: ['while'], sol: 'selama depan_kosong { maju } belok_kanan selama depan_kosong { maju } belok_kiri selama depan_kosong { maju }', hint: 'Lari, belok kanan, lari, belok kiri, lari. Tiga blok selama.' })),
+  G('Penjaga Tongkonan', 'Glitch bersembunyi di atas Tongkonan! Ikuti dinding sambil mengumpulkan serpihan.', ['S....', '.#G#*', '.#*.*', '....#'], Object.assign({}, K4A, { dir: 'E', need: ['while'], sol: 'selama bukan di_tujuan { jika depan_kosong { maju } lain { belok_kanan } }', hint: 'Selama belum di tujuan: jika depan kosong, maju; kalau tidak, belok kanan. Kodi akan berputar masuk seperti siput.' }))
+];
+
+/* ===== m_k5.js ===== */
+/* ===== KELAS 5 - Bali dan Nusa Tenggara (mengetik kode) ===== */
+const K5ALL = ['ulangi', 'jika', 'jikalain', 'selama', 'fungsi'];
+KG_M.k5 = [
+  // Bab 1: Ketik Perintah Pertama
+  G('Ketikan pertama', 'Si Moko mengajak Kodi ke pantai. Ketik satu perintah di setiap baris.', ['S..G', '....'], TX({ dir: 'E', sol: 'maju maju maju', hint: 'Ketik: maju, tekan Enter, ketik maju lagi, sampai tiga kali.' })),
+  G('Lewat dinding batu', 'Dinding batu menghalangi. Ketik perintah belok kanan dan belok kiri.', ['S.#', '.##', '..G'], TX({ dir: 'E', sol: 'belok_kanan maju maju belok_kiri maju maju', hint: 'Kodi harus turun dulu, lalu ke kanan. Gunakan belok_kanan dan belok_kiri.' })),
+  G('Serpihan di pantai', 'Serpihan kristal terdampar di pasir.', ['S*..', '.##*', '...G'], TX({ dir: 'E', sol: 'maju maju maju belok_kanan maju maju', hint: 'Jalan di atas dulu, lalu turun di sisi kanan.' })),
+  C('Salah ketik', 'Kodi bingung dan menampilkan pesan: perintah "mju" tidak dikenal.', 'Apa penyebab pesan itu?', ['Salah ketik, seharusnya "maju"', 'Kodi rusak', 'Petanya terlalu besar'], 0, { explain: 'Komputer sangat teliti. Satu huruf yang salah membuat perintah tidak dikenali.', hint: 'Bandingkan "mju" dengan perintah yang kamu tahu.' }),
+  D('Belokan yang salah', 'Salah satu belokan tertukar. Ketuk baris yang salah.', 'Kodi menabrak tepi peta. Ketuk baris yang salah.', ['S.#', '.##', '..G'], ['belok_kanan', 'maju', 'maju', 'belok_kanan', 'maju', 'maju'], 3, 'belok_kiri', { dir: 'E', hint: 'Setelah turun, Kodi menghadap bawah. Untuk ke kanan, belok kiri.' }),
+  // Bab 2: Ulangi dengan Kata
+  G('Ulangi pertama', 'Ketik perulangan: ulangi 6 kali { maju }', ['S.....G', '.......'], TX({ allow: ['ulangi'], need: ['rep'], dir: 'E', sol: 'ulangi 6 kali { maju }', hint: 'Format: ulangi 6 kali { maju }. Jangan lupa tanda kurung kurawal.' })),
+  G('Tikungan pantai', 'Pantai berbentuk huruf L.', ['S....', '####.', '####.', '####G'], TX({ allow: ['ulangi'], need: ['rep'], dir: 'E', sol: 'ulangi 4 kali { maju } belok_kanan ulangi 3 kali { maju }', hint: 'Dua perulangan dengan belok kanan di antaranya.' })),
+  G('Tangga pura', 'Tangga menuju pura naik turun.', ['S.###', '#.*##', '##..#', '###.*', '####G'], TX({ allow: ['ulangi'], need: ['rep'], dir: 'E', sol: 'ulangi 4 kali { maju belok_kanan maju belok_kiri }', hint: 'Pola: maju, belok_kanan, maju, belok_kiri. Ulangi 4 kali.' })),
+  R('Tebak tarian Kodi', 'Penari Bali mengajak Kodi menari. Ke mana Kodi akan berhenti?', 'Di huruf apa Kodi berhenti?', ['S..B', 'A...', '..C.', 'D...'], 'ulangi 3 kali {\n  maju\n  belok_kanan\n}', { dir: 'E', hint: 'Ikuti dengan jarimu: maju, belok kanan, tiga kali.' }),
+  G('Persegi panjang serpihan', 'Taman pura berbentuk persegi panjang, serpihan di dua sudut.', ['S...*', '####.', '####.', 'G...*'], TX({ allow: ['ulangi'], need: ['rep'], dir: 'E', sol: 'ulangi 4 kali { maju } belok_kanan ulangi 3 kali { maju } belok_kanan ulangi 4 kali { maju }', hint: 'Tiga perulangan: 4, 3, dan 4 kali, dengan belok kanan di antaranya.' })),
+  // Bab 3: Jika dan Lain dengan Kata
+  G('Jalan huruf U', 'Kodi memilih sendiri: maju kalau bisa, belok kalau tidak.', ['S......', '######.', 'G......'], TX({ allow: ['ulangi', 'jika', 'jikalain', 'selama'], need: ['if'], dir: 'E', sol: 'ulangi 16 kali { jika depan_kosong { maju } lain { belok_kanan } }', hint: '14 kali maju dan 2 kali belok, total 16 putaran. Format: jika depan_kosong { maju } lain { belok_kanan }' })),
+  G('Sampai tanpa menghitung', 'Si Moko menantang: tanpa menghitung langkah!', ['S....', '####.', '####.', 'G....'], TX({ allow: ['ulangi', 'jika', 'jikalain', 'selama'], need: ['while'], dir: 'E', sol: 'selama bukan di_tujuan { jika depan_kosong { maju } lain { belok_kanan } }', hint: 'Mulai dengan: selama bukan di_tujuan { ... }' })),
+  C('Jika dan selama', 'Si Moko bertanya tentang dua blok yang mirip.', 'Apa bedanya jika dan selama?', ['jika memeriksa satu kali; selama memeriksa berulang-ulang', 'Sama saja, hanya beda nama', 'selama hanya untuk belok'], 0, { explain: 'jika menjalankan isinya sekali bila syaratnya benar. selama mengulang isinya terus selama syaratnya benar.', hint: 'Satu kali atau berkali-kali?' }),
+  D('Syarat yang terbalik', 'Kodi diam di tempat! Ada kata yang hilang.', 'Kodi tidak bergerak sama sekali. Ketuk baris yang salah.', ['S....', '####.', '####.', 'G....'], ['selama di_tujuan {', '  jika depan_kosong {', '    maju', '  } lain {', '    belok_kanan', '  }', '}'], 0, 'selama bukan di_tujuan {', { dir: 'E', hint: 'Kodi belum di tujuan. Apakah "selama di_tujuan" benar saat itu?' }),
+  G('Jalan siput', 'Jalan berputar masuk seperti rumah siput. Ikuti dinding!', ['S....', '.#G#.', '.#*#*', '.#.*.', '....#'], TX({ allow: ['ulangi', 'jika', 'jikalain', 'selama'], need: ['while'], dir: 'E', sol: 'selama bukan di_tujuan { jika depan_kosong { maju } lain { belok_kanan } }', hint: 'Kodi berbelok kanan setiap kali menabrak dinding. Ia akan masuk sampai ke tujuan.' })),
+  // Bab 4: Fungsi: Tarian Berurutan
+  G('Gerakan bernama', 'Penari mengulang satu gerakan: beri nama dengan fungsi!', ['S..####', '##...##', '####...', '######G'], TX({ allow: ['ulangi', 'fungsi'], need: ['def'], dir: 'E', sol: 'fungsi anak_tangga { maju maju belok_kanan maju belok_kiri } anak_tangga anak_tangga anak_tangga', hint: 'Mulai dengan: fungsi anak_tangga { ... }. Lalu tulis anak_tangga tiga kali di bawahnya.' })),
+  G('Fungsi sisi', 'Beri nama untuk satu sisi kolam, lalu panggil beberapa kali.', ['S..*', '.##.', '.##.', 'G..*'], TX({ allow: ['ulangi', 'fungsi'], need: ['def'], dir: 'E', sol: 'fungsi sisi { ulangi 3 kali { maju } belok_kanan } sisi sisi sisi', hint: 'fungsi sisi { ulangi 3 kali { maju } belok_kanan }, lalu panggil sisi tiga kali.' })),
+  C('Mengapa pakai fungsi?', 'Si Moko ingin tahu apa manfaat fungsi.', 'Mengapa programmer membuat fungsi?', ['Agar rangkaian perintah diberi nama dan bisa dipakai berulang', 'Agar Kodi berjalan lebih cepat', 'Agar peta menjadi lebih besar'], 0, { explain: 'Fungsi membuat kode lebih rapi, pendek, dan mudah diperbaiki karena satu bagian bisa dipakai di banyak tempat.', hint: 'Fungsi itu seperti nama panggilan untuk sekumpulan perintah.' }),
+  G('Lurus dan tikung', 'Jalan berbentuk Z. Buat fungsi untuk bagian yang lurus.', ['S...###', '###.###', '###.###', '###...G'], TX({ allow: ['ulangi', 'fungsi'], need: ['def'], dir: 'E', sol: 'fungsi lurus { ulangi 3 kali { maju } } lurus belok_kanan lurus belok_kiri lurus', hint: 'Buat fungsi lurus (maju 3 kali), lalu panggil tiga kali dengan belokan di antaranya.' })),
+  D('Belokan di fungsi', 'Satu belokan tertukar di tarian ini.', 'Kodi tidak sampai tujuan. Ketuk baris yang salah.', ['S...###', '###.###', '###.###', '###...G'], ['fungsi lurus {', '  ulangi 3 kali {', '    maju', '  }', '}', 'lurus', 'belok_kanan', 'lurus', 'belok_kanan', 'lurus'], 8, 'belok_kiri', { dir: 'E', hint: 'Setelah turun, Kodi harus ke kanan. Itu belok kiri atau kanan?' }),
+  // Bab 5: Penjaga Pura
+  R('Tebak fungsi', 'Penjaga pura menguji pemahamanmu.', 'Di huruf apa Kodi berhenti?', ['S.A.', '....', 'C.B.', '...D'], 'fungsi sisi {\n  maju\n  maju\n  belok_kanan\n}\nsisi\nsisi\nsisi', { dir: 'E', hint: 'Setiap sisi: maju 2 kali, belok kanan. Panggil 3 kali.' }),
+  G('Kebun padi bersusun', 'Panen padi di kebun: pakai fungsi dan perulangan sekaligus.', ['S...*', '*....', '....*', '*....', '....G'], TX({ allow: ['ulangi', 'fungsi'], need: ['def'], dir: 'E', sol: 'fungsi baris { ulangi 4 kali { maju } } ulangi 2 kali { baris belok_kanan maju belok_kanan baris belok_kiri maju belok_kiri } baris', hint: 'Buat fungsi baris (maju 4). Satu pasang baris: baris, kanan, maju, kanan, baris, kiri, maju, kiri. Ulangi 2 kali, lalu satu baris lagi.' })),
+  C('Memanggil fungsi', 'Penjaga pura bertanya tentang fungsi yang sudah dibuat.', 'Setelah sebuah fungsi dibuat, apa yang harus dilakukan agar isinya berjalan?', ['Memanggil namanya', 'Menunggu beberapa detik', 'Menghapus fungsi itu'], 0, { explain: 'Membuat fungsi hanya memberi nama. Isinya baru berjalan saat namanya dipanggil.', hint: 'Fungsi itu seperti resep: harus dimasak, bukan hanya ditulis.' }),
+  D('Anak tangga yang rusak', 'Glitch mengacak satu perintah di fungsi anak tangga.', 'Kodi menabrak dinding. Ketuk baris yang salah di dalam fungsi.', ['S..####', '##...##', '####...', '######G'], ['fungsi anak_tangga {', '  maju', '  maju', '  belok_kanan', '  maju', '  belok_kanan', '}', 'anak_tangga', 'anak_tangga', 'anak_tangga'], 5, '  belok_kiri', { dir: 'E', hint: 'Setelah turun satu langkah, Kodi harus kembali menghadap ke kanan.' }),
+  G('Penjaga Pura', 'Glitch menunggu di puncak pura! Susun tangga pura dengan fungsi dan ambil serpihan.', ['S..####', '##.####', '##.*.##', '####.##', '####.*.', '######.', '######G'], TX({ allow: ['ulangi', 'fungsi'], need: ['def'], dir: 'E', sol: 'fungsi tangga { ulangi 2 kali { maju } belok_kanan ulangi 2 kali { maju } belok_kiri } tangga tangga tangga', hint: 'Satu anak tangga: maju 2, belok kanan, maju 2, belok kiri. Panggil tiga kali.' }))
+];
+
+/* ===== m_k6.js ===== */
+/* ===== KELAS 6 - Maluku dan Papua (perulangan bersarang, algoritma, logika) ===== */
+const K6A = ['ulangi', 'jika', 'jikalain', 'selama'];
+const K6LORONG = ['S..#...', '##.#.#.', '##...#.', '######.', '######G'];
+const K6TANGAN = 'selama bukan di_tujuan { jika kanan_kosong { belok_kanan maju } lain { jika depan_kosong { maju } lain { belok_kiri } } }';
+const K6ZMAP = ['S....####', '####.####', '####.####', '####.####', '####....G'];
+KG_M.k6 = [
+  // Bab 1: Ulangi Bersarang
+  G('Dua sisi besar', 'Pulau rempah ini luas. Satu sisi = ulangi 4 kali maju. Ulangi sisi itu dua kali!', ['S....', '.###.', '.###.', '.###.', '....G'], TX({ allow: ['ulangi'], need: ['rep'], dir: 'E', sol: 'ulangi 2 kali { ulangi 4 kali { maju } belok_kanan }', hint: 'Perulangan di dalam perulangan: ulangi 2 kali { ulangi 4 kali { maju } belok_kanan }' })),
+  G('Tangga rempah', 'Tangga di perkebunan pala turun ke selatan, lalu timur, berganti-ganti.', ['S######', '.######', '.*.####', '##.####', '##.*.##', '####.##', '####.*G'], TX({ allow: ['ulangi'], need: ['rep'], dir: 'S', sol: 'ulangi 3 kali { ulangi 2 kali { maju } belok_kiri ulangi 2 kali { maju } belok_kanan }', hint: 'Menghadap bawah: maju 2, belok kiri, maju 2, belok kanan. Ulangi 3 kali.' })),
+  R('Tebak bersarang', 'Si Cendi memberi teka-teki perulangan.', 'Di huruf apa Kodi berhenti?', ['S.A.', '.B..', '..C.', 'D...'], 'ulangi 2 kali {\n  ulangi 2 kali {\n    maju\n  }\n  belok_kanan\n}', { dir: 'E', hint: 'Satu putaran luar: maju 2 kali lalu belok kanan.' }),
+  C('Hitung maju', 'Si Cendi menguji kemampuan menghitungmu.', 'Berapa kali "maju" dijalankan oleh kode ini?', ['7', '12', '15'], 1, { code: 'ulangi 3 kali {\n  ulangi 4 kali {\n    maju\n  }\n  belok_kanan\n}', explain: 'Perulangan luar 3 kali, dalamnya 4 kali maju. Jadi 3 x 4 = 12 kali maju.', hint: 'Kalikan banyaknya putaran luar dengan putaran dalam.' }),
+  G('Kebun pala', 'Panen pala di seluruh kebun, baris demi baris, tanpa melewatkan satu pun.', ['S.....*', '*......', '......*', '*......', '......G'], TX({ allow: ['ulangi'], need: ['rep'], dir: 'E', sol: 'ulangi 2 kali { ulangi 6 kali { maju } belok_kanan maju belok_kanan ulangi 6 kali { maju } belok_kiri maju belok_kiri } ulangi 6 kali { maju }', hint: 'Satu pasang baris: maju 6, kanan, maju, kanan, maju 6, kiri, maju, kiri. Ulangi 2 kali, lalu satu baris terakhir.' })),
+  // Bab 2: Selama dan Jika
+  G('Lorong pulau', 'Lorong sempit penuh tikungan. Pakai trik tangan kanan: tempelkan tangan kanan ke dinding.', K6LORONG, TX({ allow: K6A, need: ['while'], dir: 'E', sol: K6TANGAN, hint: 'Jika kanan kosong: belok kanan lalu maju. Kalau tidak, jika depan kosong: maju. Kalau tidak: belok kiri.' })),
+  R('Tebak selama', 'Si Cendi bersembunyi di balik huruf.', 'Di huruf apa Kodi berhenti?', ['S...', '....', '....', 'A..B'], 'selama depan_kosong {\n  maju\n}\nbelok_kanan\nselama depan_kosong {\n  maju\n}', { dir: 'E', hint: 'Kodi berlari ke ujung kanan, belok kanan, lalu berlari ke ujung bawah.' }),
+  G('Pulau rempah', 'Ikuti pantai pulau sambil memetik rempah (serpihan).', ['..*.S', '.####', '.####', '.####', '..*.G'], TX({ allow: K6A, need: ['while'], dir: 'W', sol: 'selama bukan di_tujuan { jika depan_kosong { maju } lain { belok_kiri } }', hint: 'Kodi menghadap kiri dan berkeliling berlawanan arah jarum jam.' })),
+  C('Arti selama bukan', 'Si Cendi bertanya tentang kode yang kamu pakai.', 'Apa arti "selama bukan di_tujuan { ... }"?', ['Terus ulangi isinya sampai Kodi berada di tujuan', 'Kodi tidak pernah ke tujuan', 'Jalankan isinya sekali saja'], 0, { explain: 'Selama mengulang isinya selama syaratnya benar. "bukan di_tujuan" benar sampai Kodi tiba di tujuan.', hint: 'Kapan syarat "bukan di_tujuan" menjadi salah?' }),
+  D('Tangan kanan yang keliru', 'Satu belokan di aturan tangan kanan tertukar.', 'Kodi berputar-putar di lorong. Ketuk baris yang salah.', K6LORONG, ['selama bukan di_tujuan {', '  jika kanan_kosong {', '    belok_kanan', '    maju', '  } lain {', '    jika depan_kosong {', '      maju', '    } lain {', '      belok_kanan', '    }', '  }', '}'], 8, '      belok_kiri', { dir: 'E', hint: 'Kalau kanan dan depan tertutup, Kodi harus berbalik ke arah mana?' }),
+  // Bab 3: Fungsi Penolong
+  G('Fungsi pertama', 'Pecah masalah menjadi bagian kecil. Satu sisi kolam jadi satu fungsi.', ['S..*', '.##.', '.##.', 'G..*'], TX({ allow: ['ulangi', 'fungsi'], need: ['def'], dir: 'E', sol: 'fungsi sisi { ulangi 3 kali { maju } belok_kanan } sisi sisi sisi', hint: 'fungsi sisi { ulangi 3 kali { maju } belok_kanan }, lalu sisi tiga kali.' })),
+  G('Fungsi memanggil fungsi', 'Fungsi boleh memanggil fungsi lain!', ['S..####', '##.####', '##...##', '####.##', '####...', '######.', '######G'], TX({ allow: ['ulangi', 'fungsi'], need: ['def'], dir: 'E', sol: 'fungsi lurus { ulangi 2 kali { maju } } fungsi tangga { lurus belok_kanan lurus belok_kiri } tangga tangga tangga', hint: 'Buat fungsi lurus (maju 2). Buat fungsi tangga yang memanggil lurus dua kali. Panggil tangga tiga kali.' })),
+  C('Jejak fungsi', 'Si Cendi menguji jejak eksekusi fungsi.', 'Berapa kali "maju" dijalankan?', ['2', '4', '6'], 1, { code: 'fungsi a {\n  maju\n}\nfungsi b {\n  a\n  a\n}\nb\nb', explain: 'b memanggil a dua kali, jadi satu b = 2 maju. Dipanggil dua kali: 4 maju.', hint: 'Satu b menghasilkan berapa maju? Lalu b dipanggil berapa kali?' }),
+  R('Tebak fungsi lompat', 'Tebak hasil kodenya sebelum dijalankan.', 'Di huruf apa Kodi berhenti?', ['S.A.', '.B..', '..C.', 'D...'], 'fungsi lompat {\n  maju\n  maju\n  belok_kanan\n}\nlompat\nlompat', { dir: 'E', hint: 'Satu lompat: maju 2, belok kanan. Dua kali.' }),
+  G('Jalan huruf Z panjang', 'Jalan menuju gunung berbentuk Z. Satu fungsi cukup untuk bagian lurusnya.', K6ZMAP, TX({ allow: ['ulangi', 'fungsi'], need: ['def'], dir: 'E', sol: 'fungsi lurus { ulangi 4 kali { maju } } lurus belok_kanan lurus belok_kiri lurus', hint: 'Fungsi lurus = maju 4 kali. Panggil tiga kali dengan belokan di antaranya.' })),
+  // Bab 4: Logika dan Perbaiki Kode
+  C('Logika bukan', 'Si Cendi mengajak berpikir seperti ahli komputer.', 'Kodi belum sampai tujuan. Apa nilai dari "bukan di_tujuan"?', ['Benar', 'Salah', 'Tidak bisa ditentukan'], 0, { explain: '"di_tujuan" salah karena Kodi belum sampai. "bukan" membalik nilainya, jadi hasilnya benar.', hint: 'Kata "bukan" membalik benar menjadi salah, dan sebaliknya.' }),
+  C('Bilangan biner', 'Komputer hanya mengenal angka 0 dan 1.', 'Dalam biner (hanya 0 dan 1), angka 5 ditulis...', ['101', '110', '011'], 0, { explain: 'Biner: 4 + 0 + 1 = 5, jadi 101. Dari kiri ke kanan: nilai 4, 2, dan 1.', hint: 'Nilai tiap tempat dari kanan: 1, 2, 4. Bagaimana menyusun 5 dari 4 + 1?' }),
+  C('Mencari terbesar', 'Algoritma mencari angka terbesar dalam daftar.', 'Berapa nilai yang dicetak?', ['3', '9', '7'], 1, { code: 'terbesar = 0\nuntuk setiap angka di [3, 9, 4, 7] {\n  jika angka > terbesar {\n    terbesar = angka\n  }\n}\ncetak terbesar', explain: 'Setiap kali menemukan angka yang lebih besar, terbesar diganti: 3, lalu 9. Angka 4 dan 7 tidak lebih besar dari 9.', hint: 'Ikuti satu per satu. Setelah angka 3, berapa terbesar? Lalu angka 9?' }),
+  D('Syarat yang tertukar', 'Satu syarat di aturan tangan kanan berubah arah.', 'Kodi tersesat di lorong. Ketuk baris yang salah.', K6LORONG, ['selama bukan di_tujuan {', '  jika kiri_kosong {', '    belok_kanan', '    maju', '  } lain {', '    jika depan_kosong {', '      maju', '    } lain {', '      belok_kiri', '    }', '  }', '}'], 1, '  jika kanan_kosong {', { dir: 'E', hint: 'Aturan tangan kanan memeriksa sisi mana yang kosong?' }),
+  C('Program yang efisien', 'Si Cendi menguji cara berpikir programmer.', 'Dua program membuat Kodi maju 100 langkah. Program A menulis maju 100 kali. Program B memakai ulangi 100 kali { maju }. Mana yang lebih baik?', ['B, karena lebih singkat dan mudah diubah', 'A, karena lebih panjang', 'Sama saja dalam segala hal'], 0, { explain: 'Program yang singkat lebih mudah dibaca, diperbaiki, dan diubah. Perulangan menghindarkan kita menulis hal yang sama berulang-ulang.', hint: 'Bayangkan harus mengubah 100 menjadi 150. Mana yang lebih mudah?' }),
+  // Bab 5: Puncak Terakhir
+  C('Jejak perulangan', 'Glitch mengirim teka-teki terakhirnya.', 'Apa yang dicetak oleh kode ini?', ['**-**-**-', '***---', '**-**-**'], 0, { code: 'ulangi 3 kali {\n  ulangi 2 kali {\n    cetak "*"\n  }\n  cetak "-"\n}', explain: 'Setiap putaran luar mencetak ** lalu -. Tiga putaran: **-**-**-.', hint: 'Satu putaran luar mencetak apa? Lalu ulangi tiga kali.' }),
+  R('Tebak gabungan', 'Perulangan, fungsi, dan belokan sekaligus.', 'Di huruf apa Kodi berhenti?', ['S.A.', '....', 'C.B.', '...D'], 'fungsi sisi {\n  maju\n  maju\n  belok_kanan\n}\nulangi 3 kali {\n  sisi\n}', { dir: 'E', hint: 'Panggil sisi tiga kali: maju 2 + belok kanan, tiga kali.' }),
+  G('Siput di puncak', 'Kabut tebal! Ikuti dinding dengan tangan kanan menuju pusat.', ['S....', '####.', '..G#.', '.###.', '.....'], TX({ allow: K6A, need: ['while'], dir: 'E', sol: K6TANGAN, hint: 'Gunakan aturan tangan kanan. Jalannya berputar masuk ke tujuan.' })),
+  D('Fungsi yang salah belok', 'Satu belokan di kode ini salah arah.', 'Kodi tidak sampai tujuan. Ketuk baris yang salah.', K6ZMAP, ['fungsi lurus {', '  ulangi 4 kali {', '    maju', '  }', '}', 'lurus', 'belok_kanan', 'lurus', 'belok_kanan', 'lurus'], 8, 'belok_kiri', { dir: 'E', hint: 'Kodi menghadap bawah dan harus menghadap kanan lagi. Itu belok ke mana?' }),
+  G('Puncak Terakhir', 'Glitch di puncak! Ikuti dinding tangan kanan di jalan spiral dan ambil semua serpihan.', ['S..*...', '######.', '..*..#.', '.###.#.', '.#G..#.', '.#####.', '...*...'], TX({ allow: ['ulangi', 'jika', 'jikalain', 'selama', 'fungsi'], need: ['while'], dir: 'E', sol: K6TANGAN, hint: 'Aturan tangan kanan, tanpa menghitung langkah. Kodi akan menyusuri dinding sampai ke pusat spiral.' }))
+];
+
+/* ===== app_a.js ===== */
+/* ===== APLIKASI: dasar, penyimpanan, login, peta, cerita ===== */
+const ENG = KG_ENGINE;
+const STORY = KG_STORY;
+const WORLDS = STORY.dunia;
+const UNLOCK_ALL = /[?&]semua/.test(location.search);
+const AVATARS = ['🧒', '👧', '🧑', '🦸', '🧙', '🥷', '👩‍🚀', '🧑‍🔬', '🐱', '🐶', '🐼', '🦊'];
+const $ = (s, root) => (root || document).querySelector(s);
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const pad2 = (n) => String(n).padStart(2, '0');
+
+/* ---------- Data misi ---------- */
+const MISSIONS = {}; const WLIST = {};
+WORLDS.forEach((w) => {
+  const list = KG_M['k' + w.id] || [];
+  let k = 0; const chapOf = [];
+  w.bab.forEach((b, bi) => { b.start = k; for (let j = 0; j < b.n; j++) chapOf[k++] = bi; });
+  WLIST[w.id] = list.map((m, i) => {
+    const mm = Object.assign({}, m, { id: 'k' + w.id + '-' + pad2(i + 1), world: w.id, idx: i + 1, chap: chapOf[i] === undefined ? w.bab.length - 1 : chapOf[i] });
+    mm.style = m.style || (w.id === 1 ? 'abs' : 'rel');
+    mm.mode = m.mode || 'arrows';
+    MISSIONS[mm.id] = mm; return mm;
+  });
+});
+const TOTAL_MISSIONS = Object.keys(MISSIONS).length;
+
+/* ---------- Penyimpanan lokal kecil ---------- */
+function lsGet(k, d) { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } }
+function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* abaikan */ } }
+
+/* ---------- Backend: Supabase atau mode coba (lokal) ---------- */
+const ONLINE = !!(CONFIG.SUPABASE_URL && CONFIG.SUPABASE_ANON_KEY);
+const NET_ERR = { ok: false, pesan: 'Tidak bisa terhubung ke internet. Periksa koneksi lalu coba lagi.' };
+function rpcHeaders() {
+  const k = CONFIG.SUPABASE_ANON_KEY, h = { apikey: k, 'Content-Type': 'application/json' };
+  if (/^eyJ/.test(k)) h.Authorization = 'Bearer ' + k;   // kunci lama (JWT); kunci sb_publishable_ cukup di header apikey
+  return h;
+}
+const Remote = {
+  async rpc(fn, args) {
+    try {
+      const r = await fetch(CONFIG.SUPABASE_URL.replace(/\/$/, '') + '/rest/v1/rpc/' + fn, {
+        method: 'POST',
+        headers: rpcHeaders(),
+        body: JSON.stringify(args)
+      });
+      if (!r.ok) return { ok: false, pesan: 'Server menolak permintaan (' + r.status + '). Pastikan SQL setup sudah dijalankan.', net: true };
+      return await r.json();
+    } catch (e) { return Object.assign({ net: true }, NET_ERR); }
+  },
+  register: (d) => Remote.rpc('kg_daftar', { p_username: d.username, p_pin: d.pin, p_nama: d.nama, p_kelas: d.kelas, p_avatar: d.avatar }),
+  login: (u, pin) => Remote.rpc('kg_masuk', { p_username: u, p_pin: pin }),
+  save: (u, pin, misi, b) => Remote.rpc('kg_simpan', { p_username: u, p_pin: pin, p_misi: misi, p_bintang: b }),
+  guruRekap: (kode) => Remote.rpc('kg_guru_rekap', { p_kode: kode }),
+  guruPin: (kode, u, pin) => Remote.rpc('kg_guru_reset_pin', { p_kode: kode, p_username: u, p_pin: pin }),
+  guruKelas: (kode, u, k) => Remote.rpc('kg_guru_set_kelas', { p_kode: kode, p_username: u, p_kelas: k })
+};
+const Local = {
+  db() { return lsGet('kg_demo', { users: {} }); },
+  put(db) { lsSet('kg_demo', db); },
+  profil(u, x) { return { username: u, nama: x.nama, kelas: x.kelas, avatar: x.avatar }; },
+  async register(d) {
+    const db = Local.db();
+    if (db.users[d.username]) return { ok: false, pesan: 'Username itu sudah dipakai. Coba username lain.' };
+    db.users[d.username] = { pin: d.pin, nama: d.nama, kelas: d.kelas, avatar: d.avatar, progres: {}, terakhir: Date.now() };
+    Local.put(db); return { ok: true, profil: Local.profil(d.username, db.users[d.username]), progres: {} };
+  },
+  async login(u, pin) {
+    const db = Local.db(); const x = db.users[u];
+    if (!x || x.pin !== pin) return { ok: false, pesan: 'Username atau PIN salah.' };
+    x.terakhir = Date.now(); Local.put(db);
+    return { ok: true, profil: Local.profil(u, x), progres: x.progres };
+  },
+  async save(u, pin, misi, b) {
+    const db = Local.db(); const x = db.users[u]; if (!x || x.pin !== pin) return { ok: false, pesan: 'Sesi tidak valid.' };
+    x.progres[misi] = Math.max(x.progres[misi] || 0, b); x.terakhir = Date.now(); Local.put(db); return { ok: true };
+  },
+  async guruRekap(kode) {
+    if (kode !== CONFIG.KODE_GURU_DEMO) return { ok: false, pesan: 'Kode guru salah.' };
+    const db = Local.db();
+    return { ok: true, siswa: Object.keys(db.users).map((u) => { const x = db.users[u]; const v = Object.values(x.progres); return { username: u, nama: x.nama, kelas: x.kelas, avatar: x.avatar, bintang: v.reduce((a, b) => a + b, 0), selesai: v.length, terakhir: new Date(x.terakhir).toISOString() }; }) };
+  },
+  async guruPin(kode, u, pin) {
+    if (kode !== CONFIG.KODE_GURU_DEMO) return { ok: false, pesan: 'Kode guru salah.' };
+    const db = Local.db(); if (!db.users[u]) return { ok: false, pesan: 'Siswa tidak ditemukan.' }; db.users[u].pin = pin; Local.put(db); return { ok: true };
+  },
+  async guruKelas(kode, u, k) {
+    if (kode !== CONFIG.KODE_GURU_DEMO) return { ok: false, pesan: 'Kode guru salah.' };
+    const db = Local.db(); if (!db.users[u]) return { ok: false, pesan: 'Siswa tidak ditemukan.' }; db.users[u].kelas = k; Local.put(db); return { ok: true };
+  }
+};
+const Backend = ONLINE ? Remote : Local;
+
+/* ---------- Keadaan aplikasi ---------- */
+const S = { user: null, pin: null, progress: {}, view: 'login', cs: null, guruKode: null };
+const app = document.getElementById('app');
+let E = null; // keadaan misi yang sedang dimainkan
+
+function seenKey() { return 'kg_seen_' + (S.user ? S.user.username : ''); }
+function seen(k) { return !!(lsGet(seenKey(), {})[k]); }
+function markSeen(k) { const o = lsGet(seenKey(), {}); o[k] = 1; lsSet(seenKey(), o); }
+function pendKey() { return 'kg_pend_' + (S.user ? S.user.username : ''); }
+
+/* ---------- Perhitungan progres ---------- */
+const starsOf = (id) => S.progress[id] || 0;
+function worldStats(w) {
+  const list = WLIST[w.id]; let stars = 0, done = 0;
+  list.forEach((m) => { const s = starsOf(m.id); stars += s; if (s > 0) done++; });
+  return { total: list.length, done, stars, max: list.length * 3, complete: list.length > 0 && done === list.length };
+}
+function worldTier(w) {
+  const st = worldStats(w); if (!st.complete) return null;
+  const r = st.stars / st.max; return r >= 0.8 ? 'emas' : r >= 0.55 ? 'perak' : 'perunggu';
+}
+function allStats() {
+  let stars = 0, max = 0, done = 0;
+  WORLDS.forEach((w) => { const s = worldStats(w); stars += s.stars; max += s.max; done += s.done; });
+  return { stars, max, done, ratio: max ? stars / max : 0 };
+}
+function grandKey() { const r = allStats().ratio; return r >= 0.85 ? 'garuda' : r >= 0.6 ? 'penjaga' : r >= 0.35 ? 'penjelajah' : 'sahabat'; }
+function gelar() { const t = allStats().stars; let g = STORY.gelar[0][1]; STORY.gelar.forEach((x) => { if (t >= x[0]) g = x[1]; }); return g; }
+function worldOpen(w) { return UNLOCK_ALL || w.kelas <= S.user.kelas; }
+function missionOpen(m) { return UNLOCK_ALL || m.idx === 1 || starsOf('k' + m.world + '-' + pad2(m.idx - 1)) > 0; }
+const starsHtml = (n, big) => '<span class="stars' + (big ? ' big' : '') + '" aria-label="' + n + ' dari 3 bintang">' + [1, 2, 3].map((i) => '<span class="star' + (i <= n ? ' on' : '') + '">★</span>').join('') + '</span>';
+const sub = (t) => String(t).replace(/\{nama\}/g, S.user ? S.user.nama : 'teman');
+
+/* ---------- Simpan progres (dengan antrean bila offline) ---------- */
+async function saveProgress(m, stars) {
+  const prev = starsOf(m.id); if (stars <= prev) return;
+  S.progress[m.id] = stars;
+  const r = await Backend.save(S.user.username, S.pin, m.id, stars);
+  if (!r || r.ok === false) {
+    const q = lsGet(pendKey(), []); q.push([m.id, stars]); lsSet(pendKey(), q);
+    toast('Progres belum tersimpan online. Akan dicoba lagi nanti.');
+  } else flushPending();
+}
+async function flushPending() {
+  const q = lsGet(pendKey(), []); if (!q.length) return;
+  const rest = [];
+  for (const it of q) { const r = await Backend.save(S.user.username, S.pin, it[0], it[1]); if (!r || r.ok === false) rest.push(it); }
+  lsSet(pendKey(), rest);
+}
+
+/* ---------- Toast dan modal ---------- */
+function toast(msg) {
+  let t = $('#toast'); if (!t) { t = document.createElement('div'); t.id = 'toast'; t.className = 'toast'; t.setAttribute('role', 'status'); document.body.appendChild(t); }
+  t.textContent = msg; t.classList.add('on'); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('on'), 3200);
+}
+function modal(html, onAct) {
+  closeModal();
+  const o = document.createElement('div'); o.className = 'overlay'; o.id = 'modal'; o.innerHTML = '<div class="card modal" role="dialog" aria-modal="true">' + html + '</div>';
+  document.body.appendChild(o);
+  const first = o.querySelector('button, input, select'); if (first) first.focus();
+  return o;
+}
+function closeModal() { const o = $('#modal'); if (o) o.remove(); }
+
+/* ---------- Kristal Kode (6 pecahan) ---------- */
+function crystalSvg(size) {
+  const cx = 100, cy = 100, R = 92; const pts = [];
+  for (let i = 0; i < 6; i++) { const a = (-90 + 60 * i) * Math.PI / 180; pts.push([cx + R * Math.cos(a), cy + R * Math.sin(a)]); }
+  const col = { emas: '#ffc233', perak: '#dfe6ff', perunggu: '#e08a4b' };
+  let out = '<svg class="crystal" viewBox="0 0 200 200" width="' + size + '" height="' + size + '" role="img" aria-label="Kristal Kode: ' + WORLDS.filter((w) => worldTier(w)).length + ' dari 6 pecahan terkumpul">';
+  WORLDS.forEach((w, i) => {
+    const a = pts[i], b = pts[(i + 1) % 6]; const t = worldTier(w);
+    const fill = t ? col[t] : 'rgba(255,255,255,0.08)';
+    out += '<polygon points="' + cx + ',' + cy + ' ' + a[0].toFixed(1) + ',' + a[1].toFixed(1) + ' ' + b[0].toFixed(1) + ',' + b[1].toFixed(1) + '" fill="' + fill + '" stroke="#0f1440" stroke-width="4" stroke-linejoin="round"' + (t ? ' class="shard on"' : ' class="shard"') + '/>';
+  });
+  return out + '</svg>';
+}
+
+/* ---------- Pemutar cerita ---------- */
+function playScenes(scenes, opt) {
+  S.cs = { scenes, i: 0, opt: opt || {} }; S.view = 'cutscene'; render();
+}
+function speakerOf(code, w) {
+  if (code === 'helper' && w) return { e: w.helper.emoji, n: w.helper.nama };
+  if (code === 'kodi') return { e: STORY.who.kodi, n: 'Kodi' };
+  if (code === 'glitch') return { e: STORY.who.glitch, n: 'Glitch' };
+  return { e: STORY.who.narator, n: 'Cerita' };
+}
+function viewCutscene() {
+  const c = S.cs, o = c.opt, w = o.world ? WORLDS[o.world - 1] : null; const sc = c.scenes[c.i]; const sp = speakerOf(sc[0], w);
+  const last = c.i === c.scenes.length - 1; const color = w ? w.warna : '#4b57d6';
+  app.innerHTML = '<div class="screen cut" style="--accent:' + color + '" data-act="cs-next">' +
+    '<div class="cut-top"><button class="btn ghost small" data-act="cs-skip">Lewati</button></div>' +
+    '<div class="cut-stage"><div class="speaker" aria-hidden="true">' + sp.e + '</div>' +
+    '<div class="card talk" aria-live="polite"><div class="who">' + esc(sp.n) + '</div><p>' + esc(sub(sc[1])) + '</p></div></div>' +
+    '<div class="cut-bottom"><span class="dots">' + c.scenes.map((_, i) => '<i class="' + (i === c.i ? 'on' : '') + '"></i>').join('') + '</span>' +
+    '<button class="btn" data-act="cs-next">' + (last ? 'Selesai' : 'Lanjut ▶') + '</button></div></div>';
+}
+function csNext() {
+  const c = S.cs; if (!c) return;
+  if (c.i < c.scenes.length - 1) { c.i++; render(); return; }
+  csFinish();
+}
+function csFinish() { const c = S.cs; S.cs = null; if (c && c.opt.done) c.opt.done(); else go('home'); }
+
+/* ---------- Ending ---------- */
+function showWorldEnding(w, done) {
+  const tier = worldTier(w) || 'perunggu';
+  playScenes(w.ending[tier], { world: w.id, done });
+}
+function showGrandEnding() {
+  const key = grandKey();
+  playScenes(STORY.akhir[key].isi, { done: () => go('ending') });
+}
+function viewEnding() {
+  const key = grandKey(), a = STORY.akhir[key], st = allStats(); const pct = Math.round(st.ratio * 100);
+  app.innerHTML = '<div class="screen"><div class="wrap narrow">' +
+    '<div class="card center ending"><div class="big-emoji" aria-hidden="true">' + a.emoji + '</div><h1>Ending: ' + esc(a.judul) + '</h1>' +
+    '<p>Kamu mengumpulkan <b>' + st.stars + ' dari ' + st.max + ' bintang</b> (' + pct + '%).</p>' + crystalSvg(160) +
+    '<h2>Ending yang bisa kamu dapatkan</h2><ul class="endlist">' +
+    Object.keys(STORY.akhir).map((k) => '<li class="' + (k === key ? 'now' : '') + '"><span aria-hidden="true">' + STORY.akhir[k].emoji + '</span> <b>' + esc(STORY.akhir[k].judul) + '</b> <small>' + esc(STORY.akhir[k].syarat) + '</small></li>').join('') +
+    '</ul><p class="muted">Ulangi misi untuk menambah bintang. Ending-mu akan berubah mengikuti progresmu.</p>' +
+    '<div class="row"><button class="btn sec" data-act="ending-replay">Lihat ceritanya lagi</button><button class="btn" data-act="go-home">Kembali ke peta</button></div></div></div></div>';
+}
+
+/* ---------- Layar: masuk & daftar ---------- */
+function topBrand() {
+  return '<div class="brand"><div class="brand-kodi" aria-hidden="true">🤖</div><h1>' + esc(STORY.judul) + '</h1><p>Petualangan coding untuk Kelas 1 sampai 6</p></div>';
+}
+function viewLogin() {
+  const last = lsGet('kg_last_user', '');
+  app.innerHTML = '<div class="screen"><div class="wrap narrow">' + topBrand() +
+    '<form class="card form" data-form="login" autocomplete="off"><h2>Masuk</h2>' +
+    '<label>Username<input id="f-user" name="username" value="' + esc(last) + '" maxlength="20" autocapitalize="none" autocorrect="off" spellcheck="false" required></label>' +
+    '<label>PIN (4 angka)<input id="f-pin" name="pin" type="password" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" required></label>' +
+    '<div class="msg" id="f-msg" role="alert"></div>' +
+    '<button class="btn wide" type="submit">Masuk</button>' +
+    '<button class="btn sec wide" type="button" data-act="go-register">Buat akun baru</button></form>' +
+    '<p class="foot"><button class="link" data-act="go-guru">Masuk sebagai guru</button></p>' +
+    (ONLINE ? '' : '<p class="notice">Mode coba: data hanya tersimpan di perangkat ini. Hubungkan Supabase agar progres tersimpan online (lihat PANDUAN).</p>') +
+    '</div></div>';
+  setTimeout(() => { const f = $(last ? '#f-pin' : '#f-user'); if (f) f.focus(); }, 30);
+}
+function viewRegister() {
+  app.innerHTML = '<div class="screen"><div class="wrap narrow">' + topBrand() +
+    '<form class="card form" data-form="register" autocomplete="off"><h2>Buat akun</h2>' +
+    '<label>Username<input name="username" maxlength="20" autocapitalize="none" autocorrect="off" spellcheck="false" required><small>3 sampai 20 karakter: huruf kecil, angka, titik, atau garis bawah.</small></label>' +
+    '<label>PIN (4 angka)<input name="pin" type="password" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" required><small>Ingat PIN-mu. Kalau lupa, minta bantuan guru.</small></label>' +
+    '<label>Nama panggilan<input name="nama" maxlength="30" required></label>' +
+    '<label>Kelas<select name="kelas">' + [1, 2, 3, 4, 5, 6].map((k) => '<option value="' + k + '">Kelas ' + k + '</option>').join('') + '</select></label>' +
+    '<fieldset><legend>Pilih avatar</legend><div class="avatars">' + AVATARS.map((a, i) => '<label class="av"><input type="radio" name="avatar" value="' + a + '"' + (i === 0 ? ' checked' : '') + '><span>' + a + '</span></label>').join('') + '</div></fieldset>' +
+    '<div class="msg" id="f-msg" role="alert"></div>' +
+    '<button class="btn wide" type="submit">Mulai petualangan</button>' +
+    '<button class="btn ghost wide dark" type="button" data-act="go-login">Sudah punya akun</button></form></div></div>';
+}
+async function submitLogin(f) {
+  const u = f.username.value.trim().toLowerCase(), pin = f.pin.value.trim(); const msg = $('#f-msg');
+  if (!/^\d{4}$/.test(pin)) { msg.textContent = 'PIN harus 4 angka.'; return; }
+  msg.textContent = 'Memeriksa...'; const r = await Backend.login(u, pin);
+  if (!r || !r.ok) { msg.textContent = (r && r.pesan) || 'Gagal masuk.'; return; }
+  startSession(r, pin, false);
+}
+async function submitRegister(f) {
+  const d = { username: f.username.value.trim().toLowerCase(), pin: f.pin.value.trim(), nama: f.nama.value.trim(), kelas: parseInt(f.kelas.value, 10), avatar: (f.querySelector('input[name=avatar]:checked') || {}).value || AVATARS[0] };
+  const msg = $('#f-msg');
+  if (!/^[a-z0-9_.]{3,20}$/.test(d.username)) { msg.textContent = 'Username: 3 sampai 20 karakter, hanya huruf kecil, angka, titik, atau garis bawah.'; return; }
+  if (!/^\d{4}$/.test(d.pin)) { msg.textContent = 'PIN harus 4 angka.'; return; }
+  if (!d.nama) { msg.textContent = 'Isi nama panggilanmu.'; return; }
+  msg.textContent = 'Membuat akun...'; const r = await Backend.register(d);
+  if (!r || !r.ok) { msg.textContent = (r && r.pesan) || 'Gagal membuat akun.'; return; }
+  startSession(r, d.pin, true);
+}
+function startSession(r, pin, isNew) {
+  S.user = r.profil; S.pin = pin; S.progress = Object.assign({}, r.progres || {});
+  lsSet('kg_last_user', S.user.username);
+  flushPending();
+  if (!seen('prolog')) { markSeen('prolog'); playScenes(STORY.prolog, { done: () => go('home') }); } else go('home');
+}
+function logout() { S.user = null; S.pin = null; S.progress = {}; E = null; go('login'); }
+
+/* ---------- Layar: peta utama ---------- */
+function topbar() {
+  const st = allStats();
+  return '<header class="topbar"><div class="who-me"><span class="me-av" aria-hidden="true">' + esc(S.user.avatar) + '</span><div><b>' + esc(S.user.nama) + '</b><span>Kelas ' + S.user.kelas + ' • ' + esc(gelar()) + '</span></div></div>' +
+    '<div class="top-r"><span class="total" title="Total bintang">★ ' + st.stars + '</span><button class="btn ghost small" data-act="logout">Keluar</button></div></header>';
+}
+function viewHome() {
+  const st = allStats(); const w6 = WORLDS[5]; const grandReady = worldStats(w6).complete;
+  app.innerHTML = '<div class="screen">' + topbar() + '<div class="wrap">' +
+    '<section class="hero"><div class="hero-crystal">' + crystalSvg(150) + '</div><div class="hero-text"><h1>Peta Nusantara</h1>' +
+    '<p>' + WORLDS.filter((w) => worldTier(w)).length + ' dari 6 pecahan Kristal Kode sudah kembali. ' + st.done + ' dari ' + TOTAL_MISSIONS + ' misi selesai.</p>' +
+    '<div class="bar" aria-hidden="true"><i style="width:' + Math.round(st.done / TOTAL_MISSIONS * 100) + '%"></i></div>' +
+    (grandReady ? '<button class="btn" data-act="grand-ending">Lihat ending ceritamu</button>' : '') + '</div></section>' +
+    '<section class="worlds">' + WORLDS.map(worldCard).join('') + '</section></div></div>';
+}
+function worldCard(w) {
+  const open = worldOpen(w), s = worldStats(w), tier = worldTier(w), has = WLIST[w.id].length > 0;
+  return '<article class="wcard' + (open ? '' : ' locked') + '" style="--accent:' + w.warna + '"><div class="wband"><span class="wemoji" aria-hidden="true">' + w.helper.emoji + '</span><span class="wnum">Kelas ' + w.kelas + '</span></div>' +
+    '<div class="wbody"><h3>' + esc(w.nama) + '</h3><p>' + esc(w.tempat) + '</p>' +
+    (open ? '<div class="bar sm" aria-hidden="true"><i style="width:' + Math.round(s.done / s.total * 100) + '%"></i></div><small>' + s.done + '/' + s.total + ' misi • ★ ' + s.stars + '/' + s.max + '</small>' : '<small>Terbuka di Kelas ' + w.kelas + '</small>') +
+    '<div class="row">' + (open && has ? '<button class="btn small" data-act="open-world" data-w="' + w.id + '">' + (s.done ? 'Lanjut' : 'Mulai') + '</button>' : '') +
+    (tier ? '<span class="tier t-' + tier + '">Pecahan ' + tier + '</span>' : '') + '</div></div></article>';
+}
+
+/* ---------- Layar: dunia ---------- */
+function viewWorld() {
+  const w = WORLDS[S.wid - 1], s = worldStats(w), tier = worldTier(w);
+  app.innerHTML = '<div class="screen" style="--accent:' + w.warna + '">' + topbar() + '<div class="wrap">' +
+    '<div class="wtitle"><button class="btn ghost small" data-act="go-home">‹ Peta</button><div><h1>' + esc(w.nama) + '</h1><p>' + esc(w.tempat) + ' • ' + s.done + '/' + s.total + ' misi • ★ ' + s.stars + '/' + s.max + '</p></div></div>' +
+    '<div class="row"><button class="btn sec small" data-act="replay-intro">' + w.helper.emoji + ' Cerita dunia ini</button>' + (tier ? '<button class="btn small" data-act="world-ending">Lihat ending dunia (' + tier + ')</button>' : '') + '</div>' +
+    w.bab.map((b, bi) => {
+      const ms = WLIST[w.id].filter((m) => m.chap === bi); if (!ms.length) return '';
+      const cdone = ms.every((m) => starsOf(m.id) > 0);
+      return '<section class="chap"><h2><span aria-hidden="true">' + b.emoji + '</span> Bab ' + (bi + 1) + ': ' + esc(b.judul) + (cdone ? ' <span class="badge">✓ Selesai</span>' : '') + '</h2><p class="muted">' + esc(b.intro) + '</p><div class="nodes">' +
+        ms.map((m) => {
+          const op = missionOpen(m), n = starsOf(m.id);
+          return '<button class="node' + (n ? ' done' : op ? ' open' : ' lock') + '" ' + (op ? 'data-act="open-mission" data-id="' + m.id + '"' : 'disabled') + ' aria-label="Misi ' + m.idx + ': ' + esc(m.t) + (op ? '' : ' (terkunci)') + '"><b>' + (op ? m.idx : '🔒') + '</b>' + (op ? starsHtml(n) : '') + '</button>';
+        }).join('') + '</div></section>';
+    }).join('') + '</div></div>';
+}
+function openWorld(id) {
+  const w = WORLDS[id - 1]; S.wid = id;
+  if (!seen('w' + id)) { markSeen('w' + id); playScenes(w.intro, { world: id, done: () => go('world') }); } else go('world');
+}
+
+/* ---------- Layar guru ---------- */
+function viewGuru() {
+  app.innerHTML = '<div class="screen"><div class="wrap narrow">' + topBrand() +
+    '<form class="card form" data-form="guru"><h2>Masuk sebagai guru</h2><label>Kode guru<input name="kode" type="password" autocomplete="off" required></label><div class="msg" id="f-msg" role="alert"></div>' +
+    '<button class="btn wide" type="submit">Lihat rekap siswa</button><button class="btn ghost wide dark" type="button" data-act="go-login">Kembali</button></form>' +
+    (ONLINE ? '' : '<p class="notice">Mode coba: kode guru bawaan adalah <b>' + esc(CONFIG.KODE_GURU_DEMO) + '</b>.</p>') + '</div></div>';
+}
+async function submitGuru(f) {
+  const kode = f.kode.value; $('#f-msg').textContent = 'Memeriksa...';
+  const r = await Backend.guruRekap(kode);
+  if (!r || !r.ok) { $('#f-msg').textContent = (r && r.pesan) || 'Gagal.'; return; }
+  S.guruKode = kode; S.guruData = r.siswa || []; S.view = 'guru-rekap'; render();
+}
+function viewGuruRekap() {
+  const rows = (S.guruData || []).slice().sort((a, b) => a.kelas - b.kelas || a.nama.localeCompare(b.nama));
+  app.innerHTML = '<div class="screen"><header class="topbar"><div class="who-me"><b>Rekap guru</b></div><div class="top-r"><button class="btn ghost small" data-act="guru-csv">Unduh CSV</button><button class="btn ghost small" data-act="guru-out">Keluar</button></div></header><div class="wrap">' +
+    '<div class="card tablecard"><p class="muted">' + rows.length + ' siswa. Total misi: ' + TOTAL_MISSIONS + '.</p>' +
+    (rows.length ? '<div class="tscroll"><table><thead><tr><th>Siswa</th><th>Username</th><th>Kelas</th><th>Misi selesai</th><th>Bintang</th><th>Terakhir main</th><th>Aksi</th></tr></thead><tbody>' +
+      rows.map((r) => '<tr><td>' + esc(r.avatar) + ' ' + esc(r.nama) + '</td><td>' + esc(r.username) + '</td><td>' + r.kelas + '</td><td>' + r.selesai + '</td><td>' + r.bintang + '</td><td>' + esc(String(r.terakhir || '').slice(0, 10)) + '</td><td class="acts"><button class="btn sec small" data-act="guru-pin" data-u="' + esc(r.username) + '">Reset PIN</button><button class="btn sec small" data-act="guru-kelas" data-u="' + esc(r.username) + '" data-k="' + r.kelas + '">Ubah kelas</button></td></tr>').join('') + '</tbody></table></div>' : '<p>Belum ada siswa yang mendaftar.</p>') + '</div></div></div>';
+}
+async function guruRefresh() { const r = await Backend.guruRekap(S.guruKode); if (r && r.ok) { S.guruData = r.siswa || []; render(); } }
+function guruCsv() {
+  const head = ['username', 'nama', 'kelas', 'misi_selesai', 'bintang', 'terakhir_main'];
+  const lines = [head.join(',')].concat((S.guruData || []).map((r) => [r.username, r.nama, r.kelas, r.selesai, r.bintang, String(r.terakhir || '').slice(0, 10)].map((x) => { let t = String(x); if (/^[=+\-@\t\r]/.test(t)) t = "'" + t; return '"' + t.replace(/"/g, '""') + '"'; }).join(',')));
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['﻿' + lines.join('\n')], { type: 'text/csv;charset=utf-8' })); a.download = 'rekap-penjaga-kode.csv'; document.body.appendChild(a); a.click(); a.remove();
+}
+
+/* ---------- Router ---------- */
+function go(view, extra) { S.view = view; if (extra) Object.assign(S, extra); render(); window.scrollTo(0, 0); }
+function render() {
+  const v = S.view;
+  if (v !== 'mission') { if (E) E.token++; }
+  ({ login: viewLogin, register: viewRegister, home: viewHome, world: viewWorld, cutscene: viewCutscene, ending: viewEnding, guru: viewGuru, 'guru-rekap': viewGuruRekap, mission: viewMission }[v] || viewLogin)();
+}
+
+/* ===== app_b.js ===== */
+/* ===== APLIKASI: layar misi ===== */
+const OPLABEL = { rep: 'ulangi', if: 'jika', while: 'selama', def: 'fungsi' };
+const CMD = {
+  maju: ['⬆️', 'Maju', 'c-go'], belok_kiri: ['↰', 'Belok kiri', 'c-turn'], belok_kanan: ['↱', 'Belok kanan', 'c-turn'],
+  atas: ['⬆️', 'Atas', 'c-go'], bawah: ['⬇️', 'Bawah', 'c-go'], kiri: ['⬅️', 'Kiri', 'c-go'], kanan: ['➡️', 'Kanan', 'c-go']
+};
+const COND_OPTS = [['depan_kosong', 0, 'depan kosong'], ['depan_rintangan', 0, 'ada rintangan di depan'], ['kiri_kosong', 0, 'kiri kosong'], ['kanan_kosong', 0, 'kanan kosong'], ['di_tujuan', 0, 'di tujuan'], ['di_tujuan', 1, 'bukan di tujuan']];
+const DEG = { N: -90, E: 0, S: 90, W: 180 };
+
+function newE(m) {
+  const e = { m, token: 0, running: false, tries: 0, hint: false, fast: false, prog: [], target: 'root', nid: 1, done: false, text: '' };
+  if (m.map) e.M = ENG.parseMap(m.map);
+  return e;
+}
+function parOf(m) {
+  if (m._par) return m._par;
+  let p;
+  if (m.mode === 'arrows') { const f = ENG.solveFlat(m, 60); p = f ? f.length : 10; }
+  else p = ENG.run(m, ENG.parseProgram(m.sol, m.style)).size;
+  m._par = p; return p;
+}
+const starsQuiz = () => { let s = E.tries === 0 ? 3 : E.tries === 1 ? 2 : 1; if (E.hint) s = Math.min(s, 2); return s; };
+function setMsg(kind, html) { const el = $('#msg'); if (!el) return; el.className = 'msg ' + kind; el.innerHTML = html || ''; }
+
+/* ---------- Membuka misi ---------- */
+function openMission(id) {
+  const m = MISSIONS[id], w = WORLDS[m.world - 1], b = w.bab[m.chap];
+  const key = 'c' + m.world + '-' + m.chap;
+  if (m.idx - 1 === b.start && !seen(key)) {
+    markSeen(key);
+    modal('<div class="center"><div class="big-emoji" aria-hidden="true">' + b.emoji + '</div><h2>Bab ' + (m.chap + 1) + ': ' + esc(b.judul) + '</h2><p>' + esc(sub(b.intro)) + '</p><button class="btn wide" data-act="chap-go" data-id="' + id + '">Mulai bab ini</button></div>');
+    return;
+  }
+  go('mission', { mid: id });
+}
+
+/* ---------- Layar misi ---------- */
+function viewMission() {
+  const m = MISSIONS[S.mid], w = WORLDS[m.world - 1], b = w.bab[m.chap]; E = newE(m);
+  const total = WLIST[m.world].length;
+  const split = m.type === 'grid' || m.type === 'debug' || m.type === 'predict';
+  app.innerHTML = '<div class="screen mission" style="--accent:' + w.warna + ';--ground:' + w.tanah + '">' +
+    '<header class="topbar"><button class="btn ghost small" data-act="back-world">‹ Peta</button><div class="mtitle"><b>' + esc(m.t) + '</b><span>Misi ' + m.idx + ' dari ' + total + ' • ' + esc(b.judul) + '</span></div>' + starsHtml(starsOf(m.id)) + '</header>' +
+    '<div class="wrap"><div class="bubble"><span class="bub-e" aria-hidden="true">' + w.helper.emoji + '</span><p>' + esc(sub(m.s)) + '</p></div>' +
+    '<div class="play' + (split ? ' split' : '') + '">' + missionBody(m, w) + '</div></div></div>';
+  missionInit(m);
+}
+function goalLine(m) {
+  const w = WORLDS[m.world - 1], t = w.tema, M = E.M;
+  return '<p class="goal">Antarkan Kodi 🤖 ke ' + t.goal + (M.coins.length ? ' dan ambil semua ' + t.coin : '') + '.' + (m.need ? ' <b>Wajib memakai ' + m.need.map((o) => OPLABEL[o]).join(' dan ') + '.</b>' : '') + '</p>';
+}
+function missionBody(m, w) {
+  switch (m.type) {
+    case 'grid': return '<div class="left">' + goalLine(m) + boardHtml(m, w) + '</div><div class="right">' + editorHtml(m) + '</div>';
+    case 'debug': return '<div class="left"><p class="q">' + esc(m.q) + '</p>' + boardHtml(m, w) + '<div class="row"><button class="btn sec small" data-act="dbg-run">▶ Lihat Kodi menjalankan kode</button></div></div><div class="right">' + debugHtml(m) + '</div>';
+    case 'predict': return '<div class="left"><p class="q">' + esc(m.q) + '</p>' + boardHtml(m, w) + '</div><div class="right">' + predictHtml(m) + '</div>';
+    case 'order': return '<div class="left wide">' + orderHtml(m) + '</div>';
+    case 'pattern': return '<div class="left wide">' + patternHtml(m) + '</div>';
+    case 'choice': return '<div class="left wide">' + choiceHtml(m) + '</div>';
+  }
+  return '';
+}
+function missionInit(m) {
+  if (m.type === 'grid') { resetBoard(); if (m.mode !== 'text') renderEditor(); }
+  if (m.type === 'debug' || m.type === 'predict') resetBoard();
+  if (m.type === 'order') renderOrder();
+}
+
+/* ---------- Papan ---------- */
+function boardHtml(m, w) {
+  const M = E.M, t = w.tema; let cells = '';
+  for (let r = 0; r < M.rows; r++) for (let c = 0; c < M.cols; c++) {
+    let cls = 'cell', inner = '';
+    if (M.cells[r][c] === '#') { cls += ' obs'; inner = t.obs; }
+    if (M.goal && M.goal.r === r && M.goal.c === c) { cls += ' goal'; inner = t.goal; }
+    M.coins.forEach((q) => { if (q.r === r && q.c === c) inner = '<span class="coin" data-r="' + r + '" data-c="' + c + '">' + t.coin + '</span>'; });
+    for (const k in M.marks) if (M.marks[k].r === r && M.marks[k].c === c) inner = '<span class="mark">' + k + '</span>';
+    cells += '<div class="' + cls + '">' + inner + '</div>';
+  }
+  const showDir = m.style !== 'abs';
+  return '<div class="board" id="board" style="--cols:' + M.cols + ';--rows:' + M.rows + '" role="img" aria-label="Peta ' + M.cols + ' kali ' + M.rows + '">' + cells +
+    '<div class="kodi" id="kodi" style="--r:' + M.start.r + ';--c:' + M.start.c + '"><span class="kodi-e">🤖</span>' + (showDir ? '<span class="dirb" id="dirb">▶</span>' : '') + '</div></div>';
+}
+function placeKodi(r, c, dir) {
+  const k = $('#kodi'); if (!k) return; k.style.setProperty('--r', r); k.style.setProperty('--c', c);
+  const d = $('#dirb'); if (d) d.style.transform = 'rotate(' + DEG[dir] + 'deg)';
+}
+function resetBoard() {
+  const M = E.M, m = E.m; if (!M) return;
+  placeKodi(M.start.r, M.start.c, m.dir || 'E');
+  document.querySelectorAll('.coin.got').forEach((x) => x.classList.remove('got'));
+  document.querySelectorAll('.boom').forEach((x) => x.remove());
+  const k = $('#kodi'); if (k) k.classList.remove('bump');
+  document.querySelectorAll('.blk.run, .chip.run').forEach((x) => x.classList.remove('run'));
+}
+function animate(events, onDone) {
+  const my = ++E.token; E.running = true; setRunUi(true);
+  const delay = E.fast ? 140 : 360; let i = 0;
+  (function step() {
+    if (my !== E.token) return;
+    if (i >= events.length) { E.running = false; setRunUi(false); onDone(); return; }
+    const ev = events[i++];
+    document.querySelectorAll('.blk.run, .chip.run').forEach((x) => x.classList.remove('run'));
+    if (ev.node) { const n = document.querySelector('[data-nid="' + ev.node + '"]'); if (n) n.classList.add('run'); }
+    if (ev.type === 'crash') {
+      placeKodi(ev.r, ev.c, ev.dir); const k = $('#kodi'); if (k) { k.classList.remove('bump'); void k.offsetWidth; k.classList.add('bump'); }
+      const cell = document.querySelectorAll('#board .cell')[ev.tr * E.M.cols + ev.tc];
+      if (cell) { const b = document.createElement('span'); b.className = 'boom'; b.textContent = '💥'; cell.appendChild(b); }
+    } else {
+      placeKodi(ev.r, ev.c, ev.dir);
+      if (ev.type === 'move') { const co = document.querySelector('.coin[data-r="' + ev.r + '"][data-c="' + ev.c + '"]'); if (co) co.classList.add('got'); }
+    }
+    setTimeout(step, delay);
+  })();
+}
+function setRunUi(on) {
+  const b = $('#btn-run'); if (b) { b.disabled = on; b.textContent = on ? '⏳ Berjalan...' : '▶ Jalankan'; }
+}
+
+/* ---------- Editor (panah / blok / teks) ---------- */
+function editorHtml(m) {
+  const base = '<div id="palette"></div><div id="prog"></div>';
+  const text = '<div id="palette">' + snippetHtml(m) + '</div><textarea id="code" class="code" rows="9" spellcheck="false" autocapitalize="none" autocomplete="off" autocorrect="off" aria-label="Tulis kode di sini" placeholder="Tulis kodenya di sini..."></textarea>' + condHelp(m);
+  const ctrl = '<div class="row ctrl"><button class="btn" id="btn-run" data-act="run">▶ Jalankan</button><button class="btn sec" data-act="reset">↺ Ulang</button><button class="btn sec" data-act="clear">🗑 Hapus</button><button class="btn sec" data-act="fast" id="btn-fast" aria-pressed="false">⏩ Cepat</button><button class="btn sec" data-act="hint">💡 Petunjuk</button></div><div id="msg" class="msg" aria-live="polite"></div>';
+  E.max = Math.max(12, parOf(m) * 2 + 8);
+  return (m.mode === 'text' ? text : base) + ctrl;
+}
+function condHelp(m) {
+  const a = m.allow || []; if (!(a.indexOf('jika') >= 0 || a.indexOf('jikalain') >= 0 || a.indexOf('selama') >= 0)) return '';
+  return '<p class="muted small">Syarat yang bisa dipakai: depan_kosong, depan_rintangan, kiri_kosong, kanan_kosong, di_tujuan. Tambahkan kata "bukan" di depannya untuk membaliknya.</p>';
+}
+function snippetHtml(m) {
+  const cmds = ENG.cmdsFor(m.style).map((c) => '<button class="pal ' + CMD[c][2] + '" data-act="snip" data-s="' + c + '\n">' + CMD[c][0] + '<span>' + c + '</span></button>').join('');
+  const a = m.allow || []; const sn = { ulangi: ['🔁', 'ulangi', 'ulangi 3 kali {\n  |\n}\n'], jika: ['❓', 'jika', 'jika depan_kosong {\n  |\n}\n'], jikalain: ['🔀', 'jika-lain', 'jika depan_kosong {\n  |\n} lain {\n  \n}\n'], selama: ['⟳', 'selama', 'selama depan_kosong {\n  |\n}\n'], fungsi: ['🧩', 'fungsi', 'fungsi nama {\n  |\n}\n'] };
+  const cls = { ulangi: 'b-rep', jika: 'b-if', jikalain: 'b-if', selama: 'b-while', fungsi: 'b-fn' };
+  return cmds + a.map((k) => sn[k] ? '<button class="pal blockk ' + cls[k] + '" data-act="snip" data-s="' + esc(sn[k][2]) + '">' + sn[k][0] + '<span>' + sn[k][1] + '</span></button>' : '').join('');
+}
+function renderEditor() {
+  const m = E.m; if (m.mode === 'text') return;
+  const pal = $('#palette'), pr = $('#prog'); if (!pal || !pr) return;
+  let h = ENG.cmdsFor(m.style).map((c) => '<button class="pal ' + CMD[c][2] + '" data-act="add" data-c="' + c + '"><span class="pi">' + CMD[c][0] + '</span><span>' + CMD[c][1] + '</span></button>').join('');
+  if (m.mode === 'blocks') (m.allow || []).forEach((a) => {
+    if (a === 'ulangi') h += '<button class="pal blockk b-rep" data-act="addc" data-op="rep"><span class="pi">🔁</span><span>Ulangi</span></button>';
+    if (a === 'jika') h += '<button class="pal blockk b-if" data-act="addc" data-op="if"><span class="pi">❓</span><span>Jika</span></button>';
+    if (a === 'jikalain') h += '<button class="pal blockk b-if" data-act="addc" data-op="if2"><span class="pi">🔀</span><span>Jika-lain</span></button>';
+    if (a === 'selama') h += '<button class="pal blockk b-while" data-act="addc" data-op="while"><span class="pi">⟳</span><span>Selama</span></button>';
+  });
+  pal.innerHTML = '<div class="palette">' + h + '</div>';
+  if (m.mode === 'arrows') {
+    pr.innerHTML = '<div class="chips" aria-label="Perintah yang sudah dipilih">' + (E.prog.length ? E.prog.map((n, i) => '<button class="chip ' + CMD[n.name][2] + '" data-nid="' + n.id + '" data-act="del" data-id="' + n.id + '" aria-label="' + CMD[n.name][1] + ' nomor ' + (i + 1) + ', ketuk untuk menghapus">' + CMD[n.name][0] + '</button>').join('') : '<span class="empty">Ketuk tombol di atas untuk menyusun perintah.</span>') + '</div><small class="muted">' + ENG.sizeOf(E.prog) + ' perintah. Ketuk perintah untuk menghapusnya.</small>';
+  } else {
+    pr.innerHTML = '<div class="progbox">' + zoneHtml('root', E.prog, true) + '</div>';
+  }
+}
+function zoneHtml(key, list, root) {
+  return '<div class="zone' + (root ? ' rootz' : ' inner') + (E.target === key ? ' on' : '') + '" data-act="zone" data-key="' + key + '">' + (list.length ? list.map(nodeHtml).join('') : '<span class="empty">' + (root ? 'Susun blok di sini. Ketuk blok di atas untuk menambahkannya.' : 'Ketuk di sini, lalu pilih blok') + '</span>') + '</div>';
+}
+function condSelect(n) {
+  return '<select class="cond" data-act="cond" data-id="' + n.id + '" aria-label="Syarat">' + COND_OPTS.map((o) => '<option value="' + o[0] + '|' + o[1] + '"' + (o[0] === n.cond && o[1] === (n.neg ? 1 : 0) ? ' selected' : '') + '>' + o[2] + '</option>').join('') + '</select>';
+}
+function nodeHtml(n) {
+  const nid = ' data-nid="' + n.id + '"'; const x = '<button class="x" data-act="del" data-id="' + n.id + '" aria-label="Hapus blok">✕</button>';
+  if (n.op === 'cmd') return '<div class="blk ' + CMD[n.name][2] + '"' + nid + '><span class="pi">' + CMD[n.name][0] + '</span> ' + CMD[n.name][1] + x + '</div>';
+  if (n.op === 'rep') return '<div class="blk cont b-rep"' + nid + '><div class="bh"><span>🔁 Ulangi</span><span class="stepper"><button data-act="rep-" data-id="' + n.id + '" aria-label="Kurangi">−</button><b>' + n.n + '</b><button data-act="rep+" data-id="' + n.id + '" aria-label="Tambah">+</button></span><span>kali</span>' + x + '</div>' + zoneHtml(n.id + ':body', n.body) + '</div>';
+  if (n.op === 'while') return '<div class="blk cont b-while"' + nid + '><div class="bh"><span>⟳ Selama</span>' + condSelect(n) + x + '</div>' + zoneHtml(n.id + ':body', n.body) + '</div>';
+  if (n.op === 'if') return '<div class="blk cont b-if"' + nid + '><div class="bh"><span>❓ Jika</span>' + condSelect(n) + x + '</div>' + zoneHtml(n.id + ':then', n.then) + (n.else ? '<div class="bh sub"><span>lain</span></div>' + zoneHtml(n.id + ':else', n.else) : '') + '</div>';
+  return '';
+}
+function findNode(list, id) {
+  for (const n of list) { if (n.id === id) return n; for (const k of ['body', 'then', 'else']) if (n[k]) { const r = findNode(n[k], id); if (r) return r; } }
+  return null;
+}
+function removeNode(list, id) {
+  const i = list.findIndex((n) => n.id === id); if (i >= 0) { list.splice(i, 1); return true; }
+  for (const n of list) for (const k of ['body', 'then', 'else']) if (n[k] && removeNode(n[k], id)) return true;
+  return false;
+}
+function getList(key) {
+  if (key === 'root') return E.prog; const p = key.split(':'); const n = findNode(E.prog, +p[0]); return n ? n[p[1]] : null;
+}
+function addNode(node) {
+  if (E.running) return;
+  if (ENG.sizeOf(E.prog) + ENG.sizeOf([node]) > E.max) { toast('Terlalu banyak! Maksimal ' + E.max + '. Coba cari cara yang lebih singkat.'); return; }
+  const list = getList(E.target) || E.prog; list.push(node);
+  if (node.op === 'rep' || node.op === 'while') E.target = node.id + ':body'; else if (node.op === 'if') E.target = node.id + ':then';
+  renderEditor();
+}
+function getProgram() {
+  if (E.m.mode === 'text') return ENG.parseProgram($('#code').value, E.m.style);
+  return E.prog;
+}
+
+/* ---------- Menjalankan puzzle grid ---------- */
+function runGrid() {
+  if (E.running || E.done) return;
+  resetBoard(); let prog;
+  try { prog = getProgram(); } catch (e) { setMsg('bad', 'Ada yang belum tepat. ' + esc(e.message)); return; }
+  if (!prog.length) { setMsg('bad', 'Programmu masih kosong. Tambahkan perintah dulu!'); return; }
+  if (E.m.mode === 'text' && ENG.sizeOf(prog) > E.max * 2) { setMsg('bad', 'Programmu terlalu panjang. Coba cari cara yang lebih singkat.'); return; }
+  setMsg('', ''); const res = ENG.run(E.m, prog);
+  animate(res.events, () => finishGrid(res, prog));
+}
+function finishGrid(res, prog) {
+  const m = E.m, t = WORLDS[m.world - 1].tema;
+  if (res.status === 'win') {
+    const used = ENG.usesOps(prog); const miss = (m.need || []).filter((o) => !used.has(o));
+    if (miss.length) { setMsg('bad', 'Kodi sampai, tetapi misi ini meminta kamu memakai <b>' + miss.map((o) => OPLABEL[o]).join(' dan ') + '</b>. Coba lagi dengan perintah itu!'); return; }
+    const par = parOf(m); let stars = ENG.starsFor(res.size, par); if (E.hint) stars = Math.min(stars, 2);
+    success(stars, 'Kodi sampai tujuan dengan ' + res.size + ' perintah.' + (stars < 3 && !E.hint ? ' Coba cari cara lebih singkat untuk 3 bintang (target ' + par + ').' : '') + (E.hint && stars === 2 ? ' Tanpa petunjuk, kamu bisa meraih 3 bintang.' : ''));
+    return;
+  }
+  const msgs = {
+    crash_block: 'Kodi menabrak ' + t.obs + '! Periksa lagi urutan perintahmu.',
+    crash_edge: 'Kodi keluar dari peta! Periksa lagi arahnya.',
+    not_at_goal: 'Kodi belum sampai di ' + t.goal + '. Coba tambah atau ubah perintahmu.',
+    missing_coins: 'Kodi sampai di tujuan, tetapi masih ada ' + res.coinsLeft + ' ' + t.coin + ' yang belum diambil.',
+    limit: 'Programmu berjalan terlalu lama. Mungkin ada perulangan yang tidak pernah berhenti.'
+  };
+  setMsg('bad', msgs[res.status] || 'Belum berhasil. Coba lagi!');
+}
+
+/* ---------- Hasil misi ---------- */
+function success(stars, msg) {
+  E.done = true; const m = E.m; const firstTime = starsOf(m.id) === 0;
+  saveProgress(m, stars);
+  const total = WLIST[m.world].length, last = m.idx === total;
+  const nextM = WLIST[m.world][m.idx]; const chapEnd = !last && nextM.chap !== m.chap; const w = WORLDS[m.world - 1];
+  const worldDone = last && worldStats(w).complete;
+  modal('<div class="center result"><div class="big-emoji pop" aria-hidden="true">' + (stars === 3 ? '🏆' : '🎉') + '</div><h2>' + (stars === 3 ? 'Sempurna!' : 'Misi selesai!') + '</h2>' + starsHtml(stars, true) + '<p>' + esc(msg) + '</p>' +
+    (chapEnd ? '<p class="note">Bab "' + esc(w.bab[m.chap].judul) + '" selesai!</p>' : '') + (worldDone ? '<p class="note">Pecahan kristal dunia ini sudah kembali!</p>' : '') +
+    '<div class="row"><button class="btn sec" data-act="res-again">Main lagi</button><button class="btn" data-act="res-next">' + (worldDone ? 'Lihat ending dunia' : last ? 'Ke peta dunia' : 'Misi berikutnya ▶') + '</button></div><button class="link" data-act="res-map">Kembali ke peta</button></div>');
+}
+function resNext() {
+  closeModal(); const m = E.m, w = WORLDS[m.world - 1], list = WLIST[m.world];
+  if (m.idx < list.length) { openMission(list[m.idx].id); return; }
+  if (worldStats(w).complete) showWorldEnding(w, () => { if (w.id === 6) showGrandEnding(); else go('world', { wid: w.id }); });
+  else go('world', { wid: w.id });
+}
+function resAgain() { closeModal(); go('mission', { mid: E.m.id }); }
+
+/* ---------- Petunjuk ---------- */
+function showHint() {
+  const m = E.m; if (E.done) return; E.hint = true;
+  const gen = m.type === 'grid' ? (m.mode === 'text' ? 'Tulis satu perintah di setiap baris, mulai dari langkah pertama Kodi.' : 'Telusuri jalan Kodi dengan jarimu di peta, lalu susun perintahnya satu per satu.') : 'Baca lagi dengan teliti, lalu coba tebak pelan-pelan.';
+  setMsg('hint', '💡 ' + esc(m.hint || gen) + '<br><small>Dengan petunjuk, bintang maksimal 2.</small>');
+}
+
+/* ---------- Soal: urutan ---------- */
+function orderHtml(m) {
+  let arr = null, k = 0;
+  do { arr = ENG.shuffleSeed(m.items, m.id + 'o' + k++); } while (arr.every((x, i) => x.i === i) && k < 20);
+  E.pool = arr; E.ans = [];
+  return '<p class="q">' + esc(m.q) + '</p><ol class="slots" id="slots"></ol><div class="pool" id="pool"></div><div class="row"><button class="btn" data-act="order-check">Periksa urutan</button><button class="btn sec" data-act="order-reset">Ulang</button><button class="btn sec" data-act="hint">💡 Petunjuk</button></div><div id="msg" class="msg" aria-live="polite"></div>';
+}
+function renderOrder() {
+  const n = E.m.items.length; let s = '';
+  for (let i = 0; i < n; i++) {
+    const a = E.ans[i];
+    s += a ? '<li><button class="ord filled" data-act="order-del" data-i="' + i + '"><b>' + (i + 1) + '</b><span>' + esc(a.v) + '</span></button></li>' : '<li><div class="ord empty"><b>' + (i + 1) + '</b><span>...</span></div></li>';
+  }
+  $('#slots').innerHTML = s;
+  $('#pool').innerHTML = E.pool.filter((p) => E.ans.indexOf(p) < 0).map((p) => '<button class="ord pick" data-act="order-add" data-k="' + p.i + '">' + esc(p.v) + '</button>').join('');
+}
+function orderCheck() {
+  const n = E.m.items.length; if (E.done) return;
+  if (E.ans.length < n) { setMsg('bad', 'Susun semua langkah dulu.'); return; }
+  const ok = E.ans.every((a, i) => a.i === i);
+  document.querySelectorAll('#slots .ord').forEach((b, i) => { b.classList.toggle('ok', E.ans[i].i === i); b.classList.toggle('no', E.ans[i].i !== i); });
+  if (ok) success(starsQuiz(), 'Urutannya sudah benar!'); else { E.tries++; setMsg('bad', 'Belum tepat. Langkah yang berwarna merah masih salah tempat.'); }
+}
+
+/* ---------- Soal: pola ---------- */
+function patternHtml(m) {
+  const opts = ENG.shuffleSeed(m.opts, m.id + 'p');
+  return '<p class="q">' + esc(m.q) + '</p><div class="seq">' + m.seq.map((t) => t === '?' ? '<span class="tok blank" id="blank">?</span>' : '<span class="tok">' + esc(t) + '</span>').join('') + '</div>' +
+    '<div class="opts">' + opts.map((o) => '<button class="btn sec opt" data-act="pat-pick" data-v="' + esc(o.v) + '">' + esc(o.v) + '</button>').join('') + '</div><div class="row"><button class="btn sec small" data-act="hint">💡 Petunjuk</button></div><div id="msg" class="msg" aria-live="polite"></div>';
+}
+function patPick(btn) {
+  if (E.done) return; const v = btn.dataset.v;
+  if (v === E.m.ans) { const b = $('#blank'); b.textContent = v; b.classList.add('ok'); success(starsQuiz(), 'Pola yang tepat!'); }
+  else { E.tries++; btn.disabled = true; btn.classList.add('wrong'); setMsg('bad', 'Belum tepat. Perhatikan pola yang berulang.'); }
+}
+
+/* ---------- Soal: pilihan ---------- */
+function choiceHtml(m) {
+  const opts = ENG.shuffleSeed(m.opts.map((t, i) => ({ t, ok: i === m.ans })), m.id + 'c');
+  return '<p class="q">' + esc(m.q) + '</p>' + (m.code ? '<pre class="codeblock">' + esc(m.code) + '</pre>' : '') +
+    '<div class="opts col">' + opts.map((o) => '<button class="btn sec opt" data-act="ch-pick" data-ok="' + (o.v.ok ? 1 : 0) + '">' + esc(o.v.t) + '</button>').join('') + '</div><div class="row"><button class="btn sec small" data-act="hint">💡 Petunjuk</button></div><div id="msg" class="msg" aria-live="polite"></div>';
+}
+function chPick(btn) {
+  if (E.done) return;
+  if (btn.dataset.ok === '1') { btn.classList.add('right'); success(starsQuiz(), E.m.explain || 'Jawabanmu benar!'); }
+  else { E.tries++; btn.disabled = true; btn.classList.add('wrong'); setMsg('bad', 'Belum tepat. Coba jawaban lain.'); }
+}
+
+/* ---------- Soal: prediksi ---------- */
+function predictHtml(m) {
+  const letters = Object.keys(E.M.marks).sort();
+  return '<pre class="codeblock">' + esc(m.code) + '</pre><p class="muted">Kodi menghadap ' + ({ E: 'kanan', S: 'bawah', W: 'kiri', N: 'atas' }[m.dir || 'E']) + ' di awal.</p><div class="opts">' + letters.map((l) => '<button class="btn sec opt" data-act="pred-pick" data-l="' + l + '">' + l + '</button>').join('') + '</div><div class="row"><button class="btn sec small" data-act="hint">💡 Petunjuk</button></div><div id="msg" class="msg" aria-live="polite"></div>';
+}
+function predPick(btn) {
+  if (E.done || E.running) return; const m = E.m;
+  const res = ENG.run(m, ENG.parseProgram(m.code, m.style));
+  if (btn.dataset.l === res.letter) {
+    btn.classList.add('right'); resetBoard(); E.fast = true; setMsg('ok', 'Benar! Lihat Kodi berjalan...');
+    animate(res.events, () => { E.fast = false; success(starsQuiz(), 'Tebakanmu tepat! Kodi berhenti di huruf ' + res.letter + '.'); });
+  } else { E.tries++; btn.disabled = true; btn.classList.add('wrong'); setMsg('bad', 'Belum tepat. Ikuti kodenya satu baris demi satu baris di peta.'); }
+}
+
+/* ---------- Soal: cari kesalahan ---------- */
+function debugHtml(m) {
+  return '<p class="muted">Ketuk baris yang salah:</p><div class="lines" role="group" aria-label="Kode program">' + m.lines.map((l, i) => '<button class="codeline" data-act="dbg-pick" data-i="' + i + '"><span class="ln">' + (i + 1) + '</span><code>' + esc(l.replace(/ /g, ' ') || ' ') + '</code></button>').join('') + '</div><div class="row"><button class="btn sec small" data-act="hint">💡 Petunjuk</button></div><div id="msg" class="msg" aria-live="polite"></div>';
+}
+function dbgRun() {
+  if (E.running) return; const m = E.m; resetBoard();
+  let prog; try { prog = ENG.parseProgram(m.lines.join('\n'), m.style); } catch (e) { setMsg('bad', esc(e.message)); return; }
+  const res = ENG.run(m, prog); setMsg('', '');
+  animate(res.events, () => setMsg('hint', 'Perhatikan di mana Kodi mulai salah, lalu ketuk baris yang menyebabkannya.'));
+}
+function dbgPick(btn) {
+  if (E.done || E.running) return; const m = E.m, i = +btn.dataset.i;
+  if (i === m.bug) {
+    btn.classList.add('right'); document.querySelectorAll('.codeline').forEach((b) => (b.disabled = true));
+    success(starsQuiz(), 'Kamu menemukan kesalahannya! Perbaikannya: ' + (m.fix.trim() || '(hapus baris itu)') + '.');
+  } else { E.tries++; btn.classList.add('wrong'); setMsg('bad', 'Baris itu tidak salah. Ikuti kode satu per satu di peta, atau tekan "Lihat Kodi menjalankan kode".'); }
+}
+
+/* ---------- Penanganan klik ---------- */
+const ACT = {
+  'go-login': () => go('login'), 'go-register': () => go('register'), 'go-guru': () => go('guru'), 'go-home': () => go('home'),
+  logout: () => logout(),
+  'open-world': (t) => openWorld(+t.dataset.w),
+  'open-mission': (t) => openMission(t.dataset.id),
+  'chap-go': (t) => { closeModal(); go('mission', { mid: t.dataset.id }); },
+  'back-world': () => go('world', { wid: E ? E.m.world : S.wid }),
+  'replay-intro': () => { const w = WORLDS[S.wid - 1]; playScenes(w.intro, { world: w.id, done: () => go('world') }); },
+  'world-ending': () => { const w = WORLDS[S.wid - 1]; showWorldEnding(w, () => go('world')); },
+  'grand-ending': () => showGrandEnding(), 'ending-replay': () => showGrandEnding(),
+  'cs-next': () => csNext(), 'cs-skip': () => csFinish(),
+  run: () => runGrid(),
+  reset: () => { if (E.running) { E.token++; E.running = false; setRunUi(false); } resetBoard(); setMsg('', ''); },
+  clear: () => { if (E.running) return; E.prog = []; E.target = 'root'; if (E.m.mode === 'text') { $('#code').value = ''; $('#code').focus(); } else renderEditor(); resetBoard(); setMsg('', ''); },
+  fast: (t) => { E.fast = !E.fast; t.setAttribute('aria-pressed', E.fast); t.classList.toggle('on', E.fast); },
+  hint: () => showHint(),
+  add: (t) => addNode({ id: E.nid++, op: 'cmd', name: t.dataset.c }),
+  addc: (t) => {
+    const op = t.dataset.op; const id = E.nid++;
+    if (op === 'rep') addNode({ id, op: 'rep', n: 2, body: [] });
+    else if (op === 'while') addNode({ id, op: 'while', cond: 'depan_kosong', neg: false, body: [] });
+    else if (op === 'if') addNode({ id, op: 'if', cond: 'depan_rintangan', neg: false, then: [], else: null });
+    else if (op === 'if2') addNode({ id, op: 'if', cond: 'depan_kosong', neg: false, then: [], else: [] });
+  },
+  del: (t) => { if (E.running) return; removeNode(E.prog, +t.dataset.id); if (!getList(E.target)) E.target = 'root'; renderEditor(); },
+  zone: (t) => { if (E.running) return; E.target = t.dataset.key; renderEditor(); },
+  'rep-': (t) => { const n = findNode(E.prog, +t.dataset.id); if (n && n.n > 1) n.n--; renderEditor(); },
+  'rep+': (t) => { const n = findNode(E.prog, +t.dataset.id); if (n && n.n < 20) n.n++; renderEditor(); },
+  snip: (t) => {
+    const ta = $('#code'); let s = t.dataset.s; let caret = s.indexOf('|'); if (caret >= 0) s = s.replace('|', ''); else caret = s.length;
+    const a = ta.selectionStart, b = ta.selectionEnd; let pre = ta.value.slice(0, a);
+    if (pre && !/\n$/.test(pre)) { s = '\n' + s; caret += 1; }
+    ta.value = pre + s + ta.value.slice(b); ta.focus(); ta.selectionStart = ta.selectionEnd = pre.length + caret;
+  },
+  'order-add': (t) => { const p = E.pool.find((x) => x.i === +t.dataset.k); if (p && E.ans.indexOf(p) < 0) { E.ans.push(p); renderOrder(); setMsg('', ''); } },
+  'order-del': (t) => { E.ans.splice(+t.dataset.i, 1); renderOrder(); setMsg('', ''); },
+  'order-reset': () => { E.ans = []; renderOrder(); setMsg('', ''); },
+  'order-check': () => orderCheck(),
+  'pat-pick': (t) => patPick(t), 'ch-pick': (t) => chPick(t), 'pred-pick': (t) => predPick(t),
+  'dbg-run': () => dbgRun(), 'dbg-pick': (t) => dbgPick(t),
+  'res-next': () => resNext(), 'res-again': () => resAgain(), 'res-map': () => { closeModal(); go('world', { wid: E.m.world }); },
+  'guru-out': () => { S.guruKode = null; go('login'); }, 'guru-csv': () => guruCsv(),
+  'guru-pin': (t) => {
+    const u = t.dataset.u;
+    modal('<h3>Reset PIN untuk ' + esc(u) + '</h3><label>PIN baru (4 angka)<input id="gp" inputmode="numeric" maxlength="4" pattern="[0-9]{4}"></label><div class="msg" id="gm"></div><div class="row"><button class="btn sec" data-act="close">Batal</button><button class="btn" data-act="guru-pin-ok" data-u="' + esc(u) + '">Simpan</button></div>');
+  },
+  'guru-pin-ok': async (t) => {
+    const p = $('#gp').value.trim(); if (!/^\d{4}$/.test(p)) { $('#gm').textContent = 'PIN harus 4 angka.'; return; }
+    const r = await Backend.guruPin(S.guruKode, t.dataset.u, p); if (r && r.ok) { closeModal(); toast('PIN diubah.'); } else $('#gm').textContent = (r && r.pesan) || 'Gagal.';
+  },
+  'guru-kelas': (t) => {
+    const u = t.dataset.u, k = +t.dataset.k;
+    modal('<h3>Ubah kelas ' + esc(u) + '</h3><label>Kelas<select id="gk">' + [1, 2, 3, 4, 5, 6].map((x) => '<option value="' + x + '"' + (x === k ? ' selected' : '') + '>Kelas ' + x + '</option>').join('') + '</select></label><div class="msg" id="gm"></div><div class="row"><button class="btn sec" data-act="close">Batal</button><button class="btn" data-act="guru-kelas-ok" data-u="' + esc(u) + '">Simpan</button></div>');
+  },
+  'guru-kelas-ok': async (t) => { const r = await Backend.guruKelas(S.guruKode, t.dataset.u, +$('#gk').value); if (r && r.ok) { closeModal(); toast('Kelas diubah.'); guruRefresh(); } else $('#gm').textContent = (r && r.pesan) || 'Gagal.'; },
+  close: () => closeModal()
+};
+document.addEventListener('click', (ev) => {
+  const t = ev.target.closest('[data-act]'); if (!t || t.tagName === 'SELECT') return;
+  const fn = ACT[t.dataset.act]; if (fn) fn(t, ev);
+});
+document.addEventListener('change', (ev) => {
+  const t = ev.target; if (t.dataset && t.dataset.act === 'cond' && E) {
+    const n = findNode(E.prog, +t.dataset.id); if (n) { const p = t.value.split('|'); n.cond = p[0]; n.neg = p[1] === '1'; }
+  }
+});
+document.addEventListener('submit', (ev) => {
+  const f = ev.target.closest('form[data-form]'); if (!f) return; ev.preventDefault();
+  ({ login: submitLogin, register: submitRegister, guru: submitGuru }[f.dataset.form] || (() => {}))(f);
+});
+document.addEventListener('keydown', (ev) => { if (ev.key === 'Escape') closeModal(); });
+
+render();
+
+</script>
+</body>
+</html>
