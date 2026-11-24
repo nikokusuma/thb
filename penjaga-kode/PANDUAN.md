@@ -84,7 +84,7 @@ delete from public.kg_siswa where username = 'nama.pengguna';
 
 ## 6. Status misi dan menambah misi
 
-Saat ini tersedia **25 misi per kelas (total 150)** sebagai contoh lengkap semua jenis misi. Mesin game sudah siap untuk 100 misi per kelas (600 total). Tinggal menambah misinya per tahap, misalnya 25 misi per kelas per tahap, dengan jumlah bab per dunia ikut membesar. Minta tahap berikutnya kapan saja, lalu `index.html` baru diunggah menimpa yang lama (`config.js` tidak perlu diubah). Akun dan progres siswa tetap aman karena tersimpan di Supabase.
+Saat ini tersedia **50 misi per kelas (total 300)**, tersusun dalam 10 bab per dunia. Mesin game sudah siap untuk 100 misi per kelas (600 total). Tinggal menambah misinya per tahap (25 misi per kelas per tahap, yaitu bab 11–15 dan seterusnya). Minta tahap berikutnya kapan saja, lalu `index.html` baru diunggah menimpa yang lama (`config.js` tidak perlu diubah). Akun dan progres siswa tetap aman karena tersimpan di Supabase.
 
 ## 7. Bila ada masalah
 
