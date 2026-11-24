@@ -1242,6 +1242,7 @@ function errText(e) {
   var c = e && (e.code || e.status);
   var raw = ' [rincian: ' + m + (c ? ', kode ' + c : '') + ']';
   if (c === 'PGRST205' || c === '42P01' || /schema cache|does not exist/i.test(m)) return 'Tabel database belum dibuat. Jalankan isi file schema.sql di Supabase (menu SQL Editor), lalu muat ulang halaman.' + raw;
+  if (/permission denied for (table|schema|relation)/i.test(m)) return 'Izin tabel belum diberikan ke akun login. Sejak 2026 Supabase tidak lagi memberi izin otomatis untuk tabel baru. Jalankan ulang schema.sql terbaru (bagian GRANT) di SQL Editor, lalu muat ulang halaman.' + raw;
   if (c === '42501' || /row-level security|permission denied/i.test(m)) return 'Akses ditolak oleh database. Pastikan schema.sql sudah dijalankan seluruhnya dan Anda masuk dengan akun yang terdaftar.' + raw;
   if (/failed to fetch|networkerror|load failed/i.test(m)) return 'Tidak bisa terhubung ke Supabase. Periksa koneksi internet dan SUPABASE_URL di config.js.' + raw;
   if (/jwt|apikey|invalid api key/i.test(m)) return 'Kunci Supabase ditolak. Periksa SUPABASE_ANON_KEY di config.js, atau klik Tes koneksi database.' + raw;
@@ -1276,35 +1277,70 @@ function runDiagnosis(pre) {
       return r.text().then(function (t) { var j = null; try { j = JSON.parse(t); } catch (e) {} return { status: r.status, json: j }; });
     }, function (e) { return { status: 0, error: String((e && e.message) || e) }; });
   }
-  var h1 = { apikey: key }, h2 = { apikey: key, Authorization: 'Bearer ' + key };
-  return Promise.all([
-    probe('/auth/v1/settings', h1),
-    probe('/rest/v1/rapor_sekolah?select=id&limit=1', h1),
-    probe('/rest/v1/rapor_sekolah?select=id&limit=1', h2),
-    probe('/rest/v1/rapor_siswa?select=id&limit=1', h1)
-  ]).then(function (r) {
+  function msgOf(r) { return (r.json && (r.json.message || r.json.msg || r.json.error_description)) || ''; }
+  function denied(r) { var c = r.json && r.json.code; return c === '42501' || /permission denied/i.test(msgOf(r)); }
+  var TABLES = ['rapor_sekolah', 'rapor_siswa'];
+  var q = function (t) { return '/rest/v1/' + t + '?select=id&limit=1'; };
+  var h1 = { apikey: key };
+
+  // Langkah 1: tanpa login (hanya kunci)
+  return Promise.all([probe('/auth/v1/settings', h1), probe('/auth/v1/settings', { apikey: key, Authorization: 'Bearer ' + key })]
+    .concat(TABLES.map(function (t) { return probe(q(t), h1); }))).then(function (r) {
     var L = [], host = base.replace(/^https?:\/\//, '');
     L.push('Alamat: ' + host);
-    if (r[0].status === 0 && r[1].status === 0) {
+    if (r[0].status === 0 && r[2].status === 0) {
       L.push('MASALAH  Supabase tidak bisa dijangkau (' + r[0].error + '). Periksa SUPABASE_URL di config.js dan koneksi internet.');
-    } else {
-      if (r[0].status === 200) {
-        L.push('OK       Layanan login aktif.');
-        if (r[0].json && r[0].json.disable_signup === false) L.push('PERINGATAN  Pendaftaran mandiri masih aktif. Matikan di Authentication agar orang luar tidak bisa membuat akun.');
-        else if (r[0].json && r[0].json.disable_signup === true) L.push('OK       Pendaftaran mandiri nonaktif.');
-      } else if (r[0].status === 401 || r[0].status === 403) L.push('MASALAH  Kunci ditolak oleh layanan login (status ' + r[0].status + '). Salin ulang kunci publishable ke config.js.');
-      else L.push('MASALAH  Layanan login membalas status ' + r[0].status + '.');
-      [['rapor_sekolah', r[1]], ['rapor_siswa', r[3]]].forEach(function (p) {
-        var s = p[1].status, code = p[1].json && p[1].json.code;
-        if (s === 200) L.push('OK       Tabel ' + p[0] + ' ada.');
-        else if (s === 404 || code === 'PGRST205') L.push('MASALAH  Tabel ' + p[0] + ' belum ada. Jalankan schema.sql di Supabase (SQL Editor).');
-        else if (s === 401 || s === 403) L.push('MASALAH  Kunci ditolak saat membaca ' + p[0] + ' (status ' + s + '). Salin ulang kunci publishable ke config.js.');
-        else L.push('MASALAH  Tabel ' + p[0] + ' membalas status ' + s + '.');
-      });
-      if (r[1].status === 200 && r[2].status !== 200) L.push('CATATAN   Supabase menolak header Authorization berisi kunci (status ' + r[2].status + '). Aplikasi ini sudah membuang header itu otomatis.');
+      return L;
     }
-    pre.textContent = L.join('\n');
-  });
+    if (r[0].status === 200) {
+      L.push('OK       Layanan login aktif.');
+      if (r[0].json && r[0].json.disable_signup === false) L.push('PERINGATAN  Pendaftaran mandiri masih aktif. Matikan di Authentication agar orang luar tidak bisa membuat akun.');
+      else if (r[0].json && r[0].json.disable_signup === true) L.push('OK       Pendaftaran mandiri nonaktif.');
+      if (r[1].status !== 200) L.push('CATATAN   Supabase menolak header Authorization berisi kunci (status ' + r[1].status + '). Aplikasi ini sudah membuang header itu otomatis.');
+    } else if (r[0].status === 401 || r[0].status === 403) L.push('MASALAH  Kunci ditolak oleh layanan login (status ' + r[0].status + '). Salin ulang kunci publishable ke config.js.');
+    else L.push('MASALAH  Layanan login membalas status ' + r[0].status + '.');
+    TABLES.forEach(function (t, i) {
+      var x = r[2 + i];
+      if (x.status === 200) L.push('OK       Tabel ' + t + ' ada.');
+      else if (x.status === 404 || (x.json && x.json.code === 'PGRST205')) L.push('MASALAH  Tabel ' + t + ' belum ada. Jalankan schema.sql di Supabase (SQL Editor).');
+      else if (denied(x)) L.push('OK       Tabel ' + t + ' ada dan tertutup untuk pengunjung tanpa login (memang begitu).');
+      else if (x.status === 401 || x.status === 403) L.push('MASALAH  Kunci ditolak saat membaca ' + t + ' (status ' + x.status + (msgOf(x) ? ', pesan: ' + msgOf(x) : '') + '). Salin ulang kunci publishable ke config.js.');
+      else L.push('MASALAH  Tabel ' + t + ' membalas status ' + x.status + (msgOf(x) ? ' (' + msgOf(x) + ')' : '') + '.');
+    });
+    return L;
+  }).then(function (L) {
+    if (L.some(function (l) { return /tidak bisa dijangkau/.test(l); })) return L;
+    // Langkah 2: setelah login (sesi aktif, atau email dan sandi yang diisi di formulir)
+    return sb.auth.getSession().then(function (s) {
+      var sess = s && s.data && s.data.session;
+      if (sess) return { token: sess.access_token, who: 'sesi yang sedang aktif' };
+      var em = (($('#login-email') || {}).value || '').trim(), pw = ($('#login-pass') || {}).value || '';
+      if (!em || !pw) { L.push('CATATAN   Untuk menguji akses setelah login, isi email dan kata sandi di formulir, lalu klik tombol ini lagi.'); return null; }
+      var tmp = window.supabase.createClient(base, key, { global: { fetch: cleanFetch }, auth: { persistSession: false, autoRefreshToken: false, storageKey: 'rapor-sd-diag' } });
+      return tmp.auth.signInWithPassword({ email: em, password: pw }).then(function (res) {
+        if (res.error || !res.data || !res.data.session) {
+          var em2 = (res.error && res.error.message) || 'tidak diketahui';
+          L.push('MASALAH  Login dengan email yang diisi gagal (' + em2 + ').' + (/not confirmed/i.test(em2) ? ' Di Supabase, buka Authentication > Users dan konfirmasi akun itu.' : /invalid login/i.test(em2) ? ' Periksa email dan kata sandi, atau buat akunnya di Authentication > Users.' : ''));
+          return null;
+        }
+        return { token: res.data.session.access_token, who: 'akun ' + em };
+      }, function (e) { L.push('MASALAH  Login gagal: ' + ((e && e.message) || e)); return null; });
+    }).then(function (ses) {
+      if (!ses) return L;
+      L.push('OK       Login berhasil (' + ses.who + ').');
+      var hh = { apikey: key, Authorization: 'Bearer ' + ses.token };
+      return Promise.all(TABLES.map(function (t) { return probe(q(t), hh); })).then(function (rr) {
+        TABLES.forEach(function (t, i) {
+          var x = rr[i];
+          if (x.status === 200) L.push('OK       Setelah login, tabel ' + t + ' bisa dibaca.');
+          else if (denied(x)) L.push('MASALAH  Setelah login, tabel ' + t + ' ditolak: izin (GRANT) belum diberikan. Jalankan ulang schema.sql terbaru di SQL Editor (Supabase).');
+          else L.push('MASALAH  Setelah login, tabel ' + t + ' membalas status ' + x.status + (msgOf(x) ? ' (' + msgOf(x) + ')' : '') + '.');
+        });
+        return L;
+      });
+    });
+  }).then(function (L) { pre.textContent = L.join('\n'); },
+          function (e) { pre.textContent = 'Tes gagal dijalankan: ' + ((e && e.message) || e); });
 }
 function setSync(text, cls) { var s = $('#sync'); s.textContent = text; s.className = 'sync' + (cls ? ' ' + cls : ''); }
 

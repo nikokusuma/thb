@@ -88,3 +88,14 @@ create policy "staf hapus siswa"    on public.rapor_siswa for delete to authenti
 
 -- Pengunjung tanpa login (role anon) tidak mendapat policy apa pun,
 -- sehingga tidak bisa membaca satu baris pun.
+
+-- 5. Izin tabel untuk Data API.
+-- Sejak 2026 Supabase tidak lagi memberi izin otomatis untuk tabel baru di schema public,
+-- jadi izin harus diberikan sendiri. Tanpa bagian ini aplikasi gagal memuat data
+-- ("permission denied for table ..."), walaupun tabel dan policy di atas sudah ada.
+-- Hanya akun yang login (authenticated) yang diberi izin; pengunjung (anon) dicabut.
+grant usage on schema public to authenticated;
+grant select, insert, update, delete on public.rapor_sekolah to authenticated;
+grant select, insert, update, delete on public.rapor_siswa   to authenticated;
+revoke all on public.rapor_sekolah from anon;
+revoke all on public.rapor_siswa   from anon;

@@ -21,7 +21,7 @@ Aplikasi web untuk mencetak **cover rapor, identitas sekolah, identitas peserta 
 ### 1. Siapkan Supabase
 
 1. Masuk ke supabase.com, buat proyek baru (atau pakai proyek yang sudah ada; nama tabel diawali `rapor_` sehingga tidak bentrok dengan tabel lain).
-2. Buka **SQL Editor**, pilih **New query**, tempel seluruh isi `schema.sql`, lalu klik **Run**. Aman dijalankan ulang.
+2. Buka **SQL Editor**, pilih **New query**, tempel seluruh isi `schema.sql`, lalu klik **Run**. Aman dijalankan ulang. Bagian terakhir (`grant ...`) wajib ikut dijalankan: sejak 2026 Supabase tidak lagi memberi izin otomatis untuk tabel baru, sehingga tanpa bagian itu aplikasi tidak bisa membaca atau menyimpan data.
 3. Buka **Authentication > Users > Add user**. Isi email dan kata sandi, lalu centang **Auto Confirm User**. Buat satu akun untuk setiap staf yang akan memakai aplikasi.
 4. Matikan pendaftaran mandiri: **Authentication > Sign In / Providers** (atau *Settings*), matikan **Allow new users to sign up**. Ini penting karena aplikasi memuat data anak; hanya akun yang Anda buat yang boleh masuk.
 5. Buka **Project Settings > API** (atau *Data API*). Salin **Project URL** dan kunci **anon / publishable**.
@@ -48,13 +48,14 @@ Jika ingin menaruhnya di repository yang sudah dipakai aplikasi lain, letakkan s
 
 ## Jika aplikasi tidak bisa dipakai
 
-Di layar masuk (dan di kotak merah bila data gagal dimuat) ada tombol **Tes koneksi database**. Tombol ini memeriksa satu per satu dan menulis hasilnya di layar:
+Di layar masuk (dan di kotak merah bila data gagal dimuat) ada tombol **Tes koneksi database**. Isi email dan kata sandi di formulir sebelum menekannya agar akses setelah login ikut diuji (kata sandi tidak disimpan). Tombol ini memeriksa satu per satu dan menulis hasilnya di layar. Keterangan "tertutup untuk pengunjung tanpa login" itu normal:
 
 | Hasil tes | Artinya | Perbaikan |
 | --- | --- | --- |
 | Supabase tidak bisa dijangkau | `SUPABASE_URL` salah ketik, atau proyek sedang dijeda | Periksa `config.js`; aktifkan proyek di dashboard Supabase |
 | Kunci ditolak | `SUPABASE_ANON_KEY` salah atau terpotong | Salin ulang kunci anon/publishable (bukan `secret`) |
 | Tabel ... belum ada | `schema.sql` belum dijalankan | Jalankan seluruh isi `schema.sql` di SQL Editor. Jika muncul peringatan tentang `drop policy`, pilih **Run this query** |
+| Setelah login, tabel ... ditolak: izin (GRANT) belum diberikan | `schema.sql` versi lama (tanpa `grant`) yang dijalankan | Jalankan ulang seluruh `schema.sql` terbaru di SQL Editor, lalu muat ulang aplikasi |
 | Layanan login aktif, tabel ada, tetapi tidak bisa masuk | Akun belum dibuat atau belum dikonfirmasi | Authentication > Users > Add user, centang **Auto Confirm User** |
 
 Setelah mengubah `config.js` di GitHub, tunggu satu sampai dua menit lalu muat ulang dengan **Ctrl+Shift+R** (di ponsel: tutup tab lalu buka lagi), karena GitHub Pages dan browser menyimpan salinan lama.
