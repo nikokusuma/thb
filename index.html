@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Bank Soal SD</title>
-<meta name="bs-version" content="1.5.1">
+<meta name="bs-version" content="1.5.2">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Tinos:ital,wght@0,400;0,700;1,400;1,700&family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
@@ -1083,7 +1083,7 @@ sup,sub{font-size:.72em;line-height:0}
   }
 
   /* ---------- aksara Jawa (Unicode U+A980-U+A9DF): pengubah huruf Latin -> aksara ----------
-     Penulisan Latin: e = pepet, é / è = taling, o = taling tarung; ng ny th dh = satu huruf.
+     Penulisan Latin: e = pepet, é / è / e' (e dan tanda petik) = taling, o = taling tarung; ng ny th dh = satu huruf.
      Konsonan penutup ng / r / h = cecak / layar / wignyan, konsonan lain = pangkon.
      Gugus konsonan = pangkon + konsonan (font membentuk pasangan); -ra = cakra, -ya = pengkal, -re (pepet) = keret.
      Kata berawalan vokal ditulis ha + sandhangan (aksara swara hanya bila opsi swara dinyalakan, untuk kata serapan dan nama).
@@ -1167,7 +1167,7 @@ sup,sub{font-size:.72em;line-height:0}
     }
     function convert(text, opt) {
       opt = opt || {};
-      var s = String(text == null ? '' : text), out = '';
+      var s = String(text == null ? '' : text).replace(/e['\u2019\u2018`\u00B4]/g, '\u00E9').replace(/E['\u2019\u2018`\u00B4]/g, '\u00C9'), out = '';   // e' = taling (untuk papan ketik tanpa é)
       var re = /([A-Za-zÀ-ɏ]+)|(\d+)|([\s\S])/g, m;
       while ((m = re.exec(s))) {
         if (m[1]) {
@@ -2239,7 +2239,7 @@ sup,sub{font-size:.72em;line-height:0}
 (function () {
   'use strict';
   var BS = window.BS, B = window.BACKEND;
-  var VER = {"v":"1.5.1","tanggal":"2026-11-24","dibuat":"2026-11-24T03:19:56.937Z","log":[{"v":"1.5.1","tanggal":"2026-11-24","catatan":["Impor Massal: berkas teks (#kelas, #mapel, #materi, #bacaan) otomatis dibaca dalam mode Teks, tidak lagi salah dibaca sebagai tabel setelah impor CSV.","Mata pelajaran agama dipisah per agama: Islam, Kristen, Katolik, Hindu, Buddha, dan Konghucu."]},{"v":"1.5.0","tanggal":"2026-11-24","catatan":["Dukungan aksara Jawa: tombol \"Aksara Jawa\" di alat penulisan mengubah tulisan Latin jadi aksara Jawa (sandhangan, pasangan, murda, swara, rékan), lengkap dengan pratinjau dan simbol siap sisip.","Saat dicetak atau diunduh ke Word, aksara Jawa otomatis memakai font Hanacaraka 18 (font itu harus terpasang di komputer yang dipakai mencetak).","Soal Bahasa Jawa untuk mata pelajaran Muatan Lokal / Bahasa Daerah kelas 1 sampai 6, termasuk soal aksara Jawa."]},{"v":"1.4.0","tanggal":"2026-11-24","catatan":["Tombol \"Tambah soal otomatis\" untuk melengkapi kekurangan jumlah soal. Soal yang sudah ada, termasuk yang ditambah manual, tidak dihapus.","Pemberitahuan bila semua soal di bank sudah terpakai dan tidak ada lagi yang bisa ditambahkan.","Nomor versi tampil di bagian atas, dengan pemberitahuan bila situs sudah punya versi yang lebih baru."]},{"v":"1.3.0","tanggal":"2026-11-24","catatan":["Menu Pilih Soal Manual: cari kata di soal atau materi, centang soal, lihat jumlah terpilih dibanding jumlah yang diinginkan, simpan sebagai paket, dan ubah soal langsung ke database."]},{"v":"1.2.0","tanggal":"2026-11-24","catatan":["Ubah soal langsung dari lembar soal; perubahan ikut tersimpan di database.","Paket Tersimpan: simpan lembar soal, buka lagi untuk dicetak atau diperbaiki."]},{"v":"1.1.0","tanggal":"2026-11-24","catatan":["Pilih teks bacaan atau jumlah bacaan di pembuat soal otomatis.","Teks bacaan Bahasa Mandarin sepenuhnya berbahasa Mandarin."]},{"v":"1.0.0","catatan":["Versi awal: bank soal kelas 1 sampai 6, pembuat lembar soal otomatis, impor massal, cetak dan Word."]}]};   // diisi saat build: {v, tanggal, dibuat, log}
+  var VER = {"v":"1.5.2","tanggal":"2026-11-24","dibuat":"2026-11-24T05:40:27.019Z","log":[{"v":"1.5.2","tanggal":"2026-11-24","catatan":["Aksara Jawa: taling kini bisa ditulis tanpa simbol é atau è, cukup ketik e lalu tanda petik (contoh: ngombe' menjadi ngombé), atau klik tombol é di kotak pengubah."]},{"v":"1.5.1","tanggal":"2026-11-24","catatan":["Impor Massal: berkas teks (#kelas, #mapel, #materi, #bacaan) otomatis dibaca dalam mode Teks, tidak lagi salah dibaca sebagai tabel setelah impor CSV.","Mata pelajaran agama dipisah per agama: Islam, Kristen, Katolik, Hindu, Buddha, dan Konghucu."]},{"v":"1.5.0","tanggal":"2026-11-24","catatan":["Dukungan aksara Jawa: tombol \"Aksara Jawa\" di alat penulisan mengubah tulisan Latin jadi aksara Jawa (sandhangan, pasangan, murda, swara, rékan), lengkap dengan pratinjau dan simbol siap sisip.","Saat dicetak atau diunduh ke Word, aksara Jawa otomatis memakai font Hanacaraka 18 (font itu harus terpasang di komputer yang dipakai mencetak).","Soal Bahasa Jawa untuk mata pelajaran Muatan Lokal / Bahasa Daerah kelas 1 sampai 6, termasuk soal aksara Jawa."]},{"v":"1.4.0","tanggal":"2026-11-24","catatan":["Tombol \"Tambah soal otomatis\" untuk melengkapi kekurangan jumlah soal. Soal yang sudah ada, termasuk yang ditambah manual, tidak dihapus.","Pemberitahuan bila semua soal di bank sudah terpakai dan tidak ada lagi yang bisa ditambahkan.","Nomor versi tampil di bagian atas, dengan pemberitahuan bila situs sudah punya versi yang lebih baru."]},{"v":"1.3.0","tanggal":"2026-11-24","catatan":["Menu Pilih Soal Manual: cari kata di soal atau materi, centang soal, lihat jumlah terpilih dibanding jumlah yang diinginkan, simpan sebagai paket, dan ubah soal langsung ke database."]},{"v":"1.2.0","tanggal":"2026-11-24","catatan":["Ubah soal langsung dari lembar soal; perubahan ikut tersimpan di database.","Paket Tersimpan: simpan lembar soal, buka lagi untuk dicetak atau diperbaiki."]},{"v":"1.1.0","tanggal":"2026-11-24","catatan":["Pilih teks bacaan atau jumlah bacaan di pembuat soal otomatis.","Teks bacaan Bahasa Mandarin sepenuhnya berbahasa Mandarin."]},{"v":"1.0.0","catatan":["Versi awal: bank soal kelas 1 sampai 6, pembuat lembar soal otomatis, impor massal, cetak dan Word."]}]};   // diisi saat build: {v, tanggal, dibuat, log}
   var JK = BS.JENIS_KEYS, JL = BS.JENIS_LABEL, LET = BS.LETTERS, esc = BS.esc;
   function $(s, r) { return (r || document).querySelector(s); }
   function $$(s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); }
@@ -3653,7 +3653,7 @@ sup,sub{font-size:.72em;line-height:0}
       build: function (v) { return v.i ? (v.b || '') + '_' + (/^\d+$/.test(v.i) ? v.i : '{' + v.i + '}') : ''; } },
     root: { title: 'Akar', fields: [{ k: 'x', l: 'Isi di dalam akar', ph: '16', sel: true }],
       build: function (v) { return v.x ? '√{' + v.x + '}' : ''; } },
-    jv: { title: 'Aksara Jawa dari tulisan Latin', fields: [{ k: 't', l: 'Tulisan Latin (e = pepet, é atau è = taling)', ph: 'omah, sekolah, gunung', sel: true },
+    jv: { title: 'Aksara Jawa dari tulisan Latin', fields: [{ k: 't', l: 'Tulisan Latin (e = pepet; taling: ketik e lalu tanda petik, mis. ngombe\' atau te\'ka)', ph: 'omah, sekolah, gunung', sel: true },
       { k: 'm', l: 'Huruf besar di awal kata jadi aksara murda? (ketik ya bila perlu)', ph: 'tidak' },
       { k: 's', l: 'Vokal di awal kata pakai aksara swara? (ketik ya untuk kata serapan atau nama)', ph: 'tidak' }],
       build: function (v) { var yes = /^(ya|y|iya)$/i; return v.t ? BS.aksaraJawa(v.t, { murda: yes.test(v.m || ''), swara: yes.test(v.s || '') }) : ''; } },
@@ -3684,7 +3684,7 @@ sup,sub{font-size:.72em;line-height:0}
         '<span class="rt-sub">Aksara rékan</span>' + symGridJv(SYM_JV_REKAN) +
         '<span class="rt-sub">Tanda dan tanda baca (pangkon, cecak, layar, wignyan, pada lingsa, pada lungsi, pada pangkat, rerenggan)</span>' + symGridJv(SYM_JV_TANDA) +
         '<span class="rt-sub">Angka Jawa</span>' + symGridJv(SYM_JV_ANGKA) +
-        '<p class="hint">Cara termudah: klik <b>Ubah tulisan Latin jadi aksara Jawa</b>, ketik katanya (mis. <b>omah</b>, <b>sekolah</b>, <b>ngombé</b>), cek pratinjau, lalu <b>Sisipkan</b>. Aksara sandhangan dan pasangan dibentuk otomatis. Tulis <b>e</b> untuk pepet, <b>é</b> atau <b>è</b> untuk taling, dan <b>o</b> untuk taling tarung. Aksara Jawa dari keyboard atau kamus juga bisa ditempel langsung. Pada lembar cetak dan berkas Word, aksara Jawa otomatis memakai font <b>' + esc(BS.JV_STYLE.font) + ' ' + BS.JV_STYLE.pt + '</b>; font itu harus terpasang di komputer yang dipakai mencetak (bila tidak ada, dipakai font aksara Jawa lain yang tersedia).</p>';
+        '<p class="hint">Cara termudah: klik <b>Ubah tulisan Latin jadi aksara Jawa</b>, ketik katanya (mis. <b>omah</b>, <b>sekolah</b>, <b>ngombé</b>), cek pratinjau, lalu <b>Sisipkan</b>. Aksara sandhangan dan pasangan dibentuk otomatis. Tulis <b>e</b> untuk pepet; untuk taling klik tombol <b>é</b> atau ketik <b>e</b> lalu tanda petik (mis. <b>ngombe\'</b>, <b>te\'ka</b>), dan <b>o</b> untuk taling tarung. Aksara Jawa dari keyboard atau kamus juga bisa ditempel langsung. Pada lembar cetak dan berkas Word, aksara Jawa otomatis memakai font <b>' + esc(BS.JV_STYLE.font) + ' ' + BS.JV_STYLE.pt + '</b>; font itu harus terpasang di komputer yang dipakai mencetak (bila tidak ada, dipakai font aksara Jawa lain yang tersedia).</p>';
     },
     math: function () {
       return '<div class="rt-row"><span class="rt-sub">Rumus</span>' +
@@ -3728,7 +3728,7 @@ sup,sub{font-size:.72em;line-height:0}
       box.innerHTML = '<b>' + esc(m.title) + '</b><div class="rt-fields">' + m.fields.map(function (x, i) {
         return '<div class="field"><label>' + esc(x.l) + '</label><input type="text" data-k="' + x.k + '" placeholder="' + esc(x.ph || '') + '" autocomplete="off" value="' + esc(x.sel ? selTxt : '') + '"></div>';
       }).join('') + '</div><div class="rt-live" aria-live="polite"></div>' +
-        '<div class="rt-row"><button type="button" class="btn sm primary" data-do="1">Sisipkan</button><button type="button" class="btn sm ghost" data-close="1">Tutup</button></div>';
+        (key === 'jv' ? '<div class="rt-row"><span class="hint">Taling:</span><button type="button" class="btn sm" data-tal="1" aria-label="Sisipkan huruf é (taling)">é</button><span class="hint">atau ketik e dan tanda petik</span></div>' : '') + '<div class="rt-row"><button type="button" class="btn sm primary" data-do="1">Sisipkan</button><button type="button" class="btn sm ghost" data-close="1">Tutup</button></div>';
       function val() { var v = {}; $$('input[data-k]', box).forEach(function (i) { v[i.dataset.k] = i.value.trim(); }); return v; }
       function live() { var t = m.build(val()); $('.rt-live', box).innerHTML = t ? BS.richHTML(t) : '<span class="hint">Pratinjau muncul di sini</span>'; }
       function doIns() {
@@ -3740,7 +3740,9 @@ sup,sub{font-size:.72em;line-height:0}
       box.addEventListener('input', live);
       box.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); e.stopPropagation(); doIns(); } });
       box.addEventListener('click', function (e) {
-        if (e.target.closest('[data-do]')) doIns();
+        if (e.target.closest('[data-tal]')) {
+          var ti = $('input[data-k=t]', box); if (ti) { var a = ti.selectionStart == null ? ti.value.length : ti.selectionStart, b = ti.selectionEnd == null ? a : ti.selectionEnd; ti.value = ti.value.slice(0, a) + '\u00E9' + ti.value.slice(b); ti.focus(); try { ti.setSelectionRange(a + 1, a + 1); } catch (x) {} live(); }
+        } else if (e.target.closest('[data-do]')) doIns();
         else if (e.target.closest('[data-close]')) { box.hidden = true; box.innerHTML = ''; }
       });
       live();
