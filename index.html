@@ -356,6 +356,38 @@ details.help ul{padding-left:20px;margin:8px 0}
 .pk-prog{font-size:14px;color:var(--ink-2)}
 @media (max-width:520px){.pk-card .qact{max-width:none;justify-content:flex-start}}
 
+/* pilih soal manual */
+.pick-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,390px);gap:16px;align-items:start}
+.pick-side #pickPanel{position:sticky;top:8px;max-height:calc(100vh - 16px);max-height:calc(100dvh - 16px);overflow-y:auto}
+.pick-search{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.pick-search input[type=search]{flex:1 1 220px;min-width:0}
+.req-name small.ok{color:var(--good);font-weight:700}
+.qrow.picked{border-color:var(--brand);background:var(--brand-soft)}
+.pickrow .qsel input{width:22px;height:22px}
+.pickrow .qsel{padding:2px 4px 0 0}
+details.pick-sel{margin-top:14px;border-top:1px solid var(--line);padding-top:12px}
+details.pick-sel > summary{cursor:pointer;font-weight:800;font-size:14.5px}
+.sel-group{margin-top:12px}
+.sel-group h3{font-size:13.5px;font-weight:800;margin-bottom:6px}
+.sel-row{display:flex;gap:8px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--line)}
+.sel-row:last-child{border-bottom:0}
+.sel-txt{flex:1;min-width:0}
+.sel-meta{font-size:12px;color:var(--ink-3);font-weight:600}
+.sel-snip{font-size:13.5px;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;white-space:pre-line}
+.sel-act{display:flex;gap:4px;flex:none;flex-wrap:wrap;justify-content:flex-end}
+.sel-act .btn{min-height:30px;padding:3px 9px;font-size:12px}
+.pick-mini{display:none}
+@media (max-width:900px){
+  #tab-pilih{padding-bottom:72px}
+  .pick-mini{position:fixed;left:0;right:0;bottom:0;z-index:40;display:flex;gap:4px 16px;flex-wrap:wrap;justify-content:center;align-items:center;padding:10px 14px;background:var(--surface);color:var(--ink);border:0;border-top:2px solid var(--brand);box-shadow:0 -4px 16px rgba(0,0,0,.14);font:inherit;font-size:13.5px;font-weight:700;cursor:pointer}
+  .pick-mini .ok{color:var(--good)}
+  .pick-mini .low{color:var(--warn)}
+  .pick-mini .off{color:var(--ink-3);font-weight:600}
+  .pick-grid{grid-template-columns:1fr}
+  .pick-side{order:-1}
+  .pick-side #pickPanel{position:static;max-height:none;overflow:visible}
+}
+
 .sheet{font-family:"Times New Roman", Tinos, "Liberation Serif", Times, serif;font-size:12pt;line-height:1.5;color:#000;background:#fff;text-align:left}
 .sheet *{box-sizing:border-box}
 .sheet .blk{margin:0;padding:0;break-inside:avoid;page-break-inside:avoid}
@@ -448,6 +480,7 @@ sup,sub{font-size:.72em;line-height:0}
 
   <nav class="tabs" role="tablist" aria-label="Menu utama">
     <button type="button" role="tab" id="t-gen" data-tab="gen" aria-selected="true">Buat Lembar Soal</button>
+    <button type="button" role="tab" id="t-pilih" data-tab="pilih" aria-selected="false">Pilih Soal Manual</button>
     <button type="button" role="tab" id="t-paket" data-tab="paket" aria-selected="false" hidden>Paket Tersimpan</button>
     <button type="button" role="tab" id="t-bank" data-tab="bank" aria-selected="false">Bank Soal</button>
     <button type="button" role="tab" id="t-add" data-tab="add" aria-selected="false">Tambah Soal</button>
@@ -535,6 +568,51 @@ sup,sub{font-size:.72em;line-height:0}
           </div>
         </div>
       </div>
+    </section>
+
+    <!-- ========== PILIH SOAL MANUAL ========== -->
+    <section id="tab-pilih" role="tabpanel" aria-labelledby="t-pilih" hidden>
+      <div class="pick-grid">
+        <div class="col">
+          <div class="card">
+            <h2>Cari dan pilih soal</h2>
+            <p class="hint" id="pickScope" style="margin-bottom:12px"></p>
+            <form class="pick-search" id="pickSearch" role="search">
+              <input type="search" id="pick-q" placeholder="Cari kata di soal atau materi" autocomplete="off" aria-label="Cari kata di soal atau materi">
+              <button type="submit" class="btn primary" id="btnPickSearch">Cari</button>
+              <button type="button" class="btn" id="btnPickClear" hidden>Hapus kata</button>
+            </form>
+            <div class="toolbar">
+              <div class="field"><label for="pick-materi">Materi</label><select id="pick-materi"></select></div>
+              <div class="field"><label for="pick-jenis">Jenis soal</label>
+                <select id="pick-jenis"><option value="">Semua jenis</option><option value="pg">Pilihan ganda</option><option value="isian">Isian</option><option value="uraian">Uraian</option></select></div>
+              <div class="field" id="pick-bacaan-f" hidden><label for="pick-bacaan">Bacaan</label><select id="pick-bacaan"></select></div>
+              <div class="field"><label for="pick-show">Tampilkan</label>
+                <select id="pick-show"><option value="">Semua soal</option><option value="sel">Yang sudah dipilih</option><option value="unsel">Yang belum dipilih</option></select></div>
+            </div>
+            <div class="bulk" id="pickBulk"></div>
+            <div class="list" id="pickList"></div>
+            <div style="margin-top:12px;text-align:center" id="pickMore"></div>
+          </div>
+        </div>
+        <div class="col pick-side">
+          <div class="card" id="pickPanel">
+            <h2>Jumlah soal yang diinginkan</h2>
+            <div id="pickReq"></div>
+            <div id="pickStatus" class="stack" style="margin-top:6px"></div>
+            <div id="pickBar" class="paket-bar" hidden style="margin-top:12px"></div>
+            <div class="row" style="margin-top:12px">
+              <button type="button" class="btn primary" id="btnPickView">Lihat lembar dan cetak</button>
+              <button type="button" class="btn" id="btnPickNew">Mulai pilihan baru</button>
+            </div>
+            <details class="pick-sel" id="pickSelBox" open>
+              <summary id="pickSelSum"></summary>
+              <div id="pickSelList"></div>
+            </details>
+          </div>
+        </div>
+      </div>
+      <button type="button" class="pick-mini" id="pickMini" aria-label="Jumlah soal terpilih. Ketuk untuk melihat ringkasan"></button>
     </section>
 
     <!-- ========== PAKET ========== -->
@@ -2038,6 +2116,7 @@ sup,sub{font-size:.72em;line-height:0}
     gen: { sel: [], req: { pg: 10, isian: 5, uraian: 2 }, bmode: 'auto', bsel: [], bcount: 2, exam: null, used: null, view: 'list', manualSeq: 0, paket: null },
     extraBacaan: {},
     paket: { list: [], loading: false, loaded: false, err: '', unsupported: false, seq: 0 },
+    pick: { materi: '', jenis: '', bacaan: '', show: '', q: '', limit: 40, target: { pg: 10, isian: 5, uraian: 2 } },
     bank: { materi: '', jenis: '', q: '', sel: {}, limit: 40 },
     imp: { mode: 'text', items: null, busy: false, last: null },
     set: {
@@ -2199,6 +2278,7 @@ sup,sub{font-size:.72em;line-height:0}
     S.gen.exam = null; S.gen.used = null; S.gen.sel = []; S.gen.bmode = 'auto'; S.gen.bsel = []; S.gen.view = 'list'; S.gen.paket = null; S.extraBacaan = {};
     S.paket = { list: [], loading: false, loaded: false, err: '', unsupported: false, seq: S.paket.seq + 1 };
     S.bank.sel = {}; S.bank.limit = 40; S.bank.materi = '';
+    resetPickFilters();
     S.imp.items = null; S.imp.last = null;
     saveLocal(); renderScopeBar(); subscribeScope();
     if (S.tab === 'paket') { renderPaketList(); loadPaket(); }
@@ -2238,11 +2318,12 @@ sup,sub{font-size:.72em;line-height:0}
   function showTab(name) {
     S.tab = name;
     $$('.tabs button').forEach(function (b) { b.setAttribute('aria-selected', String(b.dataset.tab === name)); });
-    ['gen', 'paket', 'bank', 'add', 'bacaan', 'import'].forEach(function (t) { $('#tab-' + t).hidden = (t !== name); });
+    ['gen', 'pilih', 'paket', 'bank', 'add', 'bacaan', 'import'].forEach(function (t) { $('#tab-' + t).hidden = (t !== name); });
+    if (name === 'pilih') renderPick();
     if (name === 'paket') { renderPaketList(); if (!S.paket.loaded && !S.paket.loading) loadPaket(); }
     if (name === 'bank') renderBank();
     if (name === 'bacaan') renderBacaanList();
-    if (name === 'gen' && S.gen.view === 'preview') renderPreview();
+    if (name === 'gen') { renderReq(); renderGenState(); }   // lembar bisa berubah dari tab Pilih Soal Manual
     if (name === 'add') renderAddScope();
   }
 
@@ -2253,7 +2334,9 @@ sup,sub{font-size:.72em;line-height:0}
     Object.keys(S.bank.sel).forEach(function (id) { if (!ids[id]) delete S.bank.sel[id]; });
     syncExam();
     renderCounts(); renderMateriChips(); renderBacaanPick(); renderReq(); renderGenState(); renderBankFilters();
+    renderPickFilters();
     if (S.tab === 'bank') renderBank();
+    if (S.tab === 'pilih') renderPick();
     if (S.tab === 'bacaan') renderBacaanList();
     if (S.tab === 'gen' && S.gen.exam) renderResult();
     refreshDatalists(); refreshBacaanSelects(); renderAddScope(); renderImpScope();
@@ -2424,12 +2507,13 @@ sup,sub{font-size:.72em;line-height:0}
       if (!S.gen.bsel.length) { toast('Pilih minimal satu bacaan, atau ubah ke Otomatis.', 'error'); return; }
       go.bacaanIds = S.gen.bsel.slice();
     } else if (S.gen.bmode === 'jumlah') go.bacaanCount = S.gen.bcount;
-    if (S.gen.paket && S.gen.paket.dirty && !(await confirmDiscard(false))) return;
+    if (!(await confirmDiscard(!!(S.gen.used && S.gen.used.manual)))) return;   // paket yang belum disimpan atau pilihan manual yang belum disimpan
     if (S.gen.paket || Object.keys(S.extraBacaan).length) { S.gen.paket = null; S.extraBacaan = {}; setBacaan(S.bacaan); }   // lembar baru, bukan lagi paket yang dibuka
     var r = BS.generate(S.data, S.gen.req, go);
     S.gen.exam = r.exam;
     S.gen.used = { req: Object.assign({}, S.gen.req), keys: keys, info: r.info, bacaan: r.bacaan };
     S.gen.view = 'list';
+    S.pick.target = Object.assign({}, S.gen.req); syncPickTargets();
     renderReq(); renderGenState();
     var short = JK.filter(function (j) { return r.info[j].short > 0; });
     if (short.length) toast('Soal di bank kurang untuk ' + short.map(function (j) { return JL[j]; }).join(' dan ') + '. Lihat keterangan di atas daftar soal.', 'error');
@@ -2454,8 +2538,8 @@ sup,sub{font-size:.72em;line-height:0}
     return out;
   }
   function renderResult() {
-    var ex = S.gen.exam, used = S.gen.used, pk = S.gen.paket;
-    if (pk) JK.forEach(function (j) { used.req[j] = ex[j].length; });   // paket tersimpan: jumlahnya mengikuti isi paket, tidak ada kekurangan
+    var ex = S.gen.exam, used = S.gen.used, pk = S.gen.paket, fixed = !!(pk || used.manual);
+    if (fixed) JK.forEach(function (j) { used.req[j] = ex[j].length; });   // paket tersimpan atau pilihan manual: jumlahnya mengikuti isi lembar, tidak ada kekurangan
     // keterangan kekurangan
     var h = '', anyShort = false;
     JK.forEach(function (j) {
@@ -2467,7 +2551,7 @@ sup,sub{font-size:.72em;line-height:0}
           '<div class="alert-act w-only"><button type="button" class="btn sm" data-act="manual" data-j="' + j + '">' + ic('plus') + ' Tambah ' + need + ' soal manual</button></div></div></div>';
       }
     });
-    if (pk) h = '';
+    if (fixed) h = '<p class="hint">' + (used.manual ? 'Soal pada lembar ini dipilih manual.' : 'Lembar ini berasal dari paket tersimpan.') + ' Untuk menambah atau mengeluarkan soal, buka tab Pilih Soal Manual. <button type="button" class="btn sm" data-goto="pilih">Ubah pilihan soal</button></p>';
     else if (anyShort) h += '<p class="hint">Soal juga bisa ditambahkan ke bank lewat tab Tambah Soal atau Impor Massal, lalu klik Buat ulang soal.</p>';
     else h = '<div class="alert good" role="status"><span class="alert-ic">' + ic('check') + '</span><div class="alert-body"><div><b>' + examTotal() + ' soal siap dicetak.</b> Jumlah sudah sesuai permintaan.</div></div></div>';
     var bi = used.bacaan;
@@ -2497,7 +2581,7 @@ sup,sub{font-size:.72em;line-height:0}
     JK.forEach(function (j) {
       var arr = ex[j];
       if (!arr.length && !used.req[j]) return;
-      list += '<section class="ex-sec"><div class="ex-head"><h3>' + JL[j] + ' <span class="count">' + arr.length + (used.req[j] && !pk ? ' dari ' + used.req[j] + ' diminta' : '') + '</span></h3></div>';
+      list += '<section class="ex-sec"><div class="ex-head"><h3>' + JL[j] + ' <span class="count">' + arr.length + (used.req[j] && !fixed ? ' dari ' + used.req[j] + ' diminta' : '') + '</span></h3></div>';
       if (!arr.length) list += '<p class="hint">Belum ada soal jenis ini.</p>';
       var groups = groupSpans(arr);
       arr.forEach(function (q, i) {
@@ -2515,6 +2599,7 @@ sup,sub{font-size:.72em;line-height:0}
       });
       list += '</section>';
     });
+    if (!examTotal()) list = '<div class="empty"><h3>Lembar soal masih kosong</h3><p>Pilih soal satu per satu di tab Pilih Soal Manual, atau buat soal otomatis dari panel di sebelah kiri.</p><div class="row" style="justify-content:center"><button type="button" class="btn primary" data-goto="pilih">Pilih soal manual</button></div></div>';
     $('#examList').innerHTML = list;
     hydrateImages($('#examList'));
     $('#exAdd').innerHTML = '<span>Tambah soal manual:</span>' + JK.map(function (j) { return '<button type="button" class="btn sm" data-act="manual" data-j="' + j + '">' + ic('plus') + ' ' + JL[j] + '</button>'; }).join('');
@@ -2713,20 +2798,23 @@ sup,sub{font-size:.72em;line-height:0}
     if (!ms) return '-';
     try { return new Date(ms).toLocaleString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }); } catch (e) { return '-'; }
   }
-  function renderPaketBar() {
-    var box = $('#paketBar'), pk = S.gen.paket;
-    if (!S.gen.exam || !paketOK()) { box.hidden = true; box.innerHTML = ''; return; }
-    box.hidden = false; box.classList.toggle('dirty', !!(pk && pk.dirty));
+  function paketBarHTML(pk, sfx, empty) {   // sfx memisahkan id tombol di panel Pilih Soal Manual dari bilah di tab Buat Lembar Soal
     var busy = S.paket.busy ? ' disabled' : '';
     if (pk) {
-      box.innerHTML = '<div class="pk-info"><span><span class="chip-static pk">Paket tersimpan</span></span><b>' + esc(pk.nama) + '</b>' +
+      return '<div class="pk-info"><span><span class="chip-static pk">Paket tersimpan</span></span><b>' + esc(pk.nama) + '</b>' +
         '<small>' + (pk.dirty ? 'Ada perubahan yang belum disimpan ke paket.' : 'Semua perubahan sudah tersimpan.') + '</small></div>' +
-        '<div class="pk-act w-only"><button type="button" class="btn primary sm" id="btnPkSave"' + (pk.dirty ? busy : ' disabled') + '>Simpan perubahan</button>' +
-        '<button type="button" class="btn sm" id="btnPkSaveAs"' + busy + '>Simpan sebagai paket baru</button></div>';
-    } else {
-      box.innerHTML = '<div class="pk-info"><b>Simpan lembar ini sebagai paket</b><small>Paket bisa dibuka lagi nanti untuk dicetak atau diperbaiki.</small></div>' +
-        '<div class="pk-act w-only"><button type="button" class="btn primary sm" id="btnPkSaveAs"' + busy + '>Simpan sebagai paket</button></div>';
+        '<div class="pk-act w-only"><button type="button" class="btn primary sm" id="btnPkSave' + sfx + '"' + (pk.dirty ? busy : ' disabled') + '>Simpan perubahan</button>' +
+        '<button type="button" class="btn sm" id="btnPkSaveAs' + sfx + '"' + busy + '>Simpan sebagai paket baru</button></div>';
     }
+    return '<div class="pk-info"><b>Simpan lembar ini sebagai paket</b><small>Paket bisa dibuka lagi nanti untuk dicetak atau diperbaiki.</small></div>' +
+      '<div class="pk-act w-only"><button type="button" class="btn primary sm" id="btnPkSaveAs' + sfx + '"' + (busy || (empty ? ' disabled' : '')) + '>Simpan sebagai paket</button></div>';
+  }
+  function renderPaketBar() {
+    var box = $('#paketBar'), pk = S.gen.paket, pbox = $('#pickBar');
+    if (!S.gen.exam || !paketOK()) { box.hidden = true; box.innerHTML = ''; }
+    else { box.hidden = false; box.classList.toggle('dirty', !!(pk && pk.dirty)); box.innerHTML = paketBarHTML(pk, '', false); }
+    if (!paketOK()) { pbox.hidden = true; pbox.innerHTML = ''; }
+    else { pbox.hidden = false; pbox.classList.toggle('dirty', !!(pk && pk.dirty)); pbox.innerHTML = paketBarHTML(S.gen.exam ? pk : null, 'P', !S.gen.exam || !examTotal()); }
   }
   function showPaketError(e) {
     if (B.paketMissing && B.paketMissing(e)) {
@@ -2791,7 +2879,9 @@ sup,sub{font-size:.72em;line-height:0}
       meta[j] = items[j].length; meta.total += items[j].length;
     });
     meta.materi = examMateri();
-    return { id: id || '', kelas: S.kelas, mapel: S.mapel, nama: nama, createdAt: createdAt || 0, meta: meta, data: { v: 1, items: items, bacaan: bac, set: paketSet() } };
+    var data = { v: 1, items: items, bacaan: bac, set: paketSet() };
+    if (S.gen.used && S.gen.used.manual) { data.manual = true; meta.manual = true; data.target = { pg: S.pick.target.pg, isian: S.pick.target.isian, uraian: S.pick.target.uraian }; }
+    return { id: id || '', kelas: S.kelas, mapel: S.mapel, nama: nama, createdAt: createdAt || 0, meta: meta, data: data };
   }
   async function persistLocalImages() {   // gambar yang hanya ada di memori disimpan dulu, supaya paket masih bisa menampilkannya nanti
     var map = {};
@@ -2831,6 +2921,7 @@ sup,sub{font-size:.72em;line-height:0}
     } catch (e) { showPaketError(e); }
     scope.busy = false;
     if (S.gen.exam) renderResult();
+    renderPaketBar();
   }
   function paketItem(raw, j) {
     if (!raw || typeof raw !== 'object' || typeof raw.soal !== 'string') return null;
@@ -2873,13 +2964,16 @@ sup,sub{font-size:.72em;line-height:0}
     setBacaan(S.bacaan);
     var counts = {}, info = {};
     JK.forEach(function (j) { counts[j] = ex[j].length; info[j] = { available: 0, short: 0, bacaanTrimmed: 0 }; });
-    S.gen.exam = ex; S.gen.used = { req: counts, keys: keys, info: info, bacaan: null };
+    S.gen.exam = ex; S.gen.used = { req: counts, keys: keys, info: info, bacaan: null, manual: !!p.data.manual };
     S.gen.paket = { id: p.id || id, nama: p.nama || '', createdAt: p.createdAt || 0, dirty: false };
+    var tg = p.data.manual && p.data.target && typeof p.data.target === 'object' ? p.data.target : counts;   // paket lama atau hasil otomatis: targetnya jumlah isi paket
+    JK.forEach(function (j) { S.pick.target[j] = Math.max(0, Math.min(200, Math.floor(Number(tg[j])) || 0)); });
+    syncPickTargets();
     S.gen.view = 'list';
     applyPaketSet(p.data.set);
-    showTab('gen');
+    showTab(view === 'pick' ? 'pilih' : 'gen');
     S.gen.view = view === 'preview' ? 'preview' : 'list';
-    renderReq(); renderGenState();
+    renderReq(); renderGenState(); renderPickStatusAll();
     toast('Paket dibuka: ' + (p.nama || '') + '.', 'ok');
   }
   async function loadPaket(force) {
@@ -2911,13 +3005,14 @@ sup,sub{font-size:.72em;line-height:0}
     box.innerHTML = P.list.map(function (p) {
       var m = p.meta || {}, mat = Array.isArray(m.materi) ? m.materi : [];
       var matTxt = mat.length ? mat.slice(0, 4).join(', ') + (mat.length > 4 ? ' dan ' + (mat.length - 4) + ' materi lain' : '') : '';
-      return '<article class="qrow pk-card" data-id="' + esc(p.id) + '"><div class="qmain"><div class="qmeta"><span class="chip-static pk">Paket</span>' + (p.id === openId ? '<span class="chip-static">sedang dibuka</span>' : '') + '</div>' +
+      return '<article class="qrow pk-card" data-id="' + esc(p.id) + '"><div class="qmain"><div class="qmeta"><span class="chip-static pk">Paket</span>' + (m.manual ? '<span class="chip-static">Dipilih manual</span>' : '') + (p.id === openId ? '<span class="chip-static">sedang dibuka</span>' : '') + '</div>' +
         '<div class="qtitle">' + esc(p.nama) + '</div>' +
         '<div class="pk-meta">' + (m.total || 0) + ' soal: pilihan ganda ' + (m.pg || 0) + ', isian ' + (m.isian || 0) + ', uraian ' + (m.uraian || 0) + '</div>' +
         (matTxt ? '<div class="pk-meta">Materi: ' + esc(matTxt) + '</div>' : '') +
         '<div class="pk-meta">Terakhir diubah ' + esc(fmtWaktu(p.updatedAt)) + '</div></div>' +
         '<div class="qact"><button type="button" class="btn sm primary" data-act="pk-open">Buka</button>' +
         '<button type="button" class="btn sm" data-act="pk-print">Pratinjau dan cetak</button>' +
+        '<button type="button" class="btn sm" data-act="pk-pick">Ubah pilihan soal</button>' +
         '<button type="button" class="btn sm w-only" data-act="pk-rename">Ganti nama</button>' +
         '<button type="button" class="btn sm w-only" data-act="pk-del">' + ic('trash') + ' Hapus</button></div></article>';
     }).join('');
@@ -2952,6 +3047,217 @@ sup,sub{font-size:.72em;line-height:0}
         }
       }]
     });
+  }
+
+  /* ================= PILIH SOAL MANUAL ================= */
+  /* Pilihan manual dan lembar soal adalah satu hal yang sama: mencentang soal di sini memasukkannya ke lembar (S.gen.exam).
+     Karena itu pratinjau, cetak, Word, edit soal, dan simpan paket memakai kode yang sama dengan lembar otomatis. */
+  var PICK_MAX = 200;
+  function pickInExam() {   // id soal di lembar -> {j, i}
+    var m = {};
+    if (S.gen.exam) JK.forEach(function (j) { S.gen.exam[j].forEach(function (q, i) { m[q.id] = { j: j, i: i }; }); });
+    return m;
+  }
+  function pickKeys() {
+    var seen = {}, out = [];
+    JK.forEach(function (j) { S.gen.exam[j].forEach(function (q) { var k = BS.norm(q.materi); if (k && !seen[k]) { seen[k] = 1; out.push(k); } }); });
+    return out;
+  }
+  function pickStatus(j) {
+    var n = S.gen.exam ? S.gen.exam[j].length : 0, t = S.pick.target[j];
+    if (!t && !n) return { state: 'off', text: 'tidak dipakai' };
+    if (n === t) return { state: 'ok', text: n + ' dari ' + t + ' · sesuai' };
+    if (n < t) return { state: 'low', text: n + ' dari ' + t + ' · kurang ' + (t - n) };
+    return { state: 'over', text: n + ' dari ' + t + ' · lebih ' + (n - t) };
+  }
+  function ensureManualExam() {
+    var g = S.gen;
+    if (!g.exam) {
+      var info = {};
+      JK.forEach(function (j) { info[j] = { available: 0, short: 0, bacaanTrimmed: 0 }; });
+      g.exam = { pg: [], isian: [], uraian: [] };
+      g.used = { req: { pg: 0, isian: 0, uraian: 0 }, keys: [], info: info, bacaan: null, manual: true };
+      g.paket = null; g.view = 'list';
+    }
+    g.used.manual = true; g.used.bacaan = null;
+  }
+  function pickSet(list, on) {   // list: soal dari bank (atau {id}); on: masukkan ke lembar / keluarkan dari lembar
+    var cur = pickInExam();
+    if (on) {
+      var add = list.filter(function (q) { return !cur[q.id]; });
+      if (!add.length) return;
+      ensureManualExam();
+      add.forEach(function (q) { S.gen.exam[q.jenis].push(Object.assign({}, q)); });
+      JK.forEach(function (j) { S.gen.exam[j] = BS.groupOrder(S.gen.exam[j]); });
+    } else {
+      if (!S.gen.exam) return;
+      var rm = {}, removed = 0;
+      list.forEach(function (q) { if (cur[q.id]) rm[q.id] = 1; });
+      JK.forEach(function (j) { var before = S.gen.exam[j].length; S.gen.exam[j] = S.gen.exam[j].filter(function (q) { return !rm[q.id]; }); removed += before - S.gen.exam[j].length; });
+      if (!removed) return;
+      ensureManualExam();
+    }
+    if (!examTotal() && !S.gen.paket) { S.gen.exam = null; S.gen.used = null; }
+    else S.gen.used.keys = pickKeys();
+    markDirty(); renderPick(); renderReq();
+  }
+  function pickFiltered() {
+    var p = S.pick, term = BS.norm(p.q), inEx = pickInExam();
+    return S.data.filter(function (x) {
+      if (p.materi && BS.norm(x.materi) !== p.materi) return false;
+      if (p.jenis && x.jenis !== p.jenis) return false;
+      if (p.bacaan === '-') { if (x.bacaan) return false; } else if (p.bacaan && x.bacaan !== p.bacaan) return false;
+      if (p.show === 'sel' && !inEx[x.id]) return false;
+      if (p.show === 'unsel' && inEx[x.id]) return false;
+      if (term && BS.norm(x.materi).indexOf(term) < 0 && BS.norm(x.soal).indexOf(term) < 0 && BS.norm(x.opsi.join(' ')).indexOf(term) < 0) return false;   // kata dicari utuh, di materi, soal, atau pilihan jawaban
+      return true;
+    });
+  }
+  function resetPickFilters() {
+    var p = S.pick; p.materi = ''; p.jenis = ''; p.bacaan = ''; p.show = ''; p.q = ''; p.limit = 40;
+    var f = $('#pick-q'); if (f) f.value = '';
+    ['#pick-materi', '#pick-jenis', '#pick-bacaan', '#pick-show'].forEach(function (id) { var e = $(id); if (e) e.value = ''; });
+    var c = $('#btnPickClear'); if (c) c.hidden = true;
+  }
+  function renderPickFilters() {
+    var p = S.pick, ml = BS.materiList(S.data);
+    if (p.materi && !ml.some(function (m) { return m.key === p.materi; })) p.materi = '';
+    $('#pick-materi').innerHTML = '<option value="">Semua materi</option>' + ml.map(function (m) { return '<option value="' + esc(m.key) + '"' + (m.key === p.materi ? ' selected' : '') + '>' + esc(m.name) + ' (' + m.total + ')</option>'; }).join('');
+    if (p.bacaan && p.bacaan !== '-' && !S.bacaanMap[p.bacaan]) p.bacaan = '';
+    if (!S.bacaan.length) p.bacaan = '';
+    $('#pick-bacaan-f').hidden = !S.bacaan.length;
+    $('#pick-bacaan').innerHTML = '<option value="">Semua soal</option><option value="-"' + (p.bacaan === '-' ? ' selected' : '') + '>Tanpa bacaan</option>' +
+      S.bacaan.map(function (b) { return '<option value="' + esc(b.id) + '"' + (b.id === p.bacaan ? ' selected' : '') + '>Bacaan: ' + esc(bcLabel(b)) + '</option>'; }).join('');
+    $('#pick-jenis').value = p.jenis; $('#pick-show').value = p.show;
+  }
+  function renderPickList() {
+    var box = $('#pickList'), P = S.pick;
+    $('#pickScope').textContent = 'Soal dari bank ' + scopeLabel() + '. Centang soal untuk memasukkannya ke lembar.';
+    if (S.loading) { box.innerHTML = '<p class="hint">Memuat soal.</p>'; $('#pickBulk').innerHTML = ''; $('#pickMore').innerHTML = ''; return; }
+    var list = pickFiltered(), shown = list.slice(0, P.limit), inEx = pickInExam();
+    if (!list.length) {
+      var filtering = P.q || P.materi || P.jenis || P.bacaan || P.show;
+      box.innerHTML = '<div class="empty"><h3>' + (S.data.length ? 'Tidak ada soal yang cocok' : 'Bank soal masih kosong') + '</h3><p>' +
+        (S.data.length ? (filtering ? 'Ubah kata pencarian atau filter di atas.' : 'Belum ada soal.') : 'Tambahkan soal lewat tab Tambah Soal atau Impor Massal.') + '</p></div>';
+    } else {
+      box.innerHTML = shown.map(function (q) {
+        var on = !!inEx[q.id];
+        return '<article class="qrow pickrow' + (on ? ' picked' : '') + '" data-id="' + esc(q.id) + '"><label class="qsel"><input type="checkbox" data-act="pick"' + (on ? ' checked' : '') + ' aria-label="Pilih soal ini"></label>' +
+          '<div class="qmain"><div class="qmeta"><span class="badge j-' + q.jenis + '">' + JL[q.jenis] + '</span><span class="chip-static">' + esc(q.materi) + '</span>' + bcChip(q) + (on ? '<span class="chip-static pk">Terpilih</span>' : '') + '</div>' + qBodyHTML(q) + '</div>' +
+          '<div class="qact w-only"><button type="button" class="btn sm" data-act="edit" title="Ubah isi soal ini di bank soal">' + ic('edit') + ' Ubah</button></div></article>';
+      }).join('');
+    }
+    hydrateImages(box);
+    var nSel = list.filter(function (q) { return inEx[q.id]; }).length, all = list.length && nSel === list.length;
+    $('#pickBulk').innerHTML = list.length ? '<label class="check"><input type="checkbox" id="pickAll"' + (all ? ' checked' : '') + '> Pilih semua yang cocok (' + list.length + ')</label><span class="hint">' + list.length + ' soal cocok, ' + nSel + ' di antaranya terpilih</span>' : '';
+    $('#pickMore').innerHTML = list.length > shown.length ? '<button type="button" class="btn" data-act="more">Tampilkan lebih banyak (' + (list.length - shown.length) + ' lagi)</button>' : '';
+  }
+  function renderPickSel() {
+    var box = $('#pickSelList'), total = S.gen.exam ? examTotal() : 0;
+    $('#pickSelSum').textContent = 'Soal terpilih (' + total + ')';
+    if (!total) { box.innerHTML = '<p class="hint">Belum ada soal yang dipilih. Centang soal di daftar untuk memasukkannya ke sini.</p>'; return; }
+    var h = '';
+    JK.forEach(function (j) {
+      var arr = S.gen.exam[j]; if (!arr.length) return;
+      h += '<div class="sel-group"><h3>' + JL[j] + ' <span class="count">' + arr.length + '</span></h3>';
+      arr.forEach(function (q, i) {
+        h += '<div class="sel-row" data-id="' + esc(q.id) + '" data-j="' + j + '" data-i="' + i + '"><span class="qno">' + (i + 1) + '</span>' +
+          '<div class="sel-txt"><div class="sel-meta">' + esc(q.materi) + (q.offBank ? ' · tidak ada di bank' : '') + (q.bacaan ? ' · memakai bacaan' : '') + '</div><div class="sel-snip">' + BS.richHTML(q.soal) + '</div></div>' +
+          '<div class="sel-act"><button type="button" class="btn sm w-only" data-act="sel-edit" title="Ubah isi soal ini">Ubah</button><button type="button" class="btn sm" data-act="sel-out" title="Keluarkan dari lembar">Keluarkan</button></div></div>';
+      });
+      h += '</div>';
+    });
+    box.innerHTML = h;
+  }
+  function renderPickStatus() {
+    var total = S.gen.exam ? examTotal() : 0, bad = [], c = {};
+    JK.forEach(function (j) {
+      var st = pickStatus(j), el = $('#pick-st-' + j);
+      el.textContent = st.text; el.className = st.state === 'ok' ? 'ok' : (st.state === 'low' || st.state === 'over') ? 'low' : '';
+      c[j] = S.gen.exam ? S.gen.exam[j].length : 0;
+      if (st.state === 'low') bad.push(JL[j] + ' kurang ' + (S.pick.target[j] - c[j]));
+      else if (st.state === 'over') bad.push(JL[j] + ' lebih ' + (c[j] - S.pick.target[j]));
+    });
+    var SHORT = { pg: 'PG', isian: 'Isian', uraian: 'Uraian' };
+    $('#pickMini').innerHTML = JK.map(function (j) {
+      var st = pickStatus(j);
+      return '<span class="' + (st.state === 'ok' ? 'ok' : st.state === 'off' ? 'off' : 'low') + '">' + SHORT[j] + ' ' + c[j] + '/' + S.pick.target[j] + (st.state === 'ok' ? ' ✓' : '') + '</span>';
+    }).join(' ');   // bilah ringkas di bawah layar ponsel, supaya jumlah tetap terlihat saat menggulir daftar
+    var box = $('#pickStatus');
+    if (!total) { box.innerHTML = '<p class="hint">Atur jumlah soal yang diinginkan, lalu pilih soal. Di sini terlihat apakah jumlah pilihan Anda sudah sesuai.</p>'; return; }
+    var parts = JK.filter(function (j) { return c[j]; }).map(function (j) { return JL[j].toLowerCase() + ' ' + c[j]; }).join(', ');
+    if (!bad.length) box.innerHTML = '<div class="alert good" role="status"><span class="alert-ic">' + ic('check') + '</span><div class="alert-body"><div><b>Jumlah soal sudah sesuai.</b> ' + total + ' soal terpilih (' + esc(parts) + ').</div></div></div>';
+    else box.innerHTML = '<div class="alert warn" role="status"><span class="alert-ic">' + ic('alert') + '</span><div class="alert-body"><div><b>Jumlah belum sesuai:</b> ' + esc(bad.join(', ')) + '. Total terpilih ' + total + ' soal.</div></div></div>';
+  }
+  function renderPickStatusAll() { renderPickStatus(); renderPickSel(); renderPaketBar(); }
+  function renderPick() {
+    renderPickList(); renderPickStatusAll();
+    var lnk = $('#btnPickView'); lnk.disabled = !(S.gen.exam && examTotal());
+    $('#btnPickNew').disabled = !S.gen.exam;
+  }
+  function syncPickTargets() { JK.forEach(function (j) { var e = $('#pick-req-' + j); if (e) e.value = S.pick.target[j]; }); }
+  function setPickTarget(j, v) {
+    v = Math.max(0, Math.min(PICK_MAX, parseInt(v, 10) || 0));
+    if (v === S.pick.target[j]) { $('#pick-req-' + j).value = v; return; }
+    S.pick.target[j] = v; $('#pick-req-' + j).value = v;
+    if (S.gen.used && S.gen.used.manual) markDirty();   // target ikut tersimpan di paket pilihan manual
+    renderPickStatus();
+  }
+  function pickNew() {   // mulai pilihan baru: lembar dikosongkan
+    return confirmDiscard(true).then(function (ok) {
+      if (!ok) return;
+      S.gen.exam = null; S.gen.used = null; S.gen.paket = null; S.extraBacaan = {}; setBacaan(S.bacaan);
+      renderReq(); renderGenState(); renderPick();
+      toast('Pilihan dikosongkan.', 'ok');
+    });
+  }
+  function bindPick() {
+    $('#pickReq').innerHTML = JK.map(function (j) {
+      return '<div class="req-row"><div class="req-name"><b>' + JL[j] + '</b><small id="pick-st-' + j + '"></small></div>' +
+        '<div class="stepper"><button type="button" data-pstep="-1" data-j="' + j + '" aria-label="Kurangi jumlah ' + JL[j] + '">−</button>' +
+        '<input type="number" inputmode="numeric" min="0" max="' + PICK_MAX + '" id="pick-req-' + j + '" aria-label="Jumlah soal ' + JL[j] + ' yang diinginkan">' +
+        '<button type="button" data-pstep="1" data-j="' + j + '" aria-label="Tambah jumlah ' + JL[j] + '">+</button></div></div>';
+    }).join('');
+    syncPickTargets();
+    $('#pickReq').addEventListener('click', function (e) { var b = e.target.closest('[data-pstep]'); if (b) setPickTarget(b.dataset.j, S.pick.target[b.dataset.j] + Number(b.dataset.pstep)); });
+    $('#pickReq').addEventListener('input', function (e) { var m = /^pick-req-(\w+)$/.exec(e.target.id); if (m) setPickTarget(m[1], e.target.value); });
+    $('#pickReq').addEventListener('change', function (e) { var m = /^pick-req-(\w+)$/.exec(e.target.id); if (m) e.target.value = S.pick.target[m[1]]; });
+
+    var timer = null;
+    function applySearch(v) { S.pick.q = v; S.pick.limit = 40; $('#btnPickClear').hidden = !v; renderPickList(); }
+    $('#pick-q').addEventListener('input', function (e) { var v = e.target.value; $('#btnPickClear').hidden = !v; clearTimeout(timer); timer = setTimeout(function () { applySearch(v); }, 180); });
+    $('#pickSearch').addEventListener('submit', function (e) { e.preventDefault(); clearTimeout(timer); applySearch($('#pick-q').value); });
+    $('#btnPickClear').addEventListener('click', function () { clearTimeout(timer); $('#pick-q').value = ''; applySearch(''); $('#pick-q').focus(); });
+    [['#pick-materi', 'materi'], ['#pick-jenis', 'jenis'], ['#pick-bacaan', 'bacaan'], ['#pick-show', 'show']].forEach(function (x) {
+      $(x[0]).addEventListener('change', function (e) { S.pick[x[1]] = e.target.value; S.pick.limit = 40; renderPickList(); });
+    });
+    $('#pickList').addEventListener('click', function (e) {
+      var row = e.target.closest('.pickrow'), a = e.target.closest('[data-act]'); if (!row || !a || a.dataset.act !== 'edit') return;
+      var ref = pickInExam()[row.dataset.id];
+      if (ref) openEditExam(ref.j, ref.i); else openEdit(row.dataset.id);
+    });
+    $('#pickList').addEventListener('change', function (e) {
+      if (e.target.dataset.act !== 'pick') return;
+      var q = S.data.filter(function (x) { return x.id === e.target.closest('.pickrow').dataset.id; })[0];
+      if (q) pickSet([q], e.target.checked);
+    });
+    $('#pickBulk').addEventListener('change', function (e) {
+      if (e.target.id !== 'pickAll') return;
+      pickSet(pickFiltered(), e.target.checked);
+    });
+    $('#pickMore').addEventListener('click', function (e) { if (e.target.closest('[data-act=more]')) { S.pick.limit += 40; renderPickList(); } });
+    $('#pickSelList').addEventListener('click', function (e) {
+      var row = e.target.closest('.sel-row'), a = e.target.closest('[data-act]'); if (!row || !a) return;
+      if (a.dataset.act === 'sel-edit') openEditExam(row.dataset.j, Number(row.dataset.i));
+      else if (a.dataset.act === 'sel-out') pickSet([{ id: row.dataset.id }], false);
+    });
+    $('#pickBar').addEventListener('click', function (e) {
+      var b = e.target.closest('button'); if (!b || b.disabled) return;
+      if (b.id === 'btnPkSaveP') savePaketNow(false); else if (b.id === 'btnPkSaveAsP') savePaketNow(true);
+    });
+    $('#btnPickView').addEventListener('click', function () { if (S.gen.exam && examTotal()) { S.gen.view = 'list'; showTab('gen'); } });
+    $('#btnPickNew').addEventListener('click', pickNew);
+    $('#pickMini').addEventListener('click', function () { $('#pickPanel').scrollIntoView({ behavior: 'smooth', block: 'start' }); });
   }
 
   /* ================= GAMBAR ================= */
@@ -3857,6 +4163,7 @@ sup,sub{font-size:.72em;line-height:0}
       var id = row.dataset.id;
       if (a.dataset.act === 'pk-open') openPaket(id, 'list');
       else if (a.dataset.act === 'pk-print') openPaket(id, 'preview');
+      else if (a.dataset.act === 'pk-pick') openPaket(id, 'pick');
       else if (a.dataset.act === 'pk-rename') renamePaket(id);
       else if (a.dataset.act === 'pk-del') confirmDeletePaket(id);
     });
@@ -3865,6 +4172,7 @@ sup,sub{font-size:.72em;line-height:0}
     $('#shortage').addEventListener('click', genActions);
     $('#exAdd').addEventListener('click', genActions);
     bindSettings();
+    bindPick();
     if (window.ResizeObserver) new ResizeObserver(fitPreview).observe($('#previewWrap'));
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { if (S.tab === 'gen' && S.gen.view === 'preview') renderPreview(); });
 
