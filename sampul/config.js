@@ -11,5 +11,5 @@
 
 window.RAPOR_CONFIG = {
   SUPABASE_URL: "https://mosyezvttrfmsowookoy.supabase.co",
-  SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1vc3llenZ0dHJmbXNvd29va295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTU0MjI2NjYsImV4cCI6MjExMDk5ODY2Nn0.rwRt8jFOtv9z_YodtsVnk5_QKG_C-CsBukHVyxXLkVs"
+  SUPABASE_ANON_KEY: "sb_publishable__Xu41kEy4A5xrdewq7DbsA_Ck2JTw6R"
 };
