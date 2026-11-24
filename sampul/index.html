@@ -706,6 +706,11 @@ function fitSize(g, str, maxW, start, min, style) {
   while (g.w(str) > maxW && s > min) { s -= 0.5; g.setFont(style, s); }
   return s;
 }
+function fitLines(g, str, maxW, style, size, minSize) {
+  // perkecil huruf sampai minSize; bila masih terlalu lebar, pecah menjadi beberapa baris
+  var s = fitSize(g, safe(str), maxW, size, minSize, style);
+  return { size: s, lines: g.w(safe(str)) > maxW ? wrap(g, str, maxW) : [safe(str)] };
+}
 function placeImage(g, e, bx, by, bw, bh, labels) {
   if (!e) {
     g.rect(bx, by, bw, bh, { dash: [1.2, 1.2], color: [165, 165, 165], width: 0.25 });
@@ -835,27 +840,36 @@ function drawSiswa(c) {
 
   var by = Math.max(yEnd + 6, 266);
   if (by + 42 > 318) by = 318 - 42;
-  // foto 3x4
-  g.rect(31, by, 30, 40, { width: 0.35 });
+  // foto 3x4: di tengah halaman, tepat di kiri tanda tangan, supaya satu stempel bisa mengenai foto dan tanda tangan sekaligus
+  var px = 90, sx = 158;
+  g.rect(px, by, 30, 40, { width: 0.35 });
   g.setFont('normal', 9);
-  g.text('Foto', 46, by + 19, { align: 'center', color: [150, 150, 150] });
-  g.text('3 x 4', 46, by + 23.5, { align: 'center', color: [150, 150, 150] });
-  // tanda tangan
-  var sx = 155;
+  g.text('Foto', px + 15, by + 19, { align: 'center', color: [150, 150, 150] });
+  g.text('3 x 4', px + 15, by + 23.5, { align: 'center', color: [150, 150, 150] });
+  // tanda tangan (lebar teks dibatasi 70 mm agar tidak menabrak foto atau tepi kanan; teks yang lebih panjang turun ke baris berikutnya)
+  var sl = fitLines(g, signLine(s), 70, 'normal', 11, 8);
+  g.setFont('normal', sl.size);
+  sl.lines.forEach(function (ln, i) { g.text(ln, sx, by + 4 + i * 4.6, { align: 'center' }); });
   g.setFont('normal', 11);
-  g.text(signLine(s), sx, by + 4, { align: 'center' });
-  g.text('Kepala Sekolah,', sx, by + 10, { align: 'center' });
+  g.text('Kepala Sekolah,', sx, by + 10 + (sl.lines.length - 1) * 4.6, { align: 'center' });
   var nm = clean(s.kepsek);
   if (nm) {
-    g.setFont('bold', 11);
-    g.text(nm, sx, by + 37, { align: 'center' });
-    var wN = g.w(nm);
-    g.line(sx - wN / 2, by + 37.8, sx + wN / 2, by + 37.8, { width: 0.3 });
+    var nl = fitLines(g, nm, 70, 'bold', 11, 9), lhN = nl.size * PT * 1.25;
+    g.setFont('bold', nl.size);
+    nl.lines.forEach(function (ln, i) {
+      var yy = by + 37 - (nl.lines.length - 1 - i) * lhN, wN = g.w(ln);
+      g.text(ln, sx, yy, { align: 'center' });
+      g.line(sx - wN / 2, yy + 0.8, sx + wN / 2, yy + 0.8, { width: 0.3 });
+    });
   } else {
     g.line(sx - 30, by + 37.5, sx + 30, by + 37.5, DOT);
   }
   var nip = clean(s.nip);
-  if (nip) { g.setFont('normal', 10.5); g.text('NIP. ' + nip, sx, by + 42.5, { align: 'center' }); }
+  if (nip) {
+    var pl = fitLines(g, 'NIP. ' + nip, 70, 'normal', 10.5, 8.5);
+    g.setFont('normal', pl.size);
+    pl.lines.forEach(function (ln, i) { g.text(ln, sx, by + 42.5 + i * 4.4, { align: 'center' }); });
+  }
 }
 
 function drawMutasi(c) {
