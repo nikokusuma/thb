@@ -46,6 +46,19 @@ Jika ingin menaruhnya di repository yang sudah dipakai aplikasi lain, letakkan s
 3. Tab **Data Siswa**: unduh template Excel, isi, lalu unggah. Pilihan *Ganti semua data* menghapus siswa lama; pilihan *Tambahkan ke daftar* menambah di bawahnya.
 4. Tab **Cetak**: pilih dokumen dan siswa, periksa pratinjau, klik **Buat PDF**. Cetak PDF di kertas A4 dengan skala 100%.
 
+## Jika aplikasi tidak bisa dipakai
+
+Di layar masuk (dan di kotak merah bila data gagal dimuat) ada tombol **Tes koneksi database**. Tombol ini memeriksa satu per satu dan menulis hasilnya di layar:
+
+| Hasil tes | Artinya | Perbaikan |
+| --- | --- | --- |
+| Supabase tidak bisa dijangkau | `SUPABASE_URL` salah ketik, atau proyek sedang dijeda | Periksa `config.js`; aktifkan proyek di dashboard Supabase |
+| Kunci ditolak | `SUPABASE_ANON_KEY` salah atau terpotong | Salin ulang kunci anon/publishable (bukan `secret`) |
+| Tabel ... belum ada | `schema.sql` belum dijalankan | Jalankan seluruh isi `schema.sql` di SQL Editor. Jika muncul peringatan tentang `drop policy`, pilih **Run this query** |
+| Layanan login aktif, tabel ada, tetapi tidak bisa masuk | Akun belum dibuat atau belum dikonfirmasi | Authentication > Users > Add user, centang **Auto Confirm User** |
+
+Setelah mengubah `config.js` di GitHub, tunggu satu sampai dua menit lalu muat ulang dengan **Ctrl+Shift+R** (di ponsel: tutup tab lalu buka lagi), karena GitHub Pages dan browser menyimpan salinan lama.
+
 ## Catatan
 
 - **Keamanan data.** Tabel hanya bisa diakses akun yang sudah login. Pengunjung tanpa akun tidak mendapat data apa pun, walaupun alamat situs diketahui. Semua akun staf bisa melihat dan mengubah semua data.

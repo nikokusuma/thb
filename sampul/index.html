@@ -297,6 +297,8 @@ SUPABASE_ANON_KEY: "kunci anon / publishable"</pre>
       <label class="field"><span>Kata sandi</span><input id="login-pass" type="password" autocomplete="current-password" required></label>
       <div id="login-msg" class="msg err" hidden></div>
       <button class="btn primary big" type="submit" id="login-btn">Masuk</button>
+      <div class="row"><button class="btn small" type="button" id="btn-diag">Tes koneksi database</button></div>
+      <pre id="diag-out" hidden></pre>
     </form>
   </section>
 
@@ -1238,11 +1240,71 @@ var SCHOOL_COLS = ['nama', 'npsn', 'alamat', 'kodepos', 'desa', 'kecamatan', 'ka
 function errText(e) {
   var m = (e && (e.message || e.error_description || e.msg)) || String(e || 'Kesalahan tidak dikenal');
   var c = e && (e.code || e.status);
-  if (c === 'PGRST205' || c === '42P01' || /schema cache|does not exist/i.test(m)) return 'Tabel database belum dibuat. Jalankan isi file schema.sql di Supabase (menu SQL Editor), lalu muat ulang halaman.';
-  if (c === '42501' || /row-level security|permission denied/i.test(m)) return 'Akses ditolak oleh database. Pastikan schema.sql sudah dijalankan seluruhnya dan Anda masuk dengan akun yang terdaftar.';
-  if (/failed to fetch|networkerror|load failed/i.test(m)) return 'Tidak bisa terhubung ke Supabase. Periksa koneksi internet dan SUPABASE_URL di config.js.';
-  if (/jwt|apikey|invalid api key/i.test(m)) return 'Kunci Supabase ditolak. Periksa SUPABASE_ANON_KEY di config.js.';
+  var raw = ' [rincian: ' + m + (c ? ', kode ' + c : '') + ']';
+  if (c === 'PGRST205' || c === '42P01' || /schema cache|does not exist/i.test(m)) return 'Tabel database belum dibuat. Jalankan isi file schema.sql di Supabase (menu SQL Editor), lalu muat ulang halaman.' + raw;
+  if (c === '42501' || /row-level security|permission denied/i.test(m)) return 'Akses ditolak oleh database. Pastikan schema.sql sudah dijalankan seluruhnya dan Anda masuk dengan akun yang terdaftar.' + raw;
+  if (/failed to fetch|networkerror|load failed/i.test(m)) return 'Tidak bisa terhubung ke Supabase. Periksa koneksi internet dan SUPABASE_URL di config.js.' + raw;
+  if (/jwt|apikey|invalid api key/i.test(m)) return 'Kunci Supabase ditolak. Periksa SUPABASE_ANON_KEY di config.js, atau klik Tes koneksi database.' + raw;
   return m;
+}
+
+// supabase-js lama selalu mengirim kunci publishable sebagai "Authorization: Bearer ...".
+// Kunci itu bukan JWT, jadi header tersebut dibuang; cukup header apikey (sama seperti aplikasi bank soal).
+function cleanFetch(input, init) {
+  try {
+    if (init && init.headers) {
+      var h = new Headers(init.headers), a = h.get('Authorization');
+      if (a && /^Bearer\s+sb_/i.test(a)) { h.delete('Authorization'); init = Object.assign({}, init, { headers: h }); }
+    }
+  } catch (e) {}
+  return fetch(input, init);
+}
+
+function showAppError(text) {
+  var b = $('#app-error'); b.textContent = '';
+  var pre = el('pre', { hidden: true, style: 'margin-top:8px;color:var(--ink)' });
+  b.append(el('div', { text: text }),
+    el('div', { class: 'row', style: 'margin-top:8px' }, el('button', { class: 'btn small', type: 'button', text: 'Tes koneksi database', onclick: function () { runDiagnosis(pre); } })), pre);
+  b.hidden = false;
+}
+
+function runDiagnosis(pre) {
+  pre.hidden = false; pre.textContent = 'Menguji koneksi...';
+  var base = String(CFG.SUPABASE_URL || '').trim().replace(/\/+$/, ''), key = String(CFG.SUPABASE_ANON_KEY || '').trim();
+  function probe(path, headers) {
+    return fetch(base + path, { headers: headers }).then(function (r) {
+      return r.text().then(function (t) { var j = null; try { j = JSON.parse(t); } catch (e) {} return { status: r.status, json: j }; });
+    }, function (e) { return { status: 0, error: String((e && e.message) || e) }; });
+  }
+  var h1 = { apikey: key }, h2 = { apikey: key, Authorization: 'Bearer ' + key };
+  return Promise.all([
+    probe('/auth/v1/settings', h1),
+    probe('/rest/v1/rapor_sekolah?select=id&limit=1', h1),
+    probe('/rest/v1/rapor_sekolah?select=id&limit=1', h2),
+    probe('/rest/v1/rapor_siswa?select=id&limit=1', h1)
+  ]).then(function (r) {
+    var L = [], host = base.replace(/^https?:\/\//, '');
+    L.push('Alamat: ' + host);
+    if (r[0].status === 0 && r[1].status === 0) {
+      L.push('MASALAH  Supabase tidak bisa dijangkau (' + r[0].error + '). Periksa SUPABASE_URL di config.js dan koneksi internet.');
+    } else {
+      if (r[0].status === 200) {
+        L.push('OK       Layanan login aktif.');
+        if (r[0].json && r[0].json.disable_signup === false) L.push('PERINGATAN  Pendaftaran mandiri masih aktif. Matikan di Authentication agar orang luar tidak bisa membuat akun.');
+        else if (r[0].json && r[0].json.disable_signup === true) L.push('OK       Pendaftaran mandiri nonaktif.');
+      } else if (r[0].status === 401 || r[0].status === 403) L.push('MASALAH  Kunci ditolak oleh layanan login (status ' + r[0].status + '). Salin ulang kunci publishable ke config.js.');
+      else L.push('MASALAH  Layanan login membalas status ' + r[0].status + '.');
+      [['rapor_sekolah', r[1]], ['rapor_siswa', r[3]]].forEach(function (p) {
+        var s = p[1].status, code = p[1].json && p[1].json.code;
+        if (s === 200) L.push('OK       Tabel ' + p[0] + ' ada.');
+        else if (s === 404 || code === 'PGRST205') L.push('MASALAH  Tabel ' + p[0] + ' belum ada. Jalankan schema.sql di Supabase (SQL Editor).');
+        else if (s === 401 || s === 403) L.push('MASALAH  Kunci ditolak saat membaca ' + p[0] + ' (status ' + s + '). Salin ulang kunci publishable ke config.js.');
+        else L.push('MASALAH  Tabel ' + p[0] + ' membalas status ' + s + '.');
+      });
+      if (r[1].status === 200 && r[2].status !== 200) L.push('CATATAN   Supabase menolak header Authorization berisi kunci (status ' + r[2].status + '). Aplikasi ini sudah membuang header itu otomatis.');
+    }
+    pre.textContent = L.join('\n');
+  });
 }
 function setSync(text, cls) { var s = $('#sync'); s.textContent = text; s.className = 'sync' + (cls ? ' ' + cls : ''); }
 
@@ -1309,7 +1371,7 @@ function loadAll() {
     if (['sekolah', 'siswa', 'cetak'].indexOf(h) < 0) setTab(state.students.length ? 'cetak' : 'sekolah', true);
   })().catch(function (e) {
     setSync('Gagal memuat', 'err');
-    var b = $('#app-error'); b.textContent = errText(e); b.hidden = false;
+    showAppError(errText(e));
   });
 }
 
@@ -1416,13 +1478,17 @@ function logout() {
   sb.auth.signOut().then(function () { resetData(); showScreen('login'); });
 }
 function bootAuth() {
+  $('#btn-diag').addEventListener('click', function () { runDiagnosis($('#diag-out')); });
   if (!configOk()) { showScreen('setup'); return; }
   if (!window.supabase || !window.supabase.createClient) {
     showScreen('setup');
     var x = $('#setup-extra'); x.textContent = 'Pustaka Supabase gagal dimuat dari internet. Periksa koneksi, lalu muat ulang halaman.'; x.hidden = false;
     return;
   }
-  sb = window.supabase.createClient(String(CFG.SUPABASE_URL).trim(), String(CFG.SUPABASE_ANON_KEY).trim());
+  sb = window.supabase.createClient(String(CFG.SUPABASE_URL).trim(), String(CFG.SUPABASE_ANON_KEY).trim(), {
+    global: { fetch: cleanFetch },
+    auth: { storageKey: 'rapor-sd-auth', persistSession: true, autoRefreshToken: true }
+  });
   sb.auth.onAuthStateChange(function (ev) { if (ev === 'SIGNED_OUT') { resetData(); showScreen('login'); } });
   sb.auth.getSession().then(function (r) {
     var sess = r && r.data && r.data.session;
