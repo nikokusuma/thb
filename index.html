@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Bank Soal SD</title>
+<meta name="bs-version" content="1.4.0">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Tinos:ital,wght@0,400;0,700;1,400;1,700&family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
@@ -388,6 +389,17 @@ details.pick-sel > summary{cursor:pointer;font-weight:800;font-size:14.5px}
   .pick-side #pickPanel{position:static;max-height:none;overflow:visible}
 }
 
+/* versi aplikasi dan pembaruan */
+.ver-link{border:0;background:var(--brand-soft);color:var(--brand);font:inherit;font-size:12px;font-weight:800;padding:1px 8px;border-radius:999px;cursor:pointer;margin-left:4px}
+.ver-link:hover{background:var(--brand);color:var(--brand-ink)}
+.notice.upd{display:flex;gap:10px 14px;flex-wrap:wrap;align-items:center;justify-content:space-between;background:var(--brand-soft);border-color:var(--brand);color:var(--ink)}
+.notice.upd[hidden]{display:none}
+.ver-log{display:flex;flex-direction:column;gap:12px}
+.ver-item h4{font-size:14px;font-weight:800;margin-bottom:4px}
+.ver-item h4 small{font-weight:600;color:var(--ink-3);margin-left:6px}
+.ver-item ul{margin:0;padding-left:20px;font-size:14px}
+.pick-fill-hint{font-size:13px}
+
 .sheet{font-family:"Times New Roman", Tinos, "Liberation Serif", Times, serif;font-size:12pt;line-height:1.5;color:#000;background:#fff;text-align:left}
 .sheet *{box-sizing:border-box}
 .sheet .blk{margin:0;padding:0;break-inside:avoid;page-break-inside:avoid}
@@ -448,7 +460,7 @@ sup,sub{font-size:.72em;line-height:0}
       </div>
       <div>
         <h1>Bank Soal SD</h1>
-        <p>Kelas 1 sampai 6, semua mata pelajaran</p>
+        <p>Kelas 1 sampai 6, semua mata pelajaran <button type="button" class="ver-link" id="btnVer" hidden></button></p>
       </div>
     </div>
     <div class="top-r">
@@ -458,6 +470,8 @@ sup,sub{font-size:.72em;line-height:0}
       <div id="conn" class="conn" role="status"><i></i><span>Menghubungkan ke database</span></div>
     </div>
   </header>
+
+  <div id="updNotice" class="notice upd" role="status" hidden></div>
 
   <div id="dbMissing" class="notice" hidden>Database tidak tersedia di tampilan ini. Buka halaman ini langsung di Claude dan masuk dengan akun Anda agar bank soal bisa dimuat dan disimpan.</div>
 
@@ -600,6 +614,7 @@ sup,sub{font-size:.72em;line-height:0}
             <h2>Jumlah soal yang diinginkan</h2>
             <div id="pickReq"></div>
             <div id="pickStatus" class="stack" style="margin-top:6px"></div>
+            <div id="pickFill" class="stack" style="margin-top:10px"></div>
             <div id="pickBar" class="paket-bar" hidden style="margin-top:12px"></div>
             <div class="row" style="margin-top:12px">
               <button type="button" class="btn primary" id="btnPickView">Lihat lembar dan cetak</button>
@@ -1982,7 +1997,7 @@ sup,sub{font-size:.72em;line-height:0}
 
   var B = window.BACKEND = {
     name: 'supabase',
-    caps: { refresh: true, code: false, print: true, sheetLink: false, paket: true },
+    caps: { refresh: true, code: false, print: true, sheetLink: false, paket: true, versionCheck: true },
     limits: { imageChars: 200000 },
     labels: { connecting: 'Menghubungkan ke database', ok: 'Terhubung ke database', readonly: 'Terhubung, hanya bisa melihat', missing: 'Tidak terhubung' },
     missingTitle: 'Database belum terhubung',
@@ -2092,6 +2107,7 @@ sup,sub{font-size:.72em;line-height:0}
 (function () {
   'use strict';
   var BS = window.BS, B = window.BACKEND;
+  var VER = {"v":"1.4.0","tanggal":"2026-11-24","dibuat":"2026-11-24T01:39:57.417Z","log":[{"v":"1.4.0","tanggal":"2026-11-24","catatan":["Tombol \"Tambah soal otomatis\" untuk melengkapi kekurangan jumlah soal. Soal yang sudah ada, termasuk yang ditambah manual, tidak dihapus.","Pemberitahuan bila semua soal di bank sudah terpakai dan tidak ada lagi yang bisa ditambahkan.","Nomor versi tampil di bagian atas, dengan pemberitahuan bila situs sudah punya versi yang lebih baru."]},{"v":"1.3.0","tanggal":"2026-11-24","catatan":["Menu Pilih Soal Manual: cari kata di soal atau materi, centang soal, lihat jumlah terpilih dibanding jumlah yang diinginkan, simpan sebagai paket, dan ubah soal langsung ke database."]},{"v":"1.2.0","tanggal":"2026-11-24","catatan":["Ubah soal langsung dari lembar soal; perubahan ikut tersimpan di database.","Paket Tersimpan: simpan lembar soal, buka lagi untuk dicetak atau diperbaiki."]},{"v":"1.1.0","tanggal":"2026-11-24","catatan":["Pilih teks bacaan atau jumlah bacaan di pembuat soal otomatis.","Teks bacaan Bahasa Mandarin sepenuhnya berbahasa Mandarin."]},{"v":"1.0.0","catatan":["Versi awal: bank soal kelas 1 sampai 6, pembuat lembar soal otomatis, impor massal, cetak dan Word."]}]};   // diisi saat build: {v, tanggal, dibuat, log}
   var JK = BS.JENIS_KEYS, JL = BS.JENIS_LABEL, LET = BS.LETTERS, esc = BS.esc;
   function $(s, r) { return (r || document).querySelector(s); }
   function $$(s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); }
@@ -2114,7 +2130,8 @@ sup,sub{font-size:.72em;line-height:0}
     data: [], bacaan: [], bacaanMap: {}, img: {}, imgMiss: {}, loading: true, loadErr: null, slow: false, sub: null, slowTimer: null, subSeq: 0,
     tab: 'gen',
     gen: { sel: [], req: { pg: 10, isian: 5, uraian: 2 }, bmode: 'auto', bsel: [], bcount: 2, exam: null, used: null, view: 'list', manualSeq: 0, paket: null },
-    extraBacaan: {},
+    extraBacaan: {}, fillNote: null,
+    upd: { state: '', remote: '', checking: false, at: 0 },
     paket: { list: [], loading: false, loaded: false, err: '', unsupported: false, seq: 0 },
     pick: { materi: '', jenis: '', bacaan: '', show: '', q: '', limit: 40, target: { pg: 10, isian: 5, uraian: 2 } },
     bank: { materi: '', jenis: '', q: '', sel: {}, limit: 40 },
@@ -2548,12 +2565,14 @@ sup,sub{font-size:.72em;line-height:0}
         anyShort = true;
         h += '<div class="alert warn" role="status"><span class="alert-ic">' + ic('alert') + '</span><div class="alert-body">' +
           '<div><b>' + JL[j] + ' kurang ' + need + ' soal.</b> Diminta ' + used.req[j] + ', yang ada di bank untuk pilihan ini ' + used.info[j].available + '. Sistem hanya menyusun soal yang tersedia.</div>' +
-          '<div class="alert-act w-only"><button type="button" class="btn sm" data-act="manual" data-j="' + j + '">' + ic('plus') + ' Tambah ' + need + ' soal manual</button></div></div></div>';
+          '<div class="alert-act"><button type="button" class="btn sm" data-act="autofill" data-j="' + j + '">' + ic('refresh') + ' Tambah ' + need + ' soal otomatis</button>' +
+          '<button type="button" class="btn sm w-only" data-act="manual" data-j="' + j + '">' + ic('plus') + ' Tambah ' + need + ' soal manual</button></div></div></div>';
       }
     });
     if (fixed) h = '<p class="hint">' + (used.manual ? 'Soal pada lembar ini dipilih manual.' : 'Lembar ini berasal dari paket tersimpan.') + ' Untuk menambah atau mengeluarkan soal, buka tab Pilih Soal Manual. <button type="button" class="btn sm" data-goto="pilih">Ubah pilihan soal</button></p>';
-    else if (anyShort) h += '<p class="hint">Soal juga bisa ditambahkan ke bank lewat tab Tambah Soal atau Impor Massal, lalu klik Buat ulang soal.</p>';
+    else if (anyShort) h += '<p class="hint">Tambah soal otomatis hanya mengisi kekurangan dan tidak menghapus soal yang sudah ada, termasuk yang ditambah manual. Soal baru juga bisa dimasukkan ke bank lewat tab Tambah Soal atau Impor Massal. Buat ulang soal akan mengganti seluruh isi lembar.</p>';
     else h = '<div class="alert good" role="status"><span class="alert-ic">' + ic('check') + '</span><div class="alert-body"><div><b>' + examTotal() + ' soal siap dicetak.</b> Jumlah sudah sesuai permintaan.</div></div></div>';
+    h += fillNoteHTML();
     var bi = used.bacaan;
     if (bi) {
       var names = function (arr) { return arr.map(function (id) { return S.bacaanMap[id] ? BS.richHTML(bcLabel(S.bacaanMap[id])) : ''; }).filter(Boolean).join(', '); };
@@ -3170,12 +3189,12 @@ sup,sub{font-size:.72em;line-height:0}
     box.innerHTML = h;
   }
   function renderPickStatus() {
-    var total = S.gen.exam ? examTotal() : 0, bad = [], c = {};
+    var total = S.gen.exam ? examTotal() : 0, bad = [], c = {}, short = 0;
     JK.forEach(function (j) {
       var st = pickStatus(j), el = $('#pick-st-' + j);
       el.textContent = st.text; el.className = st.state === 'ok' ? 'ok' : (st.state === 'low' || st.state === 'over') ? 'low' : '';
       c[j] = S.gen.exam ? S.gen.exam[j].length : 0;
-      if (st.state === 'low') bad.push(JL[j] + ' kurang ' + (S.pick.target[j] - c[j]));
+      if (st.state === 'low') { bad.push(JL[j] + ' kurang ' + (S.pick.target[j] - c[j])); short += S.pick.target[j] - c[j]; }
       else if (st.state === 'over') bad.push(JL[j] + ' lebih ' + (c[j] - S.pick.target[j]));
     });
     var SHORT = { pg: 'PG', isian: 'Isian', uraian: 'Uraian' };
@@ -3184,10 +3203,19 @@ sup,sub{font-size:.72em;line-height:0}
       return '<span class="' + (st.state === 'ok' ? 'ok' : st.state === 'off' ? 'off' : 'low') + '">' + SHORT[j] + ' ' + c[j] + '/' + S.pick.target[j] + (st.state === 'ok' ? ' ✓' : '') + '</span>';
     }).join(' ');   // bilah ringkas di bawah layar ponsel, supaya jumlah tetap terlihat saat menggulir daftar
     var box = $('#pickStatus');
-    if (!total) { box.innerHTML = '<p class="hint">Atur jumlah soal yang diinginkan, lalu pilih soal. Di sini terlihat apakah jumlah pilihan Anda sudah sesuai.</p>'; return; }
-    var parts = JK.filter(function (j) { return c[j]; }).map(function (j) { return JL[j].toLowerCase() + ' ' + c[j]; }).join(', ');
-    if (!bad.length) box.innerHTML = '<div class="alert good" role="status"><span class="alert-ic">' + ic('check') + '</span><div class="alert-body"><div><b>Jumlah soal sudah sesuai.</b> ' + total + ' soal terpilih (' + esc(parts) + ').</div></div></div>';
-    else box.innerHTML = '<div class="alert warn" role="status"><span class="alert-ic">' + ic('alert') + '</span><div class="alert-body"><div><b>Jumlah belum sesuai:</b> ' + esc(bad.join(', ')) + '. Total terpilih ' + total + ' soal.</div></div></div>';
+    if (!total) box.innerHTML = '<p class="hint">Atur jumlah soal yang diinginkan, lalu pilih soal. Di sini terlihat apakah jumlah pilihan Anda sudah sesuai.</p>';
+    else {
+      var parts = JK.filter(function (j) { return c[j]; }).map(function (j) { return JL[j].toLowerCase() + ' ' + c[j]; }).join(', ');
+      if (!bad.length) box.innerHTML = '<div class="alert good" role="status"><span class="alert-ic">' + ic('check') + '</span><div class="alert-body"><div><b>Jumlah soal sudah sesuai.</b> ' + total + ' soal terpilih (' + esc(parts) + ').</div></div></div>';
+      else box.innerHTML = '<div class="alert warn" role="status"><span class="alert-ic">' + ic('alert') + '</span><div class="alert-body"><div><b>Jumlah belum sesuai:</b> ' + esc(bad.join(', ')) + '. Total terpilih ' + total + ' soal.</div></div></div>';
+    }
+    var fh = '';
+    if (short > 0) {
+      var mn = S.pick.materi ? (BS.materiList(S.data).filter(function (m) { return m.key === S.pick.materi; })[0] || {}).name : '';
+      fh += '<button type="button" class="btn" id="btnPickFill">' + ic('refresh') + ' Tambah ' + short + ' soal otomatis</button>' +
+        '<p class="hint pick-fill-hint">Hanya mengisi kekurangan. Soal yang sudah dipilih, termasuk yang ditambah manual, tidak berubah. Diambil dari ' + (mn ? 'materi <b>' + esc(mn) + '</b> (sesuai filter Materi)' : 'semua materi') + '.</p>';
+    }
+    $('#pickFill').innerHTML = fh + fillNoteHTML();
   }
   function renderPickStatusAll() { renderPickStatus(); renderPickSel(); renderPaketBar(); }
   function renderPick() {
@@ -3211,6 +3239,92 @@ sup,sub{font-size:.72em;line-height:0}
       toast('Pilihan dikosongkan.', 'ok');
     });
   }
+  /* ---------- lengkapi kekurangan soal otomatis (tidak pernah menghapus soal yang sudah ada) ---------- */
+  function examSig() { return S.gen.exam ? JK.map(function (j) { return S.gen.exam[j].map(function (q) { return q.id; }).join(','); }).join('|') : ''; }
+  function fillNoteHTML() {   // catatan hanya tampil selama isi lembar belum berubah
+    var n = S.fillNote;
+    if (!n || n.sig !== examSig()) return '';
+    return '<div class="alert warn" role="status"><span class="alert-ic">' + ic('alert') + '</span><div class="alert-body"><div>' + esc(n.text) + '</div></div></div>';
+  }
+  function rrByMateri(list, n) {   // n soal, bergantian antar materi, urutan acak
+    var groups = {}, order = [], out = [];
+    list.forEach(function (q) { var k = BS.norm(q.materi); if (!groups[k]) { groups[k] = []; order.push(k); } groups[k].push(q); });
+    order = BS.shuffle(order, Math.random);
+    order.forEach(function (k) { groups[k] = BS.shuffle(groups[k], Math.random); });
+    while (out.length < n) {
+      var moved = false;
+      for (var i = 0; i < order.length && out.length < n; i++) { var g = groups[order[i]]; if (g.length) { out.push(g.shift()); moved = true; } }
+      if (!moved) break;
+    }
+    return out;
+  }
+  function fillCandidates(j, n, keys) {
+    var inEx = pickInExam(), inB = {};
+    JK.forEach(function (k) { S.gen.exam[k].forEach(function (q) { if (q.bacaan) inB[q.bacaan] = 1; }); });
+    var pool = S.data.filter(function (q) { return q.jenis === j && !inEx[q.id] && BS.inMateri(q, keys); });
+    var same = pool.filter(function (q) { return q.bacaan && inB[q.bacaan]; });   // bacaannya sudah ada di lembar: tidak menambah bacaan baru
+    var solo = pool.filter(function (q) { return !q.bacaan; });
+    var other = pool.filter(function (q) { return q.bacaan && !inB[q.bacaan]; });
+    var out = rrByMateri(same, n);
+    if (out.length < n) out = out.concat(rrByMateri(solo, n - out.length));
+    if (out.length < n) {   // pilihan terakhir: soal dari bacaan baru, satu bacaan sekaligus
+      var gs = {}, ord = [];
+      other.forEach(function (q) { if (!gs[q.bacaan]) { gs[q.bacaan] = []; ord.push(q.bacaan); } gs[q.bacaan].push(q); });
+      BS.shuffle(ord, Math.random).forEach(function (b) {
+        if (out.length >= n) return;
+        out = out.concat(gs[b].sort(function (a, c) { return (a.createdAt || 0) - (c.createdAt || 0); }).slice(0, n - out.length));
+      });
+    }
+    return out;
+  }
+  function fillShortage(needs, keys) {   // needs: {jenis: jumlah kurang}
+    var res = { added: {}, left: {}, kind: {}, any: 0, bacaan: false };
+    JK.forEach(function (j) {
+      var n = needs[j] || 0; res.added[j] = 0; res.left[j] = 0;
+      if (n <= 0) return;
+      var add = fillCandidates(j, n, keys);
+      add.forEach(function (q) { S.gen.exam[j].push(Object.assign({}, q)); if (q.bacaan) res.bacaan = true; });
+      if (add.length) S.gen.exam[j] = BS.groupOrder(S.gen.exam[j]);
+      res.added[j] = add.length; res.left[j] = n - add.length; res.any += add.length;
+      if (res.left[j] > 0) res.kind[j] = S.data.some(function (q) { return q.jenis === j && BS.inMateri(q, keys); }) ? 'used' : 'none';
+    });
+    return res;
+  }
+  function finishFill(res, keys, manualMode) {
+    if (S.gen.exam && !examTotal() && !S.gen.paket) { S.gen.exam = null; S.gen.used = null; }   // tidak ada yang bisa ditambahkan
+    else if (S.gen.exam) { if (manualMode) S.gen.used.keys = pickKeys(); if (res.bacaan) S.gen.used.bacaan = null; }
+    if (res.any) markDirty();
+    var scope = keys.length ? ' untuk materi yang dipilih' : '', short = JK.filter(function (j) { return res.left[j] > 0; });
+    var used = short.filter(function (j) { return res.kind[j] === 'used'; }).map(function (j) { return JL[j].toLowerCase(); });
+    var none = short.filter(function (j) { return res.kind[j] === 'none'; }).map(function (j) { return JL[j].toLowerCase(); });
+    var added = JK.filter(function (j) { return res.added[j] > 0; }).map(function (j) { return res.added[j] + ' soal ' + JL[j].toLowerCase(); }).join(', ');
+    var warn = '';
+    if (short.length) {
+      warn = [used.length ? 'Semua soal ' + used.join(' dan ') + scope + ' di bank sudah terpakai di lembar ini' : '', none.length ? 'Bank belum punya soal ' + none.join(' dan ') + scope : '']
+        .filter(Boolean).join('. ') + '. Masih kurang: ' + short.map(function (j) { return JL[j].toLowerCase() + ' ' + res.left[j]; }).join(', ') + '.';
+    }
+    S.fillNote = warn ? { sig: examSig(), text: warn } : null;
+    if (res.any && !warn) toast('Ditambahkan ' + added + ' secara otomatis. Soal yang sudah ada tetap di lembar.', 'ok');
+    else if (res.any) toast('Ditambahkan ' + added + '. ' + warn, 'error');
+    else toast(warn, 'error');
+  }
+  function autoFillGen(j) {   // dari peringatan "kurang" di lembar hasil pembuat otomatis
+    var ex = S.gen.exam, used = S.gen.used; if (!ex || !used) return;
+    var need = used.req[j] - ex[j].length; if (need <= 0) return;
+    var needs = {}; needs[j] = need;
+    var keys = (used.keys || []).slice();
+    finishFill(fillShortage(needs, keys), keys, false);
+    renderResult(); renderReq();
+  }
+  function autoFillPick() {   // dari menu Pilih Soal Manual: mengisi sampai jumlah yang diinginkan
+    var needs = {}, any = 0;
+    JK.forEach(function (j) { var n = S.pick.target[j] - (S.gen.exam ? S.gen.exam[j].length : 0); if (n > 0) { needs[j] = n; any += n; } });
+    if (!any) return;
+    var keys = S.pick.materi ? [S.pick.materi] : [];
+    ensureManualExam();
+    finishFill(fillShortage(needs, keys), keys, true);
+    renderPick(); renderReq();
+  }
   function bindPick() {
     $('#pickReq').innerHTML = JK.map(function (j) {
       return '<div class="req-row"><div class="req-name"><b>' + JL[j] + '</b><small id="pick-st-' + j + '"></small></div>' +
@@ -3229,7 +3343,7 @@ sup,sub{font-size:.72em;line-height:0}
     $('#pickSearch').addEventListener('submit', function (e) { e.preventDefault(); clearTimeout(timer); applySearch($('#pick-q').value); });
     $('#btnPickClear').addEventListener('click', function () { clearTimeout(timer); $('#pick-q').value = ''; applySearch(''); $('#pick-q').focus(); });
     [['#pick-materi', 'materi'], ['#pick-jenis', 'jenis'], ['#pick-bacaan', 'bacaan'], ['#pick-show', 'show']].forEach(function (x) {
-      $(x[0]).addEventListener('change', function (e) { S.pick[x[1]] = e.target.value; S.pick.limit = 40; renderPickList(); });
+      $(x[0]).addEventListener('change', function (e) { S.pick[x[1]] = e.target.value; S.pick.limit = 40; renderPickList(); renderPickStatus(); });   // status ikut dihitung ulang: asal soal tambahan otomatis mengikuti filter materi
     });
     $('#pickList').addEventListener('click', function (e) {
       var row = e.target.closest('.pickrow'), a = e.target.closest('[data-act]'); if (!row || !a || a.dataset.act !== 'edit') return;
@@ -3257,6 +3371,7 @@ sup,sub{font-size:.72em;line-height:0}
     });
     $('#btnPickView').addEventListener('click', function () { if (S.gen.exam && examTotal()) { S.gen.view = 'list'; showTab('gen'); } });
     $('#btnPickNew').addEventListener('click', pickNew);
+    $('#pickFill').addEventListener('click', function (e) { if (e.target.closest('#btnPickFill')) autoFillPick(); });
     $('#pickMini').addEventListener('click', function () { $('#pickPanel').scrollIntoView({ behavior: 'smooth', block: 'start' }); });
   }
 
@@ -4152,6 +4267,7 @@ sup,sub{font-size:.72em;line-height:0}
       if (b.dataset.act === 'swap') swapQuestion(j, i);
       else if (b.dataset.act === 'remove') removeQuestion(j, i);
       else if (b.dataset.act === 'manual') openManual(j);
+      else if (b.dataset.act === 'autofill') autoFillGen(j);
       else if (b.dataset.act === 'edit') openEditExam(j, i);
     }
     $('#paketBar').addEventListener('click', function (e) {
@@ -4173,6 +4289,10 @@ sup,sub{font-size:.72em;line-height:0}
     $('#exAdd').addEventListener('click', genActions);
     bindSettings();
     bindPick();
+    $('#btnVer').addEventListener('click', openVersion);
+    $('#updNotice').addEventListener('click', function (e) { if (e.target.closest('#btnReloadPage')) location.reload(); });
+    window.addEventListener('focus', function () { checkUpdate(false); });
+    document.addEventListener('visibilitychange', function () { if (!document.hidden) checkUpdate(false); });
     if (window.ResizeObserver) new ResizeObserver(fitPreview).observe($('#previewWrap'));
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { if (S.tab === 'gen' && S.gen.view === 'preview') renderPreview(); });
 
@@ -4230,6 +4350,70 @@ sup,sub{font-size:.72em;line-height:0}
     $('#impPreview').addEventListener('click', function (e) { if (e.target.closest('#btnSaveImp')) saveImport(); });
   }
 
+  /* ================= VERSI APLIKASI ================= */
+  var MONTH = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+  function fmtTanggal(iso) {   // "2026-11-24" -> "24 Nov 2026"
+    var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso || ''); return m ? Number(m[3]) + ' ' + MONTH[Number(m[2]) - 1] + ' ' + m[1] : '';
+  }
+  function fmtDibuat(iso) {   // waktu build, ditampilkan dalam zona waktu perangkat
+    var d = new Date(iso); if (isNaN(d.getTime())) return '';
+    try { return d.toLocaleString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }); } catch (e) { return ''; }
+  }
+  function verCmp(a, b) {
+    var x = String(a).split('.').map(Number), y = String(b).split('.').map(Number);
+    for (var i = 0; i < Math.max(x.length, y.length); i++) { var d = (x[i] || 0) - (y[i] || 0); if (d) return d > 0 ? 1 : -1; }
+    return 0;
+  }
+  function renderVer() {
+    var b = $('#btnVer'); if (!VER) { b.hidden = true; return; }
+    b.hidden = false; b.textContent = 'v' + VER.v; b.title = 'Versi aplikasi ' + VER.v + (VER.tanggal ? ' (' + fmtTanggal(VER.tanggal) + ')' : '') + '. Klik untuk melihat riwayat pembaruan.';
+  }
+  function updStatusHTML() {
+    var u = S.upd;
+    if (!(B.caps && B.caps.versionCheck)) return '';
+    if (u.checking) return 'Memeriksa pembaruan.';
+    if (u.state === 'newer') return '<b>Ada versi baru: v' + esc(u.remote) + '.</b> Muat ulang halaman untuk memakainya.';
+    if (u.state === 'latest') return 'Anda sudah memakai versi terbaru yang ada di situs.';
+    if (u.state === 'error') return 'Pembaruan belum bisa diperiksa (tidak ada koneksi atau halaman dibuka dari berkas lokal).';
+    return '';
+  }
+  function renderUpdNotice() {
+    var n = $('#updNotice'), u = S.upd;
+    if (!VER || u.state !== 'newer') { n.hidden = true; n.innerHTML = ''; }
+    else {
+      n.hidden = false;
+      n.innerHTML = '<span><b>Ada versi baru: v' + esc(u.remote) + '</b> (Anda memakai v' + esc(VER.v) + '). Simpan dulu pekerjaan yang belum disimpan sebagai paket, lalu muat ulang halaman.</span>' +
+        '<button type="button" class="btn primary sm" id="btnReloadPage">Muat ulang halaman</button>';
+    }
+    var st = $('#verStatus'); if (st) st.innerHTML = updStatusHTML();
+  }
+  async function checkUpdate(force) {
+    if (!VER || !(B.caps && B.caps.versionCheck)) return;
+    var u = S.upd, now = Date.now();
+    if (u.checking || (!force && now - u.at < 60000)) return;
+    u.checking = true; u.at = now; var st = $('#verStatus'); if (st) st.innerHTML = updStatusHTML();
+    try {
+      var r = await fetch(location.href.split(/[?#]/)[0] + '?_cek=' + now, { cache: 'no-store' });
+      if (!r.ok) throw new Error('http ' + r.status);
+      var m = /<meta name="bs-version" content="([^"]+)"/.exec(await r.text());
+      if (!m) throw new Error('versi tidak ditemukan');
+      u.remote = m[1]; u.state = verCmp(m[1], VER.v) > 0 ? 'newer' : 'latest';
+    } catch (e) { if (u.state !== 'newer') u.state = 'error'; }
+    u.checking = false; renderUpdNotice();
+  }
+  function openVersion() {
+    if (!VER) return;
+    var h = '<p><b>Versi ' + esc(VER.v) + '</b>' + (VER.tanggal ? ' · ' + esc(fmtTanggal(VER.tanggal)) : '') + '</p>' +
+      (fmtDibuat(VER.dibuat) ? '<p class="hint">Berkas ini dibuat ' + esc(fmtDibuat(VER.dibuat)) + '.</p>' : '') +
+      '<p id="verStatus" class="hint">' + updStatusHTML() + '</p><h3 style="font-size:15px">Riwayat pembaruan</h3><div class="ver-log">' +
+      VER.log.map(function (x) {
+        return '<div class="ver-item"><h4>v' + esc(x.v) + (x.tanggal ? '<small>' + esc(fmtTanggal(x.tanggal)) + '</small>' : '') + '</h4><ul>' + x.catatan.map(function (c) { return '<li>' + esc(c) + '</li>'; }).join('') + '</ul></div>';
+      }).join('') + '</div>';
+    var acts = [{ label: 'Tutup' }];
+    if (B.caps && B.caps.versionCheck) acts.unshift({ label: 'Periksa pembaruan', kind: 'primary', onClick: function (api, btn) { btn.disabled = true; checkUpdate(true).then(function () { btn.disabled = false; }); } });
+    openModal({ title: 'Tentang aplikasi', body: h, wide: true, actions: acts });
+  }
+
   /* ================= MULAI ================= */
   function askCode(wrong) {
     return new Promise(function (resolve) {
@@ -4276,6 +4460,7 @@ sup,sub{font-size:.72em;line-height:0}
   async function init() {
     loadLocal();
     bind();
+    renderVer();
     renderScopeBar(); renderReq(); renderGenState(); renderAddScope();
     var r = await connect();
     if (!r || !r.ok) {
@@ -4287,6 +4472,7 @@ sup,sub{font-size:.72em;line-height:0}
     S.canWrite = r.canWrite !== false; S.sheetUrl = r.sheetUrl || '';
     if (r.customMapel && r.customMapel.length) S.customMapel = r.customMapel;
     applyCaps(); applyPerm(); renderMapel(); subscribeMeta(); subscribeScope();
+    setTimeout(function () { checkUpdate(false); }, 3000); setInterval(function () { checkUpdate(false); }, 600000);
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();
