@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Bank Soal SD</title>
-<meta name="bs-version" content="1.5.0">
+<meta name="bs-version" content="1.5.1">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Tinos:ital,wght@0,400;0,700;1,400;1,700&family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
@@ -750,7 +750,8 @@ sup,sub{font-size:.72em;line-height:0}
 
   var KELAS = [1, 2, 3, 4, 5, 6];
   var DEFAULT_MAPEL = [
-    'Pendidikan Agama dan Budi Pekerti', 'Pendidikan Pancasila', 'Bahasa Indonesia',
+    'Pendidikan Agama Islam', 'Pendidikan Agama Kristen', 'Pendidikan Agama Katolik', 'Pendidikan Agama Hindu', 'Pendidikan Agama Buddha', 'Pendidikan Agama Konghucu',
+    'Pendidikan Pancasila', 'Bahasa Indonesia',
     'Matematika', 'IPAS', 'IPA', 'IPS', 'PJOK', 'Seni dan Budaya', 'Bahasa Inggris',
     'Bahasa Mandarin', 'Muatan Lokal / Bahasa Daerah'
   ];
@@ -2238,7 +2239,7 @@ sup,sub{font-size:.72em;line-height:0}
 (function () {
   'use strict';
   var BS = window.BS, B = window.BACKEND;
-  var VER = {"v":"1.5.0","tanggal":"2026-11-24","dibuat":"2026-11-24T03:04:40.135Z","log":[{"v":"1.5.0","tanggal":"2026-11-24","catatan":["Dukungan aksara Jawa: tombol \"Aksara Jawa\" di alat penulisan mengubah tulisan Latin jadi aksara Jawa (sandhangan, pasangan, murda, swara, rékan), lengkap dengan pratinjau dan simbol siap sisip.","Saat dicetak atau diunduh ke Word, aksara Jawa otomatis memakai font Hanacaraka 18 (font itu harus terpasang di komputer yang dipakai mencetak).","Soal Bahasa Jawa untuk mata pelajaran Muatan Lokal / Bahasa Daerah kelas 1 sampai 6, termasuk soal aksara Jawa."]},{"v":"1.4.0","tanggal":"2026-11-24","catatan":["Tombol \"Tambah soal otomatis\" untuk melengkapi kekurangan jumlah soal. Soal yang sudah ada, termasuk yang ditambah manual, tidak dihapus.","Pemberitahuan bila semua soal di bank sudah terpakai dan tidak ada lagi yang bisa ditambahkan.","Nomor versi tampil di bagian atas, dengan pemberitahuan bila situs sudah punya versi yang lebih baru."]},{"v":"1.3.0","tanggal":"2026-11-24","catatan":["Menu Pilih Soal Manual: cari kata di soal atau materi, centang soal, lihat jumlah terpilih dibanding jumlah yang diinginkan, simpan sebagai paket, dan ubah soal langsung ke database."]},{"v":"1.2.0","tanggal":"2026-11-24","catatan":["Ubah soal langsung dari lembar soal; perubahan ikut tersimpan di database.","Paket Tersimpan: simpan lembar soal, buka lagi untuk dicetak atau diperbaiki."]},{"v":"1.1.0","tanggal":"2026-11-24","catatan":["Pilih teks bacaan atau jumlah bacaan di pembuat soal otomatis.","Teks bacaan Bahasa Mandarin sepenuhnya berbahasa Mandarin."]},{"v":"1.0.0","catatan":["Versi awal: bank soal kelas 1 sampai 6, pembuat lembar soal otomatis, impor massal, cetak dan Word."]}]};   // diisi saat build: {v, tanggal, dibuat, log}
+  var VER = {"v":"1.5.1","tanggal":"2026-11-24","dibuat":"2026-11-24T03:19:56.937Z","log":[{"v":"1.5.1","tanggal":"2026-11-24","catatan":["Impor Massal: berkas teks (#kelas, #mapel, #materi, #bacaan) otomatis dibaca dalam mode Teks, tidak lagi salah dibaca sebagai tabel setelah impor CSV.","Mata pelajaran agama dipisah per agama: Islam, Kristen, Katolik, Hindu, Buddha, dan Konghucu."]},{"v":"1.5.0","tanggal":"2026-11-24","catatan":["Dukungan aksara Jawa: tombol \"Aksara Jawa\" di alat penulisan mengubah tulisan Latin jadi aksara Jawa (sandhangan, pasangan, murda, swara, rékan), lengkap dengan pratinjau dan simbol siap sisip.","Saat dicetak atau diunduh ke Word, aksara Jawa otomatis memakai font Hanacaraka 18 (font itu harus terpasang di komputer yang dipakai mencetak).","Soal Bahasa Jawa untuk mata pelajaran Muatan Lokal / Bahasa Daerah kelas 1 sampai 6, termasuk soal aksara Jawa."]},{"v":"1.4.0","tanggal":"2026-11-24","catatan":["Tombol \"Tambah soal otomatis\" untuk melengkapi kekurangan jumlah soal. Soal yang sudah ada, termasuk yang ditambah manual, tidak dihapus.","Pemberitahuan bila semua soal di bank sudah terpakai dan tidak ada lagi yang bisa ditambahkan.","Nomor versi tampil di bagian atas, dengan pemberitahuan bila situs sudah punya versi yang lebih baru."]},{"v":"1.3.0","tanggal":"2026-11-24","catatan":["Menu Pilih Soal Manual: cari kata di soal atau materi, centang soal, lihat jumlah terpilih dibanding jumlah yang diinginkan, simpan sebagai paket, dan ubah soal langsung ke database."]},{"v":"1.2.0","tanggal":"2026-11-24","catatan":["Ubah soal langsung dari lembar soal; perubahan ikut tersimpan di database.","Paket Tersimpan: simpan lembar soal, buka lagi untuk dicetak atau diperbaiki."]},{"v":"1.1.0","tanggal":"2026-11-24","catatan":["Pilih teks bacaan atau jumlah bacaan di pembuat soal otomatis.","Teks bacaan Bahasa Mandarin sepenuhnya berbahasa Mandarin."]},{"v":"1.0.0","catatan":["Versi awal: bank soal kelas 1 sampai 6, pembuat lembar soal otomatis, impor massal, cetak dan Word."]}]};   // diisi saat build: {v, tanggal, dibuat, log}
   var JK = BS.JENIS_KEYS, JL = BS.JENIS_LABEL, LET = BS.LETTERS, esc = BS.esc;
   function $(s, r) { return (r || document).querySelector(s); }
   function $$(s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); }
@@ -4141,10 +4142,13 @@ sup,sub{font-size:.72em;line-height:0}
     renderImpScope(); renderImpHelp();
   }
   function sameScope(q) { return q.kelas === S.kelas && BS.slugify(q.mapel) === BS.slugify(S.mapel); }
+  /* berkas teks (#kelas, #mapel, #materi, #bacaan, #soal) tidak boleh dibaca sebagai tabel: itu sebab "ribuan soal perlu diperbaiki" bila mode masih Tabel dari impor CSV sebelumnya */
+  function looksLikeText(t) { return /^\uFEFF?\s*#(kelas|mapel|materi|bacaan|soal)\b/im.test(String(t || '')); }
   function checkImport() {
     var text = $('#impText').value;
     if (!text.trim()) { toast('Tempel soal atau unggah berkas dulu.', 'error'); return; }
     var defaults = { kelas: S.kelas, mapel: S.mapel, materi: $('#imp-materi').value.trim(), jenisTanpaOpsi: $('#imp-jenis').value };
+    if (S.imp.mode === 'table' && looksLikeText(text)) { setImpMode('text'); toast('Isinya berformat teks (#kelas, #mapel, #materi), jadi mode diganti ke Teks.'); }
     var items = S.imp.mode === 'text' ? BS.parseText(text, defaults) : BS.parseTable(text, defaults);
     var existing = {};
     S.data.forEach(function (q) { existing[BS.dupKey(q)] = 1; });
@@ -4266,8 +4270,8 @@ sup,sub{font-size:.72em;line-height:0}
         setImpMode('table'); $('#impText').value = csv;
       } else {
         var txt = await new Promise(function (res, rej) { var r = new FileReader(); r.onload = function () { res(String(r.result)); }; r.onerror = rej; r.readAsText(file); });
-        var isTable = /\.(csv|tsv)$/i.test(file.name);
-        setImpMode(isTable ? 'table' : S.imp.mode); $('#impText').value = txt;
+        var isTable = /\.(csv|tsv)$/i.test(file.name) && !looksLikeText(txt);
+        setImpMode(isTable ? 'table' : looksLikeText(txt) ? 'text' : S.imp.mode); $('#impText').value = txt;
       }
       checkImport();
     } catch (e) { toast('Berkas tidak bisa dibaca. Coba simpan sebagai CSV, atau tempel isinya langsung.', 'error'); }
