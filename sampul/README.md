@@ -1,6 +1,6 @@
 # Cetak Rapor SD
 
-Aplikasi web untuk mencetak **cover rapor, identitas sekolah, identitas peserta didik (dengan tempat foto 3x4 dan tanda tangan kepala sekolah), dan tabel keterangan pindah sekolah** dalam ukuran A4.
+Aplikasi web untuk mencetak **cover rapor, identitas sekolah, identitas peserta didik (dengan tempat foto 3x4 dan tanda tangan kepala sekolah), dan tabel keterangan pindah sekolah** dalam ukuran F4 (215 x 330 mm).
 
 - Tampilan: satu halaman statis (`index.html`), dihosting gratis di **GitHub Pages**.
 - Database online: **Supabase** (identitas sekolah, logo, dan data siswa).
@@ -44,7 +44,7 @@ Jika ingin menaruhnya di repository yang sudah dipakai aplikasi lain, letakkan s
 1. Buka alamat aplikasi, masuk dengan akun staf.
 2. Tab **Sekolah**: isi identitas sekolah, nama kepala sekolah, dan unggah dua logo (Tut Wuri Handayani dan logo sekolah). Perubahan tersimpan otomatis.
 3. Tab **Data Siswa**: unduh template Excel, isi, lalu unggah. Pilihan *Ganti semua data* menghapus siswa lama; pilihan *Tambahkan ke daftar* menambah di bawahnya.
-4. Tab **Cetak**: pilih dokumen dan siswa, periksa pratinjau, klik **Buat PDF**. Cetak PDF di kertas A4 dengan skala 100%.
+4. Tab **Cetak**: pilih dokumen dan siswa, periksa pratinjau, klik **Buat PDF**. Cetak PDF di kertas F4 dengan skala 100%: di dialog cetak pilih ukuran kertas F4 / Folio (atau ukuran khusus 215 x 330 mm) dan matikan "Fit to page".
 
 ## Jika aplikasi tidak bisa dipakai
 

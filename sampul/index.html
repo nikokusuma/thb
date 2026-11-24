@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-/* Layout: tiga langkah (Sekolah, Data Siswa, Cetak). Halaman Cetak memakai kolom kontrol di kiri dan pratinjau kertas A4 di kanan. */
+/* Layout: tiga langkah (Sekolah, Data Siswa, Cetak). Halaman Cetak memakai kolom kontrol di kiri dan pratinjau kertas F4 di kanan. */
 :root {
   --bg: #f1f5f2;
   --surface: #ffffff;
@@ -263,7 +263,7 @@ pre { background: var(--surface-2); border: 1px solid var(--line); border-radius
       </div>
       <div>
         <h1>Cetak Rapor SD</h1>
-        <p>Cover, identitas sekolah, identitas peserta didik, dan keterangan pindah sekolah. Ukuran A4, data siswa dari template Excel.</p>
+        <p>Cover, identitas sekolah, identitas peserta didik, dan keterangan pindah sekolah. Ukuran F4 (215 x 330 mm), data siswa dari template Excel.</p>
       </div>
     </div>
     <div class="userbar" id="userbar" hidden>
@@ -404,7 +404,7 @@ SUPABASE_ANON_KEY: "kunci anon / publishable"</pre>
         <button class="btn primary big" id="btn-pdf">Buat PDF untuk dicetak</button>
       </div>
       <div class="msg ok" id="pdf-result" hidden></div>
-      <p class="tip">Cetak PDF di kertas A4 dengan skala 100% (ukuran sebenarnya). Jika pilihan skala disetel "Fit" atau "Sesuaikan", margin dan ukuran foto 3x4 bisa bergeser.</p>
+      <p class="tip">Cetak PDF di kertas F4 (215 x 330 mm; di dialog cetak pilih F4 / Folio atau ukuran khusus 215 x 330) dengan skala 100% (ukuran sebenarnya). Jika pilihan skala disetel "Fit" atau "Sesuaikan", margin dan ukuran foto 3x4 bisa bergeser.</p>
     </section>
   </main>
 </div>
@@ -623,8 +623,9 @@ function safe(s) {
     .replace(/[–—−]/g, '-').replace(/…/g, '...').replace(/[   ]/g, ' ')
     .replace(/[^ -~¡-ÿ]/g, '?');
 }
+var PW = 215, PH = 330; // ukuran halaman F4 (mm)
 function CanvasG(cv, family) {
-  this.cv = cv; this.x = cv.getContext('2d'); this.k = cv.width / 210;
+  this.cv = cv; this.x = cv.getContext('2d'); this.k = cv.width / PW;
   this.fam = family === 'times' ? SERIF : SANS; this.size = 12; this.style = 'normal';
 }
 CanvasG.prototype.clear = function () { this.x.fillStyle = '#fff'; this.x.fillRect(0, 0, this.cv.width, this.cv.height); };
@@ -731,23 +732,23 @@ function bigBox(g, cx, y, w, h, text) {
 var DOT = { dash: [0.5, 0.9], color: [110, 110, 110], width: 0.2 };
 
 function drawCover(c) {
-  var g = c.g, s = c.school, st = c.st, cx = 105;
-  placeImage(g, c.imgs.twh, cx - 21, 20, 42, 42, ['Logo Tut Wuri', 'Handayani']);
-  g.setFont('bold', 34); g.text('RAPOR', cx, 85, { align: 'center' });
-  g.setFont('bold', 22);
-  g.text('PESERTA DIDIK', cx, 98, { align: 'center' });
-  g.text('SEKOLAH DASAR', cx, 109.5, { align: 'center' });
-  g.text('(SD)', cx, 121, { align: 'center' });
-  placeImage(g, c.imgs.sch, cx - 23, 130, 46, 46, ['Logo Sekolah']);
-  g.setFont('normal', 12.5); g.text('Nama Peserta Didik:', cx, 190, { align: 'center' });
-  bigBox(g, cx, 194, 150, 17, st.nama);
-  g.setFont('normal', 12.5); g.text('NIS / NISN:', cx, 223, { align: 'center' });
-  bigBox(g, cx, 227, 150, 17, nisLine(st));
+  var g = c.g, s = c.school, st = c.st, cx = PW / 2;
+  placeImage(g, c.imgs.twh, cx - 23, 22, 46, 46, ['Logo Tut Wuri', 'Handayani']);
+  g.setFont('bold', 36); g.text('RAPOR', cx, 98, { align: 'center' });
+  g.setFont('bold', 23);
+  g.text('PESERTA DIDIK', cx, 112, { align: 'center' });
+  g.text('SEKOLAH DASAR', cx, 125.5, { align: 'center' });
+  g.text('(SD)', cx, 139, { align: 'center' });
+  placeImage(g, c.imgs.sch, cx - 25, 150, 50, 50, ['Logo Sekolah']);
+  g.setFont('normal', 13); g.text('Nama Peserta Didik:', cx, 216, { align: 'center' });
+  bigBox(g, cx, 220, 160, 18, st.nama);
+  g.setFont('normal', 13); g.text('NIS / NISN:', cx, 250, { align: 'center' });
+  bigBox(g, cx, 254, 160, 18, nisLine(st));
   var k1 = clean(s.kemen1), k2 = clean(s.kemen2);
-  var sz = Math.min(fitSize(g, safe(k1), 175, 13, 9, 'bold'), fitSize(g, safe(k2), 175, 13, 9, 'bold'));
+  var sz = Math.min(fitSize(g, safe(k1), 180, 13, 9, 'bold'), fitSize(g, safe(k2), 180, 13, 9, 'bold'));
   g.setFont('bold', sz);
-  g.text(k1, cx, 268, { align: 'center' });
-  g.text(k2, cx, 268 + sz * PT * 1.35, { align: 'center' });
+  g.text(k1, cx, 300, { align: 'center' });
+  g.text(k2, cx, 300 + sz * PT * 1.35, { align: 'center' });
 }
 
 function layoutRows(g, rows, H, lh, size, maxW) {
@@ -777,11 +778,11 @@ function drawRows(g, rows, hs, y, G, size, lh) {
 }
 
 function drawSekolah(c) {
-  var g = c.g, s = c.school, cx = 105;
-  g.setFont('bold', 22); g.text('RAPOR', cx, 38, { align: 'center' });
+  var g = c.g, s = c.school, cx = PW / 2;
+  g.setFont('bold', 22); g.text('RAPOR', cx, 42, { align: 'center' });
   g.setFont('bold', 17);
-  g.text('PESERTA DIDIK', cx, 47, { align: 'center' });
-  g.text('SEKOLAH DASAR (SD)', cx, 55.5, { align: 'center' });
+  g.text('PESERTA DIDIK', cx, 52, { align: 'center' });
+  g.text('SEKOLAH DASAR (SD)', cx, 61.5, { align: 'center' });
   var rows = [
     { label: 'Nama Sekolah', value: s.nama }, { label: 'NPSN', value: s.npsn },
     { label: 'Alamat Sekolah', value: s.alamat }, { label: 'Kode Pos', value: s.kodepos },
@@ -790,15 +791,15 @@ function drawSekolah(c) {
     { label: 'Website', value: s.website }, { label: 'E-mail', value: s.email }
   ];
   rows.forEach(function (r) { r.value = clean(r.value); });
-  var G = { H: 13, numX: 0, labelX: 24, subX: 24, colonX: 74, valueX: 77, right: 190 };
+  var G = { H: 14.5, numX: 0, labelX: 25, subX: 25, colonX: 76, valueX: 79, right: 195 };
   var size = 12, lh = size * PT * 1.3;
   var hs = layoutRows(g, rows, G.H, lh, size, G.right - G.valueX);
-  drawRows(g, rows, hs, 80, G, size, lh);
+  drawRows(g, rows, hs, 90, G, size, lh);
 }
 
 function drawSiswa(c) {
-  var g = c.g, s = c.school, st = c.st, cx = 105;
-  g.setFont('bold', 15); g.text('IDENTITAS PESERTA DIDIK', cx, 26, { align: 'center' });
+  var g = c.g, s = c.school, st = c.st, cx = PW / 2;
+  g.setFont('bold', 15); g.text('IDENTITAS PESERTA DIDIK', cx, 30, { align: 'center' });
   var R = [
     { num: 'a.', label: 'Nama Peserta Didik', value: st.nama },
     { num: 'b.', label: 'NIS / NISN', value: nisLine(st) },
@@ -820,8 +821,8 @@ function drawSiswa(c) {
     { sub: 1, label: 'Alamat', value: st.wali_alamat }
   ];
   R.forEach(function (r) { if (r.value !== undefined) r.value = clean(r.value); });
-  var size = 11, lh = size * PT * 1.3, top = 34, limit = 230;
-  var G = { H: 8.2, numX: 22, labelX: 29, subX: 36, colonX: 80, valueX: 83, right: 190 };
+  var size = 11, lh = size * PT * 1.3, top = 40, limit = 262;
+  var G = { H: 9.5, numX: 24, labelX: 31, subX: 38, colonX: 83, valueX: 86, right: 195 };
   var hs = layoutRows(g, R, G.H, lh, size, G.right - G.valueX);
   var total = hs.reduce(function (a, b) { return a + b; }, 0);
   if (top + total > limit) {
@@ -832,15 +833,15 @@ function drawSiswa(c) {
   }
   var yEnd = drawRows(g, R, hs, top, G, size, lh);
 
-  var by = Math.max(yEnd + 6, 232);
-  if (by + 42 > 287) by = 287 - 42;
+  var by = Math.max(yEnd + 6, 266);
+  if (by + 42 > 318) by = 318 - 42;
   // foto 3x4
-  g.rect(29, by, 30, 40, { width: 0.35 });
+  g.rect(31, by, 30, 40, { width: 0.35 });
   g.setFont('normal', 9);
-  g.text('Foto', 44, by + 19, { align: 'center', color: [150, 150, 150] });
-  g.text('3 x 4', 44, by + 23.5, { align: 'center', color: [150, 150, 150] });
+  g.text('Foto', 46, by + 19, { align: 'center', color: [150, 150, 150] });
+  g.text('3 x 4', 46, by + 23.5, { align: 'center', color: [150, 150, 150] });
   // tanda tangan
-  var sx = 152;
+  var sx = 155;
   g.setFont('normal', 11);
   g.text(signLine(s), sx, by + 4, { align: 'center' });
   g.text('Kepala Sekolah,', sx, by + 10, { align: 'center' });
@@ -858,16 +859,16 @@ function drawSiswa(c) {
 }
 
 function drawMutasi(c) {
-  var g = c.g, st = c.st, cx = 105, x0 = 20;
-  g.setFont('bold', 16); g.text('KETERANGAN PINDAH SEKOLAH', cx, 30, { align: 'center' });
+  var g = c.g, st = c.st, cx = PW / 2, x0 = 20;
+  g.setFont('bold', 16); g.text('KETERANGAN PINDAH SEKOLAH', cx, 36, { align: 'center' });
   // nama peserta didik
-  g.setFont('normal', 12); g.text('Nama Peserta Didik', x0, 49);
-  g.text(':', 64, 49);
-  g.setFont('bold', 12); g.text(clean(st.nama), 67, 49);
-  g.line(67, 50.6, 190, 50.6, DOT);
+  g.setFont('normal', 12); g.text('Nama Peserta Didik', x0, 56);
+  g.text(':', 66, 56);
+  g.setFont('bold', 12); g.text(clean(st.nama), 69, 56);
+  g.line(69, 57.6, 195, 57.6, DOT);
 
-  var cols = [28, 30, 44, 68], hdr = ['Tanggal', 'Kelas yang Ditinggalkan', 'Alasan', 'Tanda Tangan Kepala Sekolah, Stempel Sekolah, dan Tanda Tangan Orang Tua'];
-  var y0 = 60, hH = 22, rH = 36, rows = 5, W = cols.reduce(function (a, b) { return a + b; }, 0);
+  var cols = [29, 31, 46, 69], hdr = ['Tanggal', 'Kelas yang Ditinggalkan', 'Alasan', 'Tanda Tangan Kepala Sekolah, Stempel Sekolah, dan Tanda Tangan Orang Tua'];
+  var y0 = 68, hH = 24, rH = 42, rows = 5, W = cols.reduce(function (a, b) { return a + b; }, 0);
   // garis
   g.rect(x0, y0, W, hH + rows * rH, { width: 0.5 });
   g.line(x0, y0 + hH, x0 + W, y0 + hH, { width: 0.5 });
@@ -1174,10 +1175,10 @@ function renderPreview() {
   var dpr = Math.min(window.devicePixelRatio || 1, 2.5);
   getImages().then(function (imgs) {
     if (token !== renderToken) return;
-    cv.width = Math.round(cssW * dpr); cv.height = Math.round(cssW * dpr * 297 / 210);
-    cv.style.width = cssW + 'px'; cv.style.height = (cssW * 297 / 210) + 'px';
+    cv.width = Math.round(cssW * dpr); cv.height = Math.round(cssW * dpr * PH / PW);
+    cv.style.width = cssW + 'px'; cv.style.height = (cssW * PH / PW) + 'px';
     var g = new CanvasG(cv, state.school.font); g.clear();
-    if (!st) { g.setFont('normal', 12); g.text('Belum ada siswa', 105, 148, { align: 'center', color: [140, 140, 140] }); return; }
+    if (!st) { g.setFont('normal', 12); g.text('Belum ada siswa', PW / 2, PH / 2, { align: 'center', color: [140, 140, 140] }); return; }
     DOCS.filter(function (d) { return d.id === state.previewDoc; })[0].draw({ g: g, school: state.school, st: st, imgs: imgs });
   });
 }
@@ -1197,7 +1198,7 @@ function makePdf() {
   setBusy(true, 'Menyusun halaman...');
   $('#pdf-result').hidden = true;
   getImages().then(function (imgs) {
-    var doc = new window.jspdf.jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait', compress: true });
+    var doc = new window.jspdf.jsPDF({ unit: 'mm', format: [PW, PH], orientation: 'portrait', compress: true });
     doc.setProperties({ title: 'Rapor SD - Cover dan Identitas' });
     var g = new PdfG(doc, state.school.font), seq = [];
     if (state.order === 'siswa') list.forEach(function (s) { docs.forEach(function (d) { seq.push([s, d]); }); });
@@ -1210,6 +1211,7 @@ function makePdf() {
         seq[i][1].draw({ g: g, school: state.school, st: seq[i][0], imgs: imgs });
       }
       if (i < seq.length) { setBusy(true, 'Menyusun ' + i + ' dari ' + seq.length + '...'); return tick().then(step); }
+      return Promise.resolve();
     }
     return step().then(function () {
       var blob = doc.output('blob');
