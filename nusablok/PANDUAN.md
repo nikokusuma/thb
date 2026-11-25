@@ -87,6 +87,12 @@ Hasil memancing dan menggali masuk ke **🎒 Buku Koleksi** (tombol 🎒 atau to
 - **Memasak**: di 🍳 Dapur dekat titik awal. Bahan dari ikan hasil memancing dan burung hasil berburu. Angkat masakan saat penanda di zona hijau; hidangan memberi bonus lari sementara dan fakta gizi.
 - Data koleksi (burung, masakan, bahan terpakai) tersimpan di akun siswa; kostum tersimpan di server.
 
+## Misi harian, ikan legendaris, dan item langka
+- **Misi harian** (ikon 📅 di kiri atas): 2 misi per hari. Misi 1 berupa misi pertanyaan, misi 2 berupa misi kumpul barang. Pelajarannya berbeda setiap hari dan misi 2 tidak pernah sama dengan misi 1. Tiap misi selesai memberi **+10 menit** waktu bermain (saldo tetap maksimal 60 menit). Hari berganti pukul 00.00 WIB.
+- **Spot ikan legendaris**: muncul acak sebagai sinar merah muda di air, sama untuk semua pemain, dan hanya beberapa menit. Peluang mendapat ikan legendaris sekitar **1%** tiap tarikan, jadi sangat langka.
+- **Item langka**: tiap kemunculan hanya bisa diambil **satu pemain** (siapa yang menyelesaikan tantangan dan tersimpan duluan). Setelah ada yang mendapat, muncul pengumuman ke semua pemain dan item hilang dari peta. Pemain lain yang sedang mengerjakan tantangan diberi tahu bahwa item sudah diambil.
+- **Bertemu pemain (APK dan browser)**: game memakai sambungan real-time. Bila sambungan itu tidak bisa dipakai di perangkat tertentu, game otomatis pindah ke jalur cadangan lewat server sehingga APK dan browser tetap saling terlihat (gerakan sedikit lebih jarang diperbarui). Pemain dibagi per level.
+
 ## Item langka dan Tantangan Legendaris
 
 - Secara acak (sekitar 4 dari 10 jendela waktu 6 menit) muncul **sinar emas ✨** di dunia, lengkap dengan penunjuk jarak dan bintang di peta mini. Letak dan jenisnya sama untuk semua pemain di level yang sama.

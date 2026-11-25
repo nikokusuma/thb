@@ -736,7 +736,18 @@ end;
 $$;
 
 -- Pemain menyelesaikan Tantangan Legendaris: item langka masuk, pengumuman dikirim ke semua pemain.
-create or replace function public.nb_langka_dapat(p_username text, p_pin text, p_mapel text)
+-- Item langka: satu pemain saja yang bisa mengambil tiap kemunculan (win = nomor jendela waktu).
+create table if not exists public.nb_langka_win (
+  win      bigint primary key,
+  username text not null,
+  mapel    text not null,
+  level    smallint not null,
+  waktu    timestamptz not null default now()
+);
+alter table public.nb_langka_win enable row level security;
+revoke all on public.nb_langka_win from anon, authenticated, public;
+drop function if exists public.nb_langka_dapat(text, text, text);
+create or replace function public.nb_langka_dapat(p_username text, p_pin text, p_mapel text, p_win bigint default null)
 returns jsonb
 language plpgsql security definer set search_path = public, extensions
 as $$
@@ -749,15 +760,28 @@ declare
   v_legenda boolean := false;
   v_kode text;
   v_maks bigint;
+  v_oleh text;
 begin
   if not (v ->> 'ok')::boolean then return v; end if;
   v_u := v ->> 'username';
   if p_mapel is null or p_mapel not in ('ipa', 'ips', 'mat', 'ing', 'man') then
     return jsonb_build_object('ok', false, 'pesan', 'Item tidak dikenal.');
   end if;
+  if p_win is null or p_win < 0 then
+    return jsonb_build_object('ok', false, 'pesan', 'Muat ulang game dulu (versi lama), lalu coba lagi.');
+  end if;
   select max(l.terakhir) into v_terakhir from public.nb_langka l where l.username = v_u;
   if v_terakhir is not null and v_terakhir > now() - interval '60 seconds' then
     return jsonb_build_object('ok', false, 'pesan', 'Tunggu sebentar sebelum tantangan berikutnya.');
+  end if;
+
+  -- Satu item langka hanya bisa diambil SATU pemain: siapa yang menyimpan duluan menang.
+  insert into public.nb_langka_win (win, username, mapel, level) values (p_win, v_u, p_mapel, (v ->> 'kelas')::int)
+  on conflict (win) do nothing;
+  if not found then
+    select w.username into v_oleh from public.nb_langka_win w where w.win = p_win;
+    return jsonb_build_object('ok', false, 'diambil', true,
+      'pesan', coalesce((select nama from public.nb_siswa where username = v_oleh), 'Pemain lain') || ' sudah mengambil item ini lebih dulu!');
   end if;
 
   insert into public.nb_langka (username, mapel) values (v_u, p_mapel)
@@ -1010,7 +1034,7 @@ grant execute on function public.nb_guru_misi_hapus(text, bigint)              t
 revoke all on function public.nb_koleksi_ambil(text, text)            from public;
 revoke all on function public.nb_koleksi_simpan(text, text, jsonb)    from public;
 revoke all on function public.nb_prestasi_catat(text, text, text)    from public;
-revoke all on function public.nb_langka_dapat(text, text, text)       from public;
+revoke all on function public.nb_langka_dapat(text, text, text, bigint) from public;
 revoke all on function public.nb_umum_baru(bigint)                    from public;
 revoke all on function public.nb_waktu_gulung(text)                   from public, anon, authenticated;
 revoke all on function public.nb_waktu_json(public.nb_waktu, integer)  from public, anon, authenticated;
@@ -1023,12 +1047,141 @@ revoke all on function public.nb_kostum_set(text, text, integer)      from publi
 grant execute on function public.nb_koleksi_ambil(text, text)         to anon, authenticated;
 grant execute on function public.nb_koleksi_simpan(text, text, jsonb) to anon, authenticated;
 grant execute on function public.nb_prestasi_catat(text, text, text)  to anon, authenticated;
-grant execute on function public.nb_langka_dapat(text, text, text)    to anon, authenticated;
+grant execute on function public.nb_langka_dapat(text, text, text, bigint) to anon, authenticated;
 grant execute on function public.nb_umum_baru(bigint)                 to anon, authenticated;
 grant execute on function public.nb_waktu_ambil(text, text)           to anon, authenticated;
 grant execute on function public.nb_waktu_pakai(text, text)           to anon, authenticated;
 grant execute on function public.nb_guru_waktu(text, text, integer)   to anon, authenticated;
 grant execute on function public.nb_kostum_set(text, text, integer)   to anon, authenticated;
+
+-- =====================================================================
+--  ITEM LANGKA: status (siapa yang sudah mengambil)
+-- =====================================================================
+create or replace function public.nb_langka_status(p_win bigint)
+returns jsonb
+language sql stable security definer set search_path = public
+as $$
+  select coalesce(
+    (select jsonb_build_object('diambil', true, 'oleh', coalesce(s.nama, 'Pemain lain'), 'mapel', w.mapel)
+       from public.nb_langka_win w left join public.nb_siswa s on s.username = w.username where w.win = p_win),
+    jsonb_build_object('diambil', false));
+$$;
+
+-- =====================================================================
+--  MISI HARIAN (2 per hari; isi misi ditentukan game dari tanggal WIB)
+-- =====================================================================
+create table if not exists public.nb_harian (
+  username text not null references public.nb_siswa(username) on delete cascade,
+  hari     date not null,
+  nomor    smallint not null check (nomor in (1, 2)),
+  primary key (username, hari, nomor)
+);
+alter table public.nb_harian enable row level security;
+revoke all on public.nb_harian from anon, authenticated, public;
+
+create or replace function public.nb_harian_ambil(p_username text, p_pin text)
+returns jsonb
+language plpgsql security definer set search_path = public, extensions
+as $$
+declare
+  v jsonb := public.nb_verifikasi(p_username, p_pin);
+  v_hari date := (now() at time zone 'Asia/Jakarta')::date;
+begin
+  if not (v ->> 'ok')::boolean then return v; end if;
+  return jsonb_build_object('ok', true, 'hari', v_hari,
+    'selesai', coalesce((select jsonb_agg(h.nomor order by h.nomor) from public.nb_harian h where h.username = v ->> 'username' and h.hari = v_hari), '[]'::jsonb),
+    'total', (select count(*) from public.nb_harian h where h.username = v ->> 'username'));
+end;
+$$;
+
+-- Misi harian selesai: +10 menit waktu bermain (sekali per misi per hari, saldo tetap maksimal 60 menit)
+create or replace function public.nb_harian_selesai(p_username text, p_pin text, p_nomor integer)
+returns jsonb
+language plpgsql security definer set search_path = public, extensions
+as $$
+declare
+  v jsonb := public.nb_verifikasi(p_username, p_pin);
+  v_u text; v_hari date := (now() at time zone 'Asia/Jakarta')::date;
+  w public.nb_waktu; v_tambah integer := 0; v_n integer;
+begin
+  if not (v ->> 'ok')::boolean then return v; end if;
+  v_u := v ->> 'username';
+  if p_nomor is null or p_nomor not in (1, 2) then return jsonb_build_object('ok', false, 'pesan', 'Misi harian tidak dikenal.'); end if;
+  insert into public.nb_harian (username, hari, nomor) values (v_u, v_hari, p_nomor) on conflict do nothing;
+  get diagnostics v_n = row_count;
+  w := public.nb_waktu_gulung(v_u);
+  if v_n = 1 then
+    v_tambah := least(600, greatest(0, 3600 - w.saldo));
+    if v_tambah > 0 then update public.nb_waktu set saldo = saldo + v_tambah where username = v_u returning * into w; end if;
+  end if;
+  return jsonb_build_object('ok', true, 'baru', v_n = 1,
+    'selesai', coalesce((select jsonb_agg(h.nomor order by h.nomor) from public.nb_harian h where h.username = v_u and h.hari = v_hari), '[]'::jsonb),
+    'total', (select count(*) from public.nb_harian h where h.username = v_u),
+    'waktu', public.nb_waktu_json(w, v_tambah));
+end;
+$$;
+
+-- =====================================================================
+--  RUANG CADANGAN (bertemu pemain lewat server bila WebSocket real time gagal, mis. di APK)
+-- =====================================================================
+create table if not exists public.nb_hadir (
+  id       text primary key,
+  username text not null,
+  level    smallint not null,
+  nama     text not null,
+  skin     smallint not null default 0,
+  kos      smallint not null default 0,
+  x real not null default 0, y real not null default 0, z real not null default 0,
+  r real not null default 0, vx real not null default 0, vz real not null default 0,
+  e smallint not null default 0,
+  et bigint not null default 0,
+  t  timestamptz not null default now()
+);
+create index if not exists nb_hadir_lv on public.nb_hadir (level, t desc);
+alter table public.nb_hadir enable row level security;
+revoke all on public.nb_hadir from anon, authenticated, public;
+
+create or replace function public.nb_ruang(p_username text, p_pin text, p_id text, p_s jsonb, p_keluar boolean default false)
+returns jsonb
+language plpgsql security definer set search_path = public, extensions
+as $$
+declare
+  v jsonb := public.nb_verifikasi(p_username, p_pin);
+  v_u text; v_lv smallint;
+begin
+  if not (v ->> 'ok')::boolean then return v; end if;
+  v_u := v ->> 'username'; v_lv := (v ->> 'kelas')::smallint;
+  if p_id is null or char_length(p_id) > 40 or left(p_id, char_length(v_u) + 1) <> v_u || '.' then
+    return jsonb_build_object('ok', false, 'pesan', 'ID ruang tidak valid.');
+  end if;
+  if p_keluar then delete from public.nb_hadir where id = p_id and username = v_u; return jsonb_build_object('ok', true); end if;
+  insert into public.nb_hadir (id, username, level, nama, skin, kos, x, y, z, r, vx, vz, e, et, t)
+  values (p_id, v_u, v_lv, v ->> 'nama', (v ->> 'skin')::smallint,
+          greatest(0, least(15, coalesce((p_s ->> 'k')::int, 0))),
+          coalesce((p_s ->> 'x')::real, 0), coalesce((p_s ->> 'y')::real, 0), coalesce((p_s ->> 'z')::real, 0),
+          coalesce((p_s ->> 'r')::real, 0), coalesce((p_s ->> 'vx')::real, 0), coalesce((p_s ->> 'vz')::real, 0),
+          greatest(0, least(20, coalesce((p_s ->> 'e')::int, 0))), coalesce((p_s ->> 'et')::bigint, 0), now())
+  on conflict (id) do update set level = excluded.level, nama = excluded.nama, skin = excluded.skin, kos = excluded.kos,
+    x = excluded.x, y = excluded.y, z = excluded.z, r = excluded.r, vx = excluded.vx, vz = excluded.vz,
+    e = case when excluded.et > public.nb_hadir.et then excluded.e else public.nb_hadir.e end,
+    et = greatest(excluded.et, public.nb_hadir.et), t = now()
+  where public.nb_hadir.username = v_u;
+  if random() < 0.03 then delete from public.nb_hadir where t < now() - interval '2 minutes'; end if;
+  return jsonb_build_object('ok', true, 'o', coalesce((
+    select jsonb_agg(jsonb_build_object('i', h.id, 'n', h.nama, 's', h.skin, 'k', h.kos, 'x', h.x, 'y', h.y, 'z', h.z, 'r', h.r,
+                                        'vx', h.vx, 'vz', h.vz, 'e', h.e, 'et', h.et))
+      from (select * from public.nb_hadir where level = v_lv and id <> p_id and t > now() - interval '9 seconds' order by t desc limit 14) h), '[]'::jsonb));
+end;
+$$;
+
+revoke all on function public.nb_langka_status(bigint)                       from public;
+revoke all on function public.nb_harian_ambil(text, text)                    from public;
+revoke all on function public.nb_harian_selesai(text, text, integer)         from public;
+revoke all on function public.nb_ruang(text, text, text, jsonb, boolean)     from public;
+grant execute on function public.nb_langka_status(bigint)                    to anon, authenticated;
+grant execute on function public.nb_harian_ambil(text, text)                 to anon, authenticated;
+grant execute on function public.nb_harian_selesai(text, text, integer)      to anon, authenticated;
+grant execute on function public.nb_ruang(text, text, text, jsonb, boolean)  to anon, authenticated;
 
 -- Minta Supabase membaca ulang daftar fungsi agar langsung bisa dipanggil game.
 notify pgrst, 'reload schema';
