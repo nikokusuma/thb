@@ -73,6 +73,20 @@ Agar siswa tidak bosan hanya menjawab soal, ada beberapa kegiatan lain. Semuanya
 
 Hasil memancing dan menggali masuk ke **🎒 Buku Koleksi** (tombol 🎒 atau tombol keyboard **K**) bersama prestasi dan berita.
 
+## Batas waktu bermain harian
+- Tiap hari (ganti hari mengikuti jam WIB) siswa mendapat **30 menit**. Jatah yang tidak terpakai terbawa ke hari berikutnya, tetapi **saldo maksimal 60 menit** (jadi paling lama terkumpul 2 hari).
+- Menyelesaikan misi memberi **+15 menit** (sekali per misi per hari, maksimal +30 menit bonus per hari). Bonus dan pemakaian harian dihitung ulang saat ganti hari.
+- Waktu dihitung **server**, bukan perangkat, jadi tidak bisa dicurangi dengan mengubah jam HP. Sisa waktu tampil di ⏱️ kiri atas; saat habis muncul layar "Waktu bermain hari ini sudah habis".
+- Guru bisa menambah waktu siswa lewat tombol **+30m** di tabel siswa (panel guru).
+- Mematikan batas waktu untuk semua: jalankan di Supabase SQL Editor `update nb_pengaturan set nilai='mati' where kunci='batas_waktu';` (nyalakan lagi dengan `'hidup'`).
+
+## Karakter, kostum, berburu, dan memasak
+- Saat mendaftar, siswa memilih **laki-laki atau perempuan** (12 tampilan tiap pilihan, termasuk berhijab).
+- **Kostum** (Buku Koleksi › 👕 Kostum): 10 pilihan, sebagian terbuka setelah mencapai syarat (memasak, memanah, memancing, misi, bintang, item langka). Kostum terlihat oleh teman satu level.
+- **Berburu burung**: ada burung di dunia. Dekati, tekan 🏹 Panah, lalu tekan TEMBAK saat penanda di zona hijau. Anak panah maksimal 6, bertambah 1 tiap 20 detik. **Burung dilindungi** (Cendrawasih, Elang Jawa, Jalak Bali) tidak boleh dipanah: bila tetap dipanah, anak panah habis dan siswa belajar tentang konservasi.
+- **Memasak**: di 🍳 Dapur dekat titik awal. Bahan dari ikan hasil memancing dan burung hasil berburu. Angkat masakan saat penanda di zona hijau; hidangan memberi bonus lari sementara dan fakta gizi.
+- Data koleksi (burung, masakan, bahan terpakai) tersimpan di akun siswa; kostum tersimpan di server.
+
 ## Item langka dan Tantangan Legendaris
 
 - Secara acak (sekitar 4 dari 10 jendela waktu 6 menit) muncul **sinar emas ✨** di dunia, lengkap dengan penunjuk jarak dan bintang di peta mini. Letak dan jenisnya sama untuk semua pemain di level yang sama.
@@ -125,16 +139,6 @@ Mengosongkan nilai di `config.js` membuat game berjalan dalam **mode coba**: dat
 Menutup pendaftaran siswa baru (jalankan di SQL Editor):
 `update public.nb_pengaturan set nilai = 'tutup' where kunci = 'pendaftaran';`
 (ganti `'tutup'` dengan `'buka'` untuk membukanya lagi).
-
-## Memasang di HP Android atau Huawei (APK)
-
-1. Buka `https://github.com/nikokusuma/thb/releases/tag/nusablok-apk` di HP, lalu unduh **NusaBlok.apk**.
-2. Buka berkas itu. Bila diminta, izinkan **pasang dari sumber tidak dikenal** untuk peramban/Berkas yang dipakai. Di Huawei, bila muncul peringatan keamanan, pilih **Lanjutkan/Pasang saja**.
-3. Buka **NusaBlok**. Aplikasi selalu landscape, layar penuh, dan layar tidak padam saat bermain. Butuh internet (sama seperti versi web).
-
-APK memuat game langsung dari alamat web, jadi **setiap pembaruan game otomatis terbawa** tanpa pasang ulang APK (cukup tutup lalu buka lagi aplikasinya; GitHub Pages bisa butuh beberapa menit). APK baru hanya perlu bila pengaturan aplikasi berubah. Tanpa internet muncul layar "Belum ada internet".
-
-Catatan: kunci tanda tangan APK ada di repositori (`nusablok-apk/nusablok.keystore`) karena ini hanya untuk dibagikan langsung, bukan Play Store.
 
 ## Bila ada masalah
 

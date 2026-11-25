@@ -23,7 +23,7 @@ create table if not exists public.nb_siswa (
   kelas           smallint not null check (kelas between 1 and 6),        -- level bermain sekarang
   kelas_sekolah   smallint not null check (kelas_sekolah between 1 and 6), -- kelas di sekolah (titik awal tes)
   ditempatkan     boolean not null default false,                          -- sudah mengerjakan tes penempatan?
-  skin            smallint not null default 0 check (skin between 0 and 11),
+  skin            smallint not null default 0 check (skin between 0 and 23),
   salah_pin       smallint not null default 0,
   terkunci_sampai timestamptz,
   dibuat          timestamptz not null default now(),
@@ -75,15 +75,26 @@ create table if not exists public.nb_pengaturan (
 insert into public.nb_pengaturan (kunci, nilai) values ('pendaftaran', 'buka')
 on conflict (kunci) do nothing;
 
--- Koleksi pemain (buku ikan & harta): {"i":{"mas":3,...},"h":{"koin":1,...}}. Hanya bisa naik, tidak turun.
+-- Instalasi lama: karakter perempuan (skin 12-23) dan kostum.
+alter table public.nb_siswa drop constraint if exists nb_siswa_skin_check;
+alter table public.nb_siswa add constraint nb_siswa_skin_check check (skin between 0 and 23);
+alter table public.nb_siswa add column if not exists kostum smallint not null default 0;
+alter table public.nb_siswa drop constraint if exists nb_siswa_kostum_check;
+alter table public.nb_siswa add constraint nb_siswa_kostum_check check (kostum between 0 and 15);
+
+-- Koleksi pemain: {"i":{ikan},"h":{harta},"b":{bahan buruan},"m":{masakan dibuat},"u":{bahan terpakai}}. Semua angka hanya bisa naik.
 create table if not exists public.nb_koleksi (
   username   text primary key references public.nb_siswa(username) on delete cascade,
   data       jsonb not null default '{}'::jsonb
-             check (jsonb_typeof(data) = 'object' and char_length(data::text) <= 2000),
+             check (jsonb_typeof(data) = 'object' and char_length(data::text) <= 4000),
   diperbarui timestamptz not null default now()
 );
 
 -- Prestasi (achievement) yang sudah diraih tiap pemain.
+-- Instalasi lama: koleksi kini memuat grup i, h, b (bahan buruan), m (masakan), u (bahan terpakai).
+alter table public.nb_koleksi drop constraint if exists nb_koleksi_data_check;
+alter table public.nb_koleksi add constraint nb_koleksi_data_check check (jsonb_typeof(data) = 'object' and char_length(data::text) <= 4000);
+
 create table if not exists public.nb_prestasi (
   username text not null references public.nb_siswa(username) on delete cascade,
   kode     text not null check (kode ~ '^[a-z0-9_]{3,24}$'),
@@ -151,7 +162,7 @@ begin
       update public.nb_siswa set salah_pin = 0, terkunci_sampai = null where username = s.username;
     end if;
     return jsonb_build_object('ok', true, 'username', s.username, 'nama', s.nama, 'kelas', s.kelas,
-                              'kelas_sekolah', s.kelas_sekolah, 'ditempatkan', s.ditempatkan, 'skin', s.skin);
+                              'kelas_sekolah', s.kelas_sekolah, 'ditempatkan', s.ditempatkan, 'skin', s.skin, 'kostum', s.kostum);
   end if;
 
   if s.salah_pin + 1 >= 5 then
@@ -193,7 +204,7 @@ begin
   if p_kelas_sekolah is null or p_kelas_sekolah not between 1 and 6 then
     return jsonb_build_object('ok', false, 'pesan', 'Pilih kelas 1 sampai 6.');
   end if;
-  if p_skin is null or p_skin not between 0 and 11 then p_skin := 0; end if;
+  if p_skin is null or p_skin not between 0 and 23 then p_skin := 0; end if;
 
   insert into public.nb_siswa (username, pin_hash, nama, kelas, kelas_sekolah, skin)
   values (v_user, extensions.crypt(p_pin, extensions.gen_salt('bf')), v_nama,
@@ -201,7 +212,7 @@ begin
 
   return jsonb_build_object('ok', true,
     'profil', jsonb_build_object('username', v_user, 'nama', v_nama, 'kelas', p_kelas_sekolah,
-                                 'kelas_sekolah', p_kelas_sekolah, 'ditempatkan', false, 'skin', p_skin),
+                                 'kelas_sekolah', p_kelas_sekolah, 'ditempatkan', false, 'skin', p_skin, 'kostum', 0),
     'progres', '{}'::jsonb);
 exception when unique_violation then
   return jsonb_build_object('ok', false, 'pesan', 'Username itu sudah dipakai. Coba username lain.');
@@ -225,7 +236,8 @@ begin
   return jsonb_build_object('ok', true,
     'profil', jsonb_build_object('username', v ->> 'username', 'nama', v ->> 'nama',
                                  'kelas', (v ->> 'kelas')::int, 'kelas_sekolah', (v ->> 'kelas_sekolah')::int,
-                                 'ditempatkan', (v ->> 'ditempatkan')::boolean, 'skin', (v ->> 'skin')::int),
+                                 'ditempatkan', (v ->> 'ditempatkan')::boolean, 'skin', (v ->> 'skin')::int,
+                                 'kostum', coalesce((v ->> 'kostum')::int, 0)),
     'progres', v_prog);
 end;
 $$;
@@ -287,7 +299,7 @@ begin
     set bintang = greatest(public.nb_progres.bintang, excluded.bintang), diperbarui = now();
 
   update public.nb_siswa set terakhir = now() where username = v ->> 'username';
-  return jsonb_build_object('ok', true);
+  return jsonb_build_object('ok', true, 'waktu', public.nb_waktu_bonus(v ->> 'username', p_misi));
 end;
 $$;
 
@@ -663,13 +675,13 @@ declare
 begin
   if not (v ->> 'ok')::boolean then return v; end if;
   v_u := v ->> 'username';
-  if p_data is null or jsonb_typeof(p_data) <> 'object' or char_length(p_data::text) > 2000 then
+  if p_data is null or jsonb_typeof(p_data) <> 'object' or char_length(p_data::text) > 4000 then
     return jsonb_build_object('ok', false, 'pesan', 'Data koleksi tidak valid.');
   end if;
   select k.data into v_lama from public.nb_koleksi k where k.username = v_u;
   v_lama := coalesce(v_lama, '{}'::jsonb);
 
-  foreach v_g in array array['i', 'h'] loop
+  foreach v_g in array array['i', 'h', 'b', 'm', 'u'] loop
     v_in := coalesce(p_data -> v_g, '{}'::jsonb);
     if jsonb_typeof(v_in) <> 'object' then
       return jsonb_build_object('ok', false, 'pesan', 'Data koleksi tidak valid.');
@@ -691,7 +703,7 @@ begin
     v_hasil := v_hasil || jsonb_build_object(v_g, v_gab);
   end loop;
 
-  if char_length(v_hasil::text) > 2000 then
+  if char_length(v_hasil::text) > 4000 then
     return jsonb_build_object('ok', false, 'pesan', 'Koleksi terlalu besar.');
   end if;
   insert into public.nb_koleksi (username, data) values (v_u, v_hasil)
@@ -809,6 +821,160 @@ begin
 end;
 $$;
 
+
+-- ======================================================================
+--  BATAS WAKTU BERMAIN HARIAN
+--  Jatah dasar 30 menit per hari. Tiap misi selesai (sekali per misi per hari) menambah 15 menit,
+--  bonus maksimal 30 menit per hari. Sisa waktu terbawa ke hari berikutnya, saldo maksimal 60 menit
+--  (= terakumulasi paling banyak 2 hari). Hari diganti pukul 00.00 WIB. Semua dihitung di server.
+-- ======================================================================
+create table if not exists public.nb_waktu (
+  username text primary key references public.nb_siswa(username) on delete cascade,
+  hari     date    not null,                                   -- tanggal (WIB) terakhir dihitung
+  saldo    integer not null default 1800 check (saldo between 0 and 10800),  -- detik waktu tersisa
+  bonus    integer not null default 0 check (bonus between 0 and 1800),      -- detik bonus misi yang didapat hari ini
+  dipakai  integer not null default 0,                         -- detik terpakai hari ini (info)
+  terakhir timestamptz                                         -- detak terakhir sesi ini (null = sesi baru)
+);
+create table if not exists public.nb_waktu_misi (
+  username text not null references public.nb_siswa(username) on delete cascade,
+  hari     date not null,
+  misi     text not null,
+  primary key (username, hari, misi)
+);
+alter table public.nb_waktu      enable row level security;
+alter table public.nb_waktu_misi enable row level security;
+revoke all on table public.nb_waktu, public.nb_waktu_misi from anon, authenticated;
+insert into public.nb_pengaturan (kunci, nilai) values ('batas_waktu', 'hidup') on conflict (kunci) do nothing;
+
+-- Menghitung ulang baris waktu (ganti hari). Bukan untuk browser.
+create or replace function public.nb_waktu_gulung(p_u text)
+returns public.nb_waktu
+language plpgsql security definer set search_path = public, extensions
+as $$
+declare
+  v_hari date := (now() at time zone 'Asia/Jakarta')::date;
+  w public.nb_waktu;
+begin
+  insert into public.nb_waktu (username, hari) values (p_u, v_hari) on conflict (username) do nothing;
+  select * into w from public.nb_waktu where username = p_u for update;
+  if w.hari < v_hari then
+    update public.nb_waktu
+       set saldo = case when saldo >= 3600 then saldo else least(3600, saldo + 1800 * (v_hari - hari)) end,
+           bonus = 0, dipakai = 0, terakhir = null, hari = v_hari
+     where username = p_u returning * into w;
+    delete from public.nb_waktu_misi where username = p_u and hari < v_hari;
+  end if;
+  return w;
+end;
+$$;
+
+create or replace function public.nb_waktu_json(w public.nb_waktu, p_tambah integer default 0)
+returns jsonb
+language sql stable set search_path = public
+as $$
+  select jsonb_build_object('aktif', coalesce((select nilai from public.nb_pengaturan where kunci = 'batas_waktu'), 'hidup') <> 'mati',
+                            'saldo', w.saldo, 'bonus', w.bonus, 'tambah', p_tambah,
+                            'sisa_bonus', 1800 - w.bonus, 'hari', w.hari);
+$$;
+
+-- Bonus waktu karena menyelesaikan misi (dipanggil nb_simpan). Sekali per misi per hari.
+create or replace function public.nb_waktu_bonus(p_u text, p_misi text)
+returns jsonb
+language plpgsql security definer set search_path = public, extensions
+as $$
+declare
+  w public.nb_waktu := public.nb_waktu_gulung(p_u);
+  v_tambah integer := 0; v_baru integer; v_n integer;
+begin
+  v_tambah := least(900, 1800 - w.bonus, greatest(0, 3600 - w.saldo));
+  if v_tambah > 0 then
+    insert into public.nb_waktu_misi (username, hari, misi) values (p_u, w.hari, p_misi) on conflict do nothing;
+    get diagnostics v_n = row_count;
+    if v_n = 1 then
+      update public.nb_waktu set saldo = saldo + v_tambah, bonus = bonus + v_tambah where username = p_u returning * into w;
+    else v_tambah := 0; end if;
+  end if;
+  return public.nb_waktu_json(w, v_tambah);
+end;
+$$;
+
+-- Dipanggil saat masuk game: membaca sisa waktu hari ini.
+create or replace function public.nb_waktu_ambil(p_username text, p_pin text)
+returns jsonb
+language plpgsql security definer set search_path = public, extensions
+as $$
+declare
+  v jsonb := public.nb_verifikasi(p_username, p_pin);
+  w public.nb_waktu;
+begin
+  if not (v ->> 'ok')::boolean then return v; end if;
+  w := public.nb_waktu_gulung(v ->> 'username');
+  update public.nb_waktu set terakhir = null where username = w.username returning * into w;
+  return jsonb_build_object('ok', true) || public.nb_waktu_json(w);
+end;
+$$;
+
+-- Detak tiap ±20 detik saat siswa bermain. Server memotong waktu sebesar selang sejak detak terakhir
+-- (maksimal 60 detik; bila terputus lebih dari 90 detik, selang itu tidak dihitung).
+create or replace function public.nb_waktu_pakai(p_username text, p_pin text)
+returns jsonb
+language plpgsql security definer set search_path = public, extensions
+as $$
+declare
+  v jsonb := public.nb_verifikasi(p_username, p_pin);
+  w public.nb_waktu; v_dt numeric; v_pakai integer := 0;
+begin
+  if not (v ->> 'ok')::boolean then return v; end if;
+  w := public.nb_waktu_gulung(v ->> 'username');
+  if w.terakhir is not null then
+    v_dt := extract(epoch from (now() - w.terakhir));
+    if v_dt <= 90 then v_pakai := least(60, greatest(0, round(v_dt)))::int; end if;
+  end if;
+  update public.nb_waktu set saldo = greatest(0, saldo - v_pakai), dipakai = dipakai + v_pakai, terakhir = now()
+   where username = w.username returning * into w;
+  return jsonb_build_object('ok', true) || public.nb_waktu_json(w);
+end;
+$$;
+
+-- Guru menambah waktu bermain seorang siswa (5-120 menit; saldo maksimal 180 menit).
+create or replace function public.nb_guru_waktu(p_kode text, p_username text, p_menit integer)
+returns jsonb
+language plpgsql security definer set search_path = public, extensions
+as $$
+declare
+  v_err text := public.kg_cek_guru(p_kode);
+  w public.nb_waktu; v_u text := lower(coalesce(p_username, ''));
+begin
+  if v_err is not null then return jsonb_build_object('ok', false, 'pesan', v_err); end if;
+  if p_menit is null or p_menit not between 5 and 120 then
+    return jsonb_build_object('ok', false, 'pesan', 'Tambahan waktu 5 sampai 120 menit.');
+  end if;
+  if not exists (select 1 from public.nb_siswa where username = v_u) then
+    return jsonb_build_object('ok', false, 'pesan', 'Siswa tidak ditemukan.');
+  end if;
+  w := public.nb_waktu_gulung(v_u);
+  update public.nb_waktu set saldo = least(10800, saldo + p_menit * 60) where username = v_u returning * into w;
+  return jsonb_build_object('ok', true) || public.nb_waktu_json(w);
+end;
+$$;
+
+-- Memilih kostum (hanya tampilan; kostum mana yang terbuka dihitung di game).
+create or replace function public.nb_kostum_set(p_username text, p_pin text, p_kostum integer)
+returns jsonb
+language plpgsql security definer set search_path = public, extensions
+as $$
+declare v jsonb := public.nb_verifikasi(p_username, p_pin);
+begin
+  if not (v ->> 'ok')::boolean then return v; end if;
+  if p_kostum is null or p_kostum not between 0 and 15 then
+    return jsonb_build_object('ok', false, 'pesan', 'Kostum tidak dikenal.');
+  end if;
+  update public.nb_siswa set kostum = p_kostum where username = v ->> 'username';
+  return jsonb_build_object('ok', true, 'kostum', p_kostum);
+end;
+$$;
+
 -- ---------- Izin: hanya fungsi game yang boleh dipanggil dari browser ----------
 revoke all on function public.nb_norm_soal(jsonb)                from public, anon, authenticated;
 revoke all on function public.nb_misi_simpan_inti(bigint, jsonb) from public, anon, authenticated;
@@ -846,12 +1012,23 @@ revoke all on function public.nb_koleksi_simpan(text, text, jsonb)    from publi
 revoke all on function public.nb_prestasi_catat(text, text, text)    from public;
 revoke all on function public.nb_langka_dapat(text, text, text)       from public;
 revoke all on function public.nb_umum_baru(bigint)                    from public;
+revoke all on function public.nb_waktu_gulung(text)                   from public, anon, authenticated;
+revoke all on function public.nb_waktu_json(public.nb_waktu, integer)  from public, anon, authenticated;
+revoke all on function public.nb_waktu_bonus(text, text)              from public, anon, authenticated;
+revoke all on function public.nb_waktu_ambil(text, text)              from public;
+revoke all on function public.nb_waktu_pakai(text, text)              from public;
+revoke all on function public.nb_guru_waktu(text, text, integer)      from public;
+revoke all on function public.nb_kostum_set(text, text, integer)      from public;
 
 grant execute on function public.nb_koleksi_ambil(text, text)         to anon, authenticated;
 grant execute on function public.nb_koleksi_simpan(text, text, jsonb) to anon, authenticated;
 grant execute on function public.nb_prestasi_catat(text, text, text)  to anon, authenticated;
 grant execute on function public.nb_langka_dapat(text, text, text)    to anon, authenticated;
 grant execute on function public.nb_umum_baru(bigint)                 to anon, authenticated;
+grant execute on function public.nb_waktu_ambil(text, text)           to anon, authenticated;
+grant execute on function public.nb_waktu_pakai(text, text)           to anon, authenticated;
+grant execute on function public.nb_guru_waktu(text, text, integer)   to anon, authenticated;
+grant execute on function public.nb_kostum_set(text, text, integer)   to anon, authenticated;
 
 -- Minta Supabase membaca ulang daftar fungsi agar langsung bisa dipanggil game.
 notify pgrst, 'reload schema';
@@ -862,6 +1039,10 @@ notify pgrst, 'reload schema';
 --  Tutup / buka pendaftaran siswa baru:
 --    update public.nb_pengaturan set nilai = 'tutup' where kunci = 'pendaftaran';
 --    update public.nb_pengaturan set nilai = 'buka'  where kunci = 'pendaftaran';
+--
+--  Matikan / hidupkan batas waktu bermain harian untuk semua siswa:
+--    update public.nb_pengaturan set nilai = 'mati'  where kunci = 'batas_waktu';
+--    update public.nb_pengaturan set nilai = 'hidup' where kunci = 'batas_waktu';
 --
 --  Hapus satu siswa (progresnya ikut terhapus):
 --    delete from public.nb_siswa where username = 'nama.pengguna';
