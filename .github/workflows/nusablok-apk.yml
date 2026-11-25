@@ -1,5 +1,6 @@
-# Membuat APK Android NusaBlok (landscape, layar penuh) dari nusablok/index.html + config.js.
-# Jalan otomatis tiap folder nusablok/ atau nusablok-apk/ berubah, atau manual (Actions > Run workflow).
+# Membuat APK Android NusaBlok (landscape, layar penuh). APK memuat game langsung dari
+# https://nikokusuma.github.io/thb/nusablok/ sehingga pembaruan game otomatis terbawa tanpa pasang ulang.
+# APK hanya perlu dibangun ulang bila pengaturan aplikasinya berubah (atau manual: Actions > Run workflow).
 # Hasilnya ada di: Releases > "nusablok-apk" (berkas NusaBlok.apk).
 name: APK NusaBlok
 on:
@@ -7,8 +8,6 @@ on:
   push:
     branches: [main]
     paths:
-      - 'nusablok/index.html'
-      - 'nusablok/config.js'
       - 'nusablok-apk/**'
       - '.github/workflows/nusablok-apk.yml'
 permissions:
@@ -31,8 +30,8 @@ jobs:
       - name: Siapkan isi game
         run: |
           mkdir -p www
-          cp ../nusablok/index.html www/index.html
-          cp ../nusablok/config.js www/config.js
+          cp offline.html www/index.html
+          cp offline.html www/offline.html
       - name: Pasang Capacitor dan buat proyek Android
         run: |
           npm install --no-audit --no-fund
@@ -89,5 +88,5 @@ jobs:
           name: NusaBlok untuk Android (APK)
           body: |
             Unduh **NusaBlok.apk**, buka di HP Android/Huawei (izinkan "pasang dari sumber tidak dikenal"). Cara pakai ada di nusablok/PANDUAN.md.
-            Dibangun dari commit ${{ github.sha }}.
+            Game dimuat dari internet, jadi selalu versi terbaru. Dibangun dari commit ${{ github.sha }}.
           files: nusablok-apk/NusaBlok.apk

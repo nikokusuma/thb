@@ -132,7 +132,7 @@ Menutup pendaftaran siswa baru (jalankan di SQL Editor):
 2. Buka berkas itu. Bila diminta, izinkan **pasang dari sumber tidak dikenal** untuk peramban/Berkas yang dipakai. Di Huawei, bila muncul peringatan keamanan, pilih **Lanjutkan/Pasang saja**.
 3. Buka **NusaBlok**. Aplikasi selalu landscape, layar penuh, dan layar tidak padam saat bermain. Butuh internet (sama seperti versi web).
 
-APK memuat isi game yang ada di `nusablok/` saat dibangun. Setelah game diperbarui, APK dibangun ulang otomatis (sekitar 3 menit) dan muncul di halaman yang sama; siswa perlu mengunduh dan memasang ulang APK baru (data siswa aman karena tersimpan di server). Bila game dipasang di project Supabase lain, ubah `nusablok/config.js` lebih dulu.
+APK memuat game langsung dari alamat web, jadi **setiap pembaruan game otomatis terbawa** tanpa pasang ulang APK (cukup tutup lalu buka lagi aplikasinya; GitHub Pages bisa butuh beberapa menit). APK baru hanya perlu bila pengaturan aplikasi berubah. Tanpa internet muncul layar "Belum ada internet".
 
 Catatan: kunci tanda tangan APK ada di repositori (`nusablok-apk/nusablok.keystore`) karena ini hanya untuk dibagikan langsung, bukan Play Store.
 

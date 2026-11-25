@@ -3,6 +3,10 @@
   "appName": "NusaBlok",
   "webDir": "www",
   "backgroundColor": "#5aa9ff",
-  "server": { "androidScheme": "https" },
+  "server": {
+    "url": "https://nikokusuma.github.io/thb/nusablok/",
+    "androidScheme": "https",
+    "errorPath": "offline.html"
+  },
   "android": { "allowMixedContent": false }
 }
