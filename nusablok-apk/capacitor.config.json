@@ -1,0 +1,8 @@
+{
+  "appId": "id.thb.nusablok",
+  "appName": "NusaBlok",
+  "webDir": "www",
+  "backgroundColor": "#5aa9ff",
+  "server": { "androidScheme": "https" },
+  "android": { "allowMixedContent": false }
+}

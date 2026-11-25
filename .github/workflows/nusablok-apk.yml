@@ -1,0 +1,93 @@
+# Membuat APK Android NusaBlok (landscape, layar penuh) dari nusablok/index.html + config.js.
+# Jalan otomatis tiap folder nusablok/ atau nusablok-apk/ berubah, atau manual (Actions > Run workflow).
+# Hasilnya ada di: Releases > "nusablok-apk" (berkas NusaBlok.apk).
+name: APK NusaBlok
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'nusablok/index.html'
+      - 'nusablok/config.js'
+      - 'nusablok-apk/**'
+      - '.github/workflows/nusablok-apk.yml'
+permissions:
+  contents: write
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: nusablok-apk
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - name: Siapkan isi game
+        run: |
+          mkdir -p www
+          cp ../nusablok/index.html www/index.html
+          cp ../nusablok/config.js www/config.js
+      - name: Pasang Capacitor dan buat proyek Android
+        run: |
+          npm install --no-audit --no-fund
+          npx cap add android
+      - name: Terapkan pengaturan (landscape, layar penuh, ikon, tanda tangan)
+        env:
+          RUN_NO: ${{ github.run_number }}
+        run: |
+          python3 - <<'PY'
+          import re, os, pathlib
+          m = pathlib.Path('android/app/src/main/AndroidManifest.xml')
+          s = m.read_text()
+          s = re.sub(r'(<activity\b)', r'\1 android:screenOrientation="sensorLandscape"', s, count=1)
+          m.write_text(s)
+          g = pathlib.Path('android/app/build.gradle')
+          t = g.read_text()
+          sign = '''
+              signingConfigs {
+                  nusablok {
+                      storeFile file("../../nusablok.keystore")
+                      storePassword "nusablok2026"
+                      keyAlias "nusablok"
+                      keyPassword "nusablok2026"
+                  }
+              }
+          '''
+          t = t.replace('    buildTypes {', sign + '\n    buildTypes {', 1)
+          t = t.replace('release {', 'release {\n            signingConfig signingConfigs.nusablok', 1)
+          t = t.replace('debug {', 'debug {\n            signingConfig signingConfigs.nusablok', 1) if 'debug {' in t else t
+          t = re.sub(r'versionCode \d+', 'versionCode ' + os.environ['RUN_NO'], t)
+          g.write_text(t)
+          PY
+          cp -r res/* android/app/src/main/res/
+          cp android-src/MainActivity.java android/app/src/main/java/id/thb/nusablok/MainActivity.java
+          grep -n "screenOrientation" android/app/src/main/AndroidManifest.xml
+      - name: Sinkron dan bangun APK
+        run: |
+          npx cap sync android
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleRelease --no-daemon
+          ls -la app/build/outputs/apk/release/
+      - name: Siapkan berkas
+        run: |
+          cp android/app/build/outputs/apk/release/app-release.apk NusaBlok.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: NusaBlok-apk
+          path: nusablok-apk/NusaBlok.apk
+      - name: Terbitkan di Releases
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: nusablok-apk
+          name: NusaBlok untuk Android (APK)
+          body: |
+            Unduh **NusaBlok.apk**, buka di HP Android/Huawei (izinkan "pasang dari sumber tidak dikenal"). Cara pakai ada di nusablok/PANDUAN.md.
+            Dibangun dari commit ${{ github.sha }}.
+          files: nusablok-apk/NusaBlok.apk
