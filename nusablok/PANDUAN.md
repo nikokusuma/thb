@@ -83,11 +83,29 @@ Hasil memancing dan menggali masuk ke **🎒 Buku Koleksi** (tombol 🎒 atau to
 ## Karakter, kostum, berburu, dan memasak
 - Saat mendaftar, siswa memilih **laki-laki atau perempuan** (12 tampilan tiap pilihan, termasuk berhijab).
 - **Kostum** (Buku Koleksi › 👕 Kostum): 10 pilihan, sebagian terbuka setelah mencapai syarat (memasak, memanah, memancing, misi, bintang, item langka). Kostum terlihat oleh teman satu level.
-- **Berburu burung (bidik bebas)**: burung bergerak sungguhan (ayam hutan, bebek, puyuh, kalkun berjalan dan lari bila didekati; merpati dan burung lain terbang berputar). **Tahan** tombol 🏹 di kanan bawah (atau tahan tombol **F** di komputer) untuk menarik busur: kamera pindah ke atas bahu dan muncul bidikan ⊙ di tengah layar. Arahkan bidikan ke burung (geser layar / mouse), **lepas** untuk menembak. Makin lama ditahan (maks. 1,1 detik, ada bilah di bawah bidikan) makin cepat dan jauh panahnya. Ditahan terlalu singkat = batal, panah tidak keluar.
-- **Anak panah**: jumlahnya tertulis di atas tombol 🏹 (awal 5, **maksimal 10**). Tambah panah dengan menebang pohon: berdiri dekat pohon, tombol berubah menjadi 🪓, lalu **ketuk** (bukan tahan) → +3 panah. Pohon yang sama baru bisa ditebang lagi setelah 90 detik, jadi cari pohon lain. Jumlah panah tersimpan per akun di perangkat.
+- **Berburu burung (bidik bebas)**: burung bergerak sungguhan (ayam hutan, bebek, puyuh, kalkun berjalan dan lari bila didekati; merpati dan burung lain terbang berputar). **Tahan** tombol 🏹 di kanan bawah (atau tahan tombol **F** di komputer) untuk menarik busur: kamera pindah ke atas bahu dan muncul bidikan ⊙ di tengah layar. Arahkan bidikan **naik, turun, kiri, kanan** dengan **menggeser jari pada tombol 🏹 yang sedang ditahan** (seperti tombol tembak di gim tembak-menembak). Di komputer: tahan **F** lalu tekan **tanda panah** atau gerakkan mouse. **Lepas** untuk menembak. Makin lama ditahan (maks. 1,1 detik, ada bilah di bawah bidikan) makin cepat dan jauh panahnya. Ditahan terlalu singkat = batal, panah tidak keluar.
+- **Anak panah**: jumlahnya tertulis di atas tombol 🏹 (awal 5, **maksimal 10**). Tambah panah dengan menebang pohon: berdiri dekat pohon, tombol berubah menjadi 🪓, lalu **ketuk** (bukan tahan) → +3 panah. Pohon yang sama baru bisa ditebang lagi setelah 90 detik, jadi cari pohon lain. Tiap pohon juga memberi **1 🪵 kayu** (dipakai untuk perahu, lihat di bawah). Jumlah panah tersimpan per akun di perangkat.
 - **Burung dilindungi** (Cendrawasih, Elang Jawa, Jalak Bali, ditandai 🛡️ di atas kepalanya) tidak boleh dipanah: bila terkena, burung kabur, siswa kehilangan sampai 3 anak panah, dan muncul fakta konservasi. Burung yang kena jatuh dan muncul lagi sekitar 28 detik kemudian.
 - **Memasak**: di ⛺ **Tenda Dapur Nusantara** (dekat Harbor English, ada penanda di peta kecil). Dekati **Koki Bu Sari** lalu tekan tombol 🍳 Memasak untuk membuka daftar resep. Bahan dari ikan hasil memancing dan burung hasil berburu. Angkat masakan saat penanda di zona hijau; hidangan memberi bonus lari sementara dan fakta gizi.
 - Data koleksi (burung, masakan, bahan terpakai) tersimpan di akun siswa; kostum tersimpan di server.
+
+## Sesi pengamatan burung (🔭)
+
+- Tombol **🔭** di samping tombol busur (atau tombol **V** di komputer) menyalakan **mode pengamatan**: layar diperbesar seperti teropong dan tombol busur berubah menjadi **📸**. Geser jari pada 📸 untuk membidik, lepas untuk memotret. Tekan 🔭 lagi untuk selesai.
+- Burung yang terpotret tercatat di **Buku Koleksi › 🔭 Pengamatan** lengkap dengan **ciri-ciri** dan fakta tiap burung. Burung dilindungi (🛡️) boleh dipotret tanpa dilukai, dan dapat pujian khusus.
+- Prestasi: Pengamat Pemula (foto pertama), Pengamat Burung (4 jenis), Ahli Burung (semua 8 jenis), Sahabat Satwa (ketiga burung dilindungi).
+
+## Pulau terpencil, zombi, dan Raja Zombi
+
+Ada **satu pulau tersembunyi** di barat laut yang **tidak tampak di peta kecil maupun peta besar**. Siswa hanya menemukannya lewat petunjuk Pak Darto.
+
+- **Cara ke sana**: temui **Pak Darto** (tukang perahu) di dermaga tenggara. Ia meminta **8 kayu** 🪵 (tebang 8 pohon dengan ketuk 🪓). Setelah perahu dibangun, dekati perahu lalu tekan **🚣 Naik Perahu**, arahkan dengan joystick/WASD ke barat laut, dan tekan **⚓ Turun** di dermaga pulau. **Berenang tidak bisa**: arus laut mendorong perenang kembali ke pulau utama.
+- **Zombi** muncul tanpa henti di pulau (maksimal beberapa sekaligus). Bisa dikalahkan dengan **panah** (1 panah penuh membunuh 1 zombi) atau **tebasan jarak dekat** (ketuk cepat tombol 🏹 saat zombi dekat). Zombi kadang menjatuhkan anak panah.
+- **Nyawa**: siswa punya ❤️ **6 hati** di pulau (hati hanya tampil di sana). Zombi menggigit 1 hati, hentakan Raja 2-3 hati. Hati pulih pelan-pelan bila tidak diserang, dan penuh lagi saat meninggalkan pulau. Bila habis, siswa **kalah**, muncul pesan semangat, lalu dikembalikan ke pantai awal (perahu kembali ke dermaga). Tidak ada hukuman lain.
+- **Raja Zombi 👑** menunggu di lapangan batu pulau. Ia **hanya terluka bila minimal 3 pemain berbeda menyerang dalam 10 detik yang sama**. Selama kurang dari itu, bilah nyawanya bertuliskan "KEBAL". Nyawanya **1200** dan **dipakai bersama semua pemain** di server. Bila tidak ada serangan 30 detik, nyawanya pulih penuh. Ia menghentak tanah (lingkaran merah, siswa bisa **melompat** menghindar) dan memanggil zombi; saat nyawa di bawah 40% ia mengamuk. Setelah dikalahkan, ia **bangkit lagi 15 menit kemudian**.
+- **Prestasi** (Buku Koleksi › 🧟 Pulau dan 🏅): Pembuat Perahu, Penjelajah Pulau Terpencil, Pemburu Zombi (1), Penjaga Pulau (50), dan **🗡️ Penakluk Raja Zombi**. Prestasi terakhir hanya diberikan server kepada pemain yang menyumbang minimal 30 poin kerusakan (atau yang memberi pukulan terakhir) dan **diumumkan ke semua pemain**. Prestasi ini tidak bisa dipalsukan dari peramban.
+- **Mengatur kesulitan** (SQL Editor, opsional): `insert into public.nb_pengaturan (kunci, nilai) values ('raja_min', '2') on conflict (kunci) do update set nilai = excluded.nilai;` (minimal penyerang), `'raja_hp'` (nyawa, bawaan 1200), `'raja_bangkit'` (menit bangkit, bawaan 15). Untuk membangkitkan raja sekarang: `update public.nb_raja set hp = 0, mati_sampai = now() where id = 1;`
+- Karena butuh banyak pemain, guru bisa mengadakan **sesi bersama di kelas**: tiap siswa membuat perahu lebih dulu, lalu berlayar bersamaan dan menyerang Raja bersama-sama.
 
 ## Misi harian, ikan legendaris, dan item langka
 - **Misi harian** (ikon 📅 di kiri atas): 2 misi per hari. Misi 1 berupa misi pertanyaan, misi 2 berupa misi kumpul barang. Pelajarannya berbeda setiap hari dan misi 2 tidak pernah sama dengan misi 1. Tiap misi selesai memberi **+10 menit** waktu bermain (saldo tetap maksimal 60 menit). Hari berganti pukul 00.00 WIB.
@@ -105,7 +123,7 @@ Hasil memancing dan menggali masuk ke **🎒 Buku Koleksi** (tombol 🎒 atau to
 
 ## Prestasi (achievement)
 
-Ada 24 prestasi di Buku Koleksi (tab 🏅), misalnya Langkah Pertama, Pelajar Rajin, Juara Level, Kolektor Bintang, Pengumpul Handal, Mata Elang, Murid Teladan, Pancingan Pertama, dan prestasi untuk tiap item langka. Prestasi hanya bertambah, tidak pernah hilang.
+Ada 40 prestasi di Buku Koleksi (tab 🏅), misalnya Langkah Pertama, Pelajar Rajin, Juara Level, Kolektor Bintang, Pengumpul Handal, Mata Elang, Murid Teladan, Pancingan Pertama, dan prestasi untuk tiap item langka. Prestasi hanya bertambah, tidak pernah hilang.
 
 ## Catatan teknis dan keamanan fitur ini
 
@@ -138,7 +156,7 @@ Game sudah terpasang di project Supabase "thb app" (tabel berawalan `nb_`, tidak
 Untuk memasang di project lain:
 
 1. Jalankan setup Penjaga Kode lebih dulu (game ini memakai kode gurunya).
-2. Di Supabase: **SQL Editor → New query**, tempel isi `supabase_setup.sql`, lalu **Run**. Berkas ini aman dijalankan ulang, dan **wajib dijalankan ulang bila game diperbarui** (versi ini menambah misi kumpul barang, koleksi, item langka, prestasi, dan pengumuman).
+2. Di Supabase: **SQL Editor → New query**, tempel isi `supabase_setup.sql`, lalu **Run**. Berkas ini aman dijalankan ulang, dan **wajib dijalankan ulang bila game diperbarui** (versi ini menambah pengamatan burung, pulau zombi, dan Raja Zombi).
 3. Isi `config.js` dengan URL project dan kunci *publishable* (kunci ini aman dilihat orang; jangan pernah menaruh kunci *secret*).
 4. Unggah `index.html` dan `config.js` ke folder `nusablok/` di GitHub Pages.
 

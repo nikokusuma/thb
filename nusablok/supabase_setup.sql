@@ -82,7 +82,7 @@ alter table public.nb_siswa add column if not exists kostum smallint not null de
 alter table public.nb_siswa drop constraint if exists nb_siswa_kostum_check;
 alter table public.nb_siswa add constraint nb_siswa_kostum_check check (kostum between 0 and 15);
 
--- Koleksi pemain: {"i":{ikan},"h":{harta},"b":{bahan buruan},"m":{masakan dibuat},"u":{bahan terpakai}}. Semua angka hanya bisa naik.
+-- Koleksi pemain: {"i":{ikan},"h":{harta},"b":{bahan buruan},"m":{masakan dibuat},"u":{bahan terpakai},"p":{burung diamati},"z":{zombi}}. Semua angka hanya bisa naik.
 create table if not exists public.nb_koleksi (
   username   text primary key references public.nb_siswa(username) on delete cascade,
   data       jsonb not null default '{}'::jsonb
@@ -681,7 +681,7 @@ begin
   select k.data into v_lama from public.nb_koleksi k where k.username = v_u;
   v_lama := coalesce(v_lama, '{}'::jsonb);
 
-  foreach v_g in array array['i', 'h', 'b', 'm', 'u'] loop
+  foreach v_g in array array['i', 'h', 'b', 'm', 'u', 'p', 'z'] loop
     v_in := coalesce(p_data -> v_g, '{}'::jsonb);
     if jsonb_typeof(v_in) <> 'object' then
       return jsonb_build_object('ok', false, 'pesan', 'Data koleksi tidak valid.');
@@ -724,7 +724,7 @@ declare
 begin
   if not (v ->> 'ok')::boolean then return v; end if;
   v_u := v ->> 'username';
-  if p_kode is null or p_kode !~ '^[a-z0-9_]{3,24}$' or p_kode ~ '^(langka_|legenda)' then
+  if p_kode is null or p_kode !~ '^[a-z0-9_]{3,24}$' or p_kode ~ '^(langka_|legenda|raja)' then
     return jsonb_build_object('ok', false, 'pesan', 'Kode prestasi tidak valid.');
   end if;
   if (select count(*) from public.nb_prestasi p where p.username = v_u) < 60 then
@@ -1183,6 +1183,131 @@ grant execute on function public.nb_harian_ambil(text, text)                 to 
 grant execute on function public.nb_harian_selesai(text, text, integer)      to anon, authenticated;
 grant execute on function public.nb_ruang(text, text, text, jsonb, boolean)  to anon, authenticated;
 
+
+-- =====================================================================
+--  PULAU ZOMBI: RAJA ZOMBI (nyawa bersama semua pemain)
+--  Raja hanya terluka bila minimal 3 pemain berbeda menyerang dalam 10 detik terakhir.
+--  Tanpa serangan 30 detik, nyawanya pulih penuh. Setelah dikalahkan, ia bangkit lagi 15 menit kemudian.
+--  Semua pemain yang menyerang (>= 30 poin) mendapat prestasi 'rajazombi'; ada pengumuman untuk semua pemain.
+--  Pengaturan (opsional, tabel nb_pengaturan): raja_hp (1200), raja_min (3), raja_bangkit (15, menit).
+-- =====================================================================
+alter table public.nb_umum drop constraint if exists nb_umum_jenis_check;
+alter table public.nb_umum add constraint nb_umum_jenis_check check (jenis in ('langka', 'legenda', 'raja'));
+
+create table if not exists public.nb_raja (
+  id          integer primary key check (id = 1),
+  putaran     integer not null default 1,
+  hp          integer not null,
+  terakhir    timestamptz not null default now(),
+  mati_sampai timestamptz
+);
+insert into public.nb_raja (id, hp) values (1, 1200) on conflict (id) do nothing;
+create table if not exists public.nb_raja_serang (
+  username text not null references public.nb_siswa(username) on delete cascade,
+  putaran  integer not null,
+  dmg      integer not null default 0,
+  terakhir timestamptz not null default now(),
+  primary key (username, putaran)
+);
+alter table public.nb_raja        enable row level security;
+alter table public.nb_raja_serang enable row level security;
+revoke all on public.nb_raja, public.nb_raja_serang from anon, authenticated, public;
+
+create or replace function public.nb_raja_cfg(p_kunci text, p_def integer)
+returns integer language sql stable security definer set search_path = public, extensions
+as $$ select coalesce((select n.nilai::integer from public.nb_pengaturan n where n.kunci = p_kunci and n.nilai ~ '^[0-9]{1,6}$'), p_def) $$;
+
+-- Menormalkan keadaan raja (bangkit / pulih) lalu mengembalikan ringkasannya.
+create or replace function public.nb_raja_keadaan(p_u text)
+returns jsonb
+language plpgsql security definer set search_path = public, extensions
+as $$
+declare
+  r public.nb_raja%rowtype;
+  v_maks integer := public.nb_raja_cfg('raja_hp', 1200);
+  v_min integer := public.nb_raja_cfg('raja_min', 3);
+  v_pen integer;
+begin
+  select * into r from public.nb_raja where id = 1 for update;
+  if r.hp <= 0 and (r.mati_sampai is null or r.mati_sampai <= now()) then
+    update public.nb_raja set hp = v_maks, putaran = putaran + 1, mati_sampai = null, terakhir = now() where id = 1 returning * into r;
+    delete from public.nb_raja_serang s where s.putaran < r.putaran - 1;
+  elsif r.hp > 0 and (r.hp > v_maks or (r.hp < v_maks and r.terakhir < now() - interval '30 seconds')) then
+    update public.nb_raja set hp = v_maks where id = 1 returning * into r;
+  end if;
+  select count(*) into v_pen from public.nb_raja_serang s where s.putaran = r.putaran and s.terakhir > now() - interval '10 seconds';
+  return jsonb_build_object('ok', true, 'hp', r.hp, 'maks', v_maks, 'hidup', r.hp > 0, 'penyerang', v_pen, 'perlu', v_min, 'putaran', r.putaran,
+    'bangkit', case when r.hp <= 0 then greatest(0, ceil(extract(epoch from (r.mati_sampai - now()))))::integer else 0 end,
+    'sekarang', (extract(epoch from now()) * 1000)::bigint,
+    'menang', exists (select 1 from public.nb_prestasi p where p.username = p_u and p.kode = 'rajazombi'));
+end;
+$$;
+
+create or replace function public.nb_raja_status(p_username text, p_pin text)
+returns jsonb
+language plpgsql security definer set search_path = public, extensions
+as $$
+declare v jsonb := public.nb_verifikasi(p_username, p_pin);
+begin
+  if not (v ->> 'ok')::boolean then return v; end if;
+  return public.nb_raja_keadaan(v ->> 'username');
+end;
+$$;
+
+-- Satu pukulan ke Raja Zombi (p_dmg 1-12). Diabaikan bila terlalu cepat (< 0,3 detik dari pukulan sebelumnya).
+create or replace function public.nb_raja_serang(p_username text, p_pin text, p_dmg integer)
+returns jsonb
+language plpgsql security definer set search_path = public, extensions
+as $$
+declare
+  v jsonb := public.nb_verifikasi(p_username, p_pin);
+  v_u text; k jsonb; r public.nb_raja%rowtype;
+  v_t timestamptz; v_pen integer; v_min integer; v_dmg integer; v_kena boolean := false; v_tamat boolean := false; v_maks bigint;
+begin
+  if not (v ->> 'ok')::boolean then return v; end if;
+  v_u := v ->> 'username';
+  k := public.nb_raja_keadaan(v_u);
+  if not (k ->> 'hidup')::boolean then return k || jsonb_build_object('kena', false, 'kebal', false, 'tamat', false); end if;
+  v_dmg := greatest(1, least(12, coalesce(p_dmg, 1)));
+  select * into r from public.nb_raja where id = 1;
+  select s.terakhir into v_t from public.nb_raja_serang s where s.username = v_u and s.putaran = r.putaran;
+  if v_t is not null and v_t > now() - interval '300 milliseconds' then
+    return k || jsonb_build_object('kena', false, 'kebal', false, 'cepat', true, 'tamat', false);
+  end if;
+  insert into public.nb_raja_serang (username, putaran, dmg, terakhir) values (v_u, r.putaran, 0, now())
+  on conflict (username, putaran) do update set terakhir = now();
+  update public.nb_raja set terakhir = now() where id = 1;
+  select count(*) into v_pen from public.nb_raja_serang s where s.putaran = r.putaran and s.terakhir > now() - interval '10 seconds';
+  v_min := public.nb_raja_cfg('raja_min', 3);
+  if v_pen >= v_min then
+    update public.nb_raja set hp = greatest(0, hp - v_dmg) where id = 1 returning * into r;
+    update public.nb_raja_serang s set dmg = s.dmg + v_dmg where s.username = v_u and s.putaran = r.putaran;
+    v_kena := true;
+    if r.hp <= 0 then
+      v_tamat := true;
+      update public.nb_raja set mati_sampai = now() + make_interval(mins => public.nb_raja_cfg('raja_bangkit', 15)) where id = 1;
+      insert into public.nb_prestasi (username, kode)
+      select s.username, 'rajazombi' from public.nb_raja_serang s
+       where s.putaran = r.putaran and s.dmg >= 30 and s.terakhir > now() - interval '3 minutes'
+      on conflict do nothing;
+      insert into public.nb_prestasi (username, kode) values (v_u, 'rajazombi') on conflict do nothing;
+      insert into public.nb_umum (jenis, mapel, nama, level) values ('raja', '', v ->> 'nama', (v ->> 'kelas')::int);
+      select max(u.id) into v_maks from public.nb_umum u;
+      delete from public.nb_umum u where u.id <= v_maks - 200;
+    end if;
+  end if;
+  k := public.nb_raja_keadaan(v_u);
+  return k || jsonb_build_object('kena', v_kena, 'kebal', not v_kena, 'tamat', v_tamat, 'dmg', case when v_kena then v_dmg else 0 end);
+end;
+$$;
+
+revoke all on function public.nb_raja_cfg(text, integer)                  from public, anon, authenticated;
+revoke all on function public.nb_raja_keadaan(text)                       from public, anon, authenticated;
+revoke all on function public.nb_raja_status(text, text)                  from public;
+revoke all on function public.nb_raja_serang(text, text, integer)         from public;
+grant execute on function public.nb_raja_status(text, text)               to anon, authenticated;
+grant execute on function public.nb_raja_serang(text, text, integer)      to anon, authenticated;
+
 -- Minta Supabase membaca ulang daftar fungsi agar langsung bisa dipanggil game.
 notify pgrst, 'reload schema';
 
@@ -1196,6 +1321,12 @@ notify pgrst, 'reload schema';
 --  Matikan / hidupkan batas waktu bermain harian untuk semua siswa:
 --    update public.nb_pengaturan set nilai = 'mati'  where kunci = 'batas_waktu';
 --    update public.nb_pengaturan set nilai = 'hidup' where kunci = 'batas_waktu';
+--
+--  Raja Zombi (Pulau Zombi): ubah kesulitan (nilai angka), mis. minimal pemain, nyawa, dan menit bangkit:
+--    insert into public.nb_pengaturan (kunci, nilai) values ('raja_min', '2') on conflict (kunci) do update set nilai = excluded.nilai;
+--    insert into public.nb_pengaturan (kunci, nilai) values ('raja_hp', '800') on conflict (kunci) do update set nilai = excluded.nilai;
+--    insert into public.nb_pengaturan (kunci, nilai) values ('raja_bangkit', '5') on conflict (kunci) do update set nilai = excluded.nilai;
+--    update public.nb_raja set hp = 0, mati_sampai = now() where id = 1;   -- bangkitkan raja sekarang (setel ulang)
 --
 --  Hapus satu siswa (progresnya ikut terhapus):
 --    delete from public.nb_siswa where username = 'nama.pengguna';
