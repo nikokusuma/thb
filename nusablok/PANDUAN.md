@@ -126,6 +126,16 @@ Menutup pendaftaran siswa baru (jalankan di SQL Editor):
 `update public.nb_pengaturan set nilai = 'tutup' where kunci = 'pendaftaran';`
 (ganti `'tutup'` dengan `'buka'` untuk membukanya lagi).
 
+## Memasang di HP Android atau Huawei (APK)
+
+1. Buka `https://github.com/nikokusuma/thb/releases/tag/nusablok-apk` di HP, lalu unduh **NusaBlok.apk**.
+2. Buka berkas itu. Bila diminta, izinkan **pasang dari sumber tidak dikenal** untuk peramban/Berkas yang dipakai. Di Huawei, bila muncul peringatan keamanan, pilih **Lanjutkan/Pasang saja**.
+3. Buka **NusaBlok**. Aplikasi selalu landscape, layar penuh, dan layar tidak padam saat bermain. Butuh internet (sama seperti versi web).
+
+APK memuat isi game yang ada di `nusablok/` saat dibangun. Setelah game diperbarui, APK dibangun ulang otomatis (sekitar 3 menit) dan muncul di halaman yang sama; siswa perlu mengunduh dan memasang ulang APK baru (data siswa aman karena tersimpan di server). Bila game dipasang di project Supabase lain, ubah `nusablok/config.js` lebih dulu.
+
+Catatan: kunci tanda tangan APK ada di repositori (`nusablok-apk/nusablok.keystore`) karena ini hanya untuk dibagikan langsung, bukan Play Store.
+
 ## Bila ada masalah
 
 | Gejala | Yang dicek |
