@@ -112,10 +112,45 @@ Ada **satu pulau tersembunyi** di barat laut yang **tidak tampak di peta kecil m
 Ada **pulau tersembunyi kedua** di timur, di luar bagian dunia yang digambar peta (jadi **tidak tampak di peta kecil maupun peta besar**). Ke sana **tidak memakai perahu, tetapi lewat gua**. Dari pulau-pulau biasa, pulau ini **tidak kelihatan** karena diselimuti **kabut gelap** berbentuk tembok awan ungu-hitam. Perahu yang mendekat berhenti di tepi kabut, dan pemain yang berenang didorong kembali oleh arus laut. Dari **dalam** pulau, kabut tampak sebagai langit gelap di sekeliling.
 
 - **Gua gelap**: bukit batu dengan mulut gua berlampu di **pantai timur laut** daratan utama (di dekat Kota Nusantara). Siswa berjalan masuk, layar makin gelap, sampai **gerbang ungu** di ujung. Layar menghitam sebentar lalu siswa muncul di **gua seberang** di pulau kedua (jalan pulang: gerbang ungu di gua pulau itu). Pak Darto memberi petunjuk samar tentang gua ini.
-- **Pulau Tulang**: pulau lonjong yang **sekitar 3 kali lebih luas** daripada pulau zombi (lebar sekitar 85 blok, panjang sekitar 60 blok), dengan nisan, pohon mati, dan lengkungan tulang rusuk tersebar. Gua pulang ada di pantai barat, lapangan Baphomet di sisi timur. **Skeleton** 💀 (menembak panah setelah membidik sebentar, siswa bisa menghindar dengan bergerak atau melompat) dan **kelelawar** 🦇 (berputar lalu menyambar) muncul **tanpa henti**, dan bisa dikalahkan dengan panah atau tebasan. Daerah sekitar mulut gua dibuat aman beberapa detik. Siswa punya ❤️ 6 hati seperti di pulau zombi; bila habis, siswa dipulangkan ke desa.
+- **Pulau Tulang**: pulau lonjong yang **sekitar 3 kali lebih luas** daripada pulau zombi (lebar sekitar 85 blok, panjang sekitar 60 blok), dengan nisan, pohon mati, dan lengkungan tulang rusuk tersebar. Gua pulang ada di pantai barat, lapangan Baphomet di sisi timur. **Skeleton** 💀 (menembak panah setelah membidik sebentar, siswa bisa menghindar dengan bergerak atau melompat) dan **kelelawar** 🦇 (berputar lalu menyambar) muncul **bergantian dengan jeda** (skeleton tiap ±9–14 detik, maksimal 4 sekaligus; kelelawar tiap ±13–19 detik, maksimal 3), dan bisa dikalahkan dengan panah atau tebasan. **Saat siswa melawan Baphomet**, jeda dibuat lebih lama (skeleton ±16–24 detik, kelelawar ±22–30 detik, maksimal 1 musuh tambahan) supaya siswa sempat menebas bos sambil sesekali menghadapi anak buahnya. Daerah sekitar mulut gua dibuat aman beberapa detik. Siswa punya ❤️ 6 hati seperti di pulau zombi; bila habis, siswa dipulangkan ke desa.
 - **Baphomet 🐐** (bos): berdiri di lapangan batu ungu-hitam dan **bangkit saat didekati**. Bisa dikalahkan **sendirian, tanpa server, dan tanpa prestasi**. Nyawanya **520** dalam 3 fase: (1) hantaman dan hujan api (lingkaran merah di tanah, 1,5 detik sebelum meledak), (2) hentakan keliling (lompat untuk menghindar), bola api, memanggil skeleton, berpindah tempat, (3) lebih cepat dan lebih ganas. Dengan pedang butuh sekitar **43 tebasan** (hampir 2 pedang), sehingga siswa perlu menyiapkan beberapa pedang dan fokus menghindar. Setelah kalah, ia **bangkit lagi 4 menit kemudian** dan memberi hadiah **2 pedang**.
+- **Ramuan penyembuh ❤️**: botol merah dengan **sinar merah muda** muncul **acak di tempat berbeda-beda** di Pulau Tulang (tiap ±15–26 detik, maksimal 2 sekaligus, hilang sendiri setelah ±100 detik; saat melawan Baphomet separuhnya muncul di dekat lapangan bos). Cukup **dekati** untuk meminumnya: **+2 hati**. Bila hati siswa sudah penuh, ramuan dibiarkan agar tidak terbuang. Di layar muncul petunjuk jarak ke ramuan terdekat bila hati siswa kurang. Jumlah ramuan yang diminum tercatat di Buku Koleksi (tab 🧟 Pulau).
 - **Pedang ⚔️**: ditemukan secara acak (sekitar **17%**) saat **menggali ⛏️ tanda ✖**. **Maksimal 10 pedang** dibawa (bila penuh, hasil galian tetap dapat harta biasa). Tiap pedang punya **ketahanan 25 kali kena**, lalu **patah**. Pedang dipakai dengan **tombol ⚔️ khusus** di kanan bawah (di sebelah kiri tombol 🏹; di komputer tekan **G**). **Ketuk** = satu tebasan, **tahan** = menebas berulang. Badan otomatis berputar ke musuh terdekat (jangkauan sekitar 3,6 blok), jadi siswa tidak perlu membidik tepat. Tombol berdenyut bila ada musuh dekat, angka kecil di pojoknya adalah jumlah pedang. Kerusakannya jauh lebih besar daripada tangan kosong (juga melawan zombi dan Raja Zombi). Tanpa pedang, tombol ⚔️ tetap menebas dengan tangan kosong (lebih lemah) dan tidak ada yang rusak. Ketahanan pedang yang sedang dipakai tampil di label dekat tombol 🏹. **Pedang disimpan di perangkat masing-masing** (ganti perangkat berarti mulai dari nol), sedangkan statistik (pedang ditemukan/patah, monster dikalahkan) tersimpan di akun di Buku Koleksi › 🧟 Pulau.
 - Nama monster dan teks semuanya ada di kode (`src/gua.js`, `src/activities.js`) bila sekolah ingin mengganti nama bos.
+
+## Cuaca yang berubah sendiri
+
+Langit NusaBlok tidak selalu cerah. Ada lima cuaca: **☀️ cerah, ⛅ berawan, 🌧️ hujan, 🌫️ berkabut, dan ⛈️ badai petir**. Cuaca berganti kira-kira **tiap 6 menit** (peluang tiap cuaca berbeda-beda; cerah paling sering, badai paling jarang) dan berubah **perlahan sekitar 40 detik**, bukan mendadak. Saat berganti, muncul pemberitahuan singkat di layar.
+
+- Cuaca dihitung dari **jam server**, jadi **semua siswa melihat cuaca yang sama** pada saat yang sama. Tidak ada data yang disimpan.
+- **Tampilan**: langit dan kabut jarak pandang menyesuaikan, awan bertambah, hujan turun mengikuti kamera, dan saat badai ada **kilat dan guntur** (kilatnya singkat dan jarang). Level 6 (malam) tetap malam, hanya lebih gelap.
+- **Di dalam gua** tidak ada hujan. Di Pulau Tulang hujan terlihat lebih tipis.
+- **Memancing**: saat hujan dan badai ikan **lebih cepat menggigit** (waktu tunggu lebih pendek), saat berkabut sedikit lebih cepat. Tantangan memancingnya sendiri tidak berubah.
+- Chip kecil di sebelah kiri layar menunjukkan cuaca saat ini.
+- **Suara** hujan dan guntur dibuat dari bunyi acak di peramban (tanpa berkas audio) dan ikut mati bila suara dimatikan di ⚙️ Menu.
+- **Pratinjau untuk guru**: tambahkan `?cuaca=hujan` di akhir alamat game (pilihan: `cerah`, `berawan`, `hujan`, `kabut`, `badai`) untuk memaksa cuaca di perangkat itu saja. Hapus tambahan itu untuk kembali normal.
+
+## Dunia yang tumbuh sendiri
+
+NusaBlok **bertambah luas dengan sendirinya**. Pembaruannya sangat pelan: **kira-kira sebulan sekali (30 hari) muncul satu pulau baru**, sampai **6 pulau** (jadi sekitar 6 bulan setelah tanggal mulai). Setelah itu dunia berhenti tumbuh. Tidak ada yang perlu dilakukan guru: tidak perlu unggah ulang, tidak perlu jalankan SQL.
+
+| Tahap | Muncul setelah | Pulau | Letak |
+|---|---|---|---|
+| 1 | 30 hari | 🌴 Pulau Kelapa (pasir, pohon kelapa, kios) | utara |
+| 2 | 60 hari | 🌸 Taman Sakura (pohon merah muda, kolam, gerbang merah) | timur |
+| 3 | 90 hari | 🗼 Pulau Mercusuar (menara merah-putih berlampu) | selatan |
+| 4 | 120 hari | 🌾 Pulau Sawah (petak sawah, orang-orangan sawah) | barat |
+| 5 | 150 hari | 🏛️ Reruntuhan Kuno (tiang batu, altar emas) | tenggara |
+| 6 | 180 hari | 🌟 Pulau Bintang (lantai bintang emas, tugu) | selatan |
+
+- Tiap pulau terhubung ke daratan dengan **jembatan kayu**, punya **2 tanda ✖ galian** sendiri (galian pulau itu muncul lagi di pulau yang sama), dan muncul di **peta besar** dengan ikonnya. Daratan lama, jalan, desa, dan pohon-pohonnya **tidak berubah**; hanya ditambah pulau.
+- Pertama kali siswa menginjak pulau baru, muncul pemberitahuan **"Pulau baru ditemukan!"**, dan jumlahnya tercatat di Buku Koleksi (tab 🧟 Pulau). Saat siswa masuk game setelah ada pembaruan, muncul **jendela sekali tampil** yang menjelaskan pulau barunya.
+- Di ⚙️ Menu ada kartu **🌱 Dunia tumbuh sendiri**: tahap saat ini, sisa hari ke pembaruan berikutnya (pulau berikutnya sengaja dirahasiakan ❓), dan pulau yang sudah ditemukan.
+- **Tanggal mulai** bawaan: **28 November 2026** (hari berganti pukul 00.00 WIB). Tahap dihitung dari **jam server**, jadi semua siswa melihat dunia yang sama, walaupun jam perangkatnya keliru. Bila jam server tidak terjangkau, dipakai jam perangkat.
+- Pulau baru **muncul saat game dimuat**. Siswa yang sedang bermain ketika pembaruan terjadi akan diberi tahu (maksimal 1 menit kemudian) untuk **keluar lalu masuk lagi**.
+- **Mengatur sendiri** (opsional, di `config.js`, di dalam `window.NB_CONFIG`): `TUMBUH_MULAI: '2027-01-15'` (tanggal mulai), `TUMBUH_HARI: 30` (jarak antar pembaruan, 1–365 hari), `TUMBUH_MAKS: 3` (batas jumlah pulau, 0–6; `0` = dunia tidak tumbuh). Mengubah tanggal mulai atau jarak hari akan **menghitung ulang tahap** pada muat berikutnya, jadi pulau bisa bertambah atau **menghilang lagi**. Atur sekali di awal saja.
+- **Pratinjau untuk guru**: tambahkan `?tahap=3` di akhir alamat game untuk melihat dunia pada tahap 3 (0–6) di perangkat itu saja. Pilihan ini **diingat** di perangkat; kembalikan dengan `?tahap=lagi`. Saat pratinjau, jendela pembaruan tidak muncul.
+- Pulau-pulau baru ada di peta, tetapi **di Pulau Tulang tidak ada perubahan** (tetap tersembunyi di balik kabut).
 
 ## Misi harian, ikan legendaris, dan item langka
 - **Misi harian** (ikon 📅 di kiri atas): 2 misi per hari. Misi 1 berupa misi pertanyaan, misi 2 berupa misi kumpul barang. Pelajarannya berbeda setiap hari dan misi 2 tidak pernah sama dengan misi 1. Tiap misi selesai memberi **+10 menit** waktu bermain (saldo tetap maksimal 60 menit). Hari berganti pukul 00.00 WIB.
@@ -141,6 +176,7 @@ Ada 40 prestasi di Buku Koleksi (tab 🏅), misalnya Langkah Pertama, Pelajar Ra
 - Koleksi, ikan, harta, dan prestasi tersimpan di server (per siswa) sehingga ikut pindah bila siswa berganti perangkat. Angka koleksi hanya bisa naik.
 - Seperti misi bawaan, perhitungan hadiah dilakukan di peramban siswa. Siswa yang mahir teknis bisa memalsukan koleksi atau prestasi biasa. Ini hanya hiasan dan **tidak dipakai untuk nilai**. Yang dijaga ketat di server: item langka dan pengumumannya (jeda minimal 60 detik per siswa, dan prestasi `langka_*`/`legenda` tidak bisa dicatat dari luar).
 - Pengumuman disimpan 200 terakhir; yang lama dihapus otomatis.
+- Cuaca dan tahap pertumbuhan dunia dihitung dari **jam server** (diambil sekali saat masuk dan diperbarui berkala), tanpa tabel baru di Supabase. Pulau Tulang, cuaca, ramuan, dan pedang **tidak memerlukan pembaruan SQL**.
 
 ## Mengubah level siswa (oleh guru)
 
