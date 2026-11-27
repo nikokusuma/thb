@@ -152,6 +152,34 @@ NusaBlok **bertambah luas dengan sendirinya**. Pembaruannya sangat pelan: **kira
 - **Pratinjau untuk guru**: tambahkan `?tahap=3` di akhir alamat game untuk melihat dunia pada tahap 3 (0–6) di perangkat itu saja. Pilihan ini **diingat** di perangkat; kembalikan dengan `?tahap=lagi`. Saat pratinjau, jendela pembaruan tidak muncul.
 - Pulau-pulau baru ada di peta, tetapi **di Pulau Tulang tidak ada perubahan** (tetap tersembunyi di balik kabut).
 
+## Pulau berkarakter: kepala suku, misi cerita, dungeon, dan bos
+
+Setiap pulau baru (lihat tabel di atas) punya **kepala suku**, **2 warga**, **4 misi cerita**, satu **dungeon bertingkat**, satu **bos**, **kostum bos**, dan **prestasi**. Semuanya muncul bersama pulaunya, jadi tidak ada yang perlu diatur guru. Ceritanya satu rangkaian bernama **Pecahan Bintang Kejora**: Batara Kala menelan cahaya langit dan pecahannya jatuh ke 6 pulau. Misi-misi di tiap pulau saling berhubungan (pesan diantar ke kepala suku pulau lain) dan kepala suku saling menyebut satu sama lain.
+
+| Pulau | Kepala suku | Dungeon (3 lantai) | Bos | Kostum |
+|---|---|---|---|---|
+| 🌴 Kelapa | Datu Pasang | 🪸 Gua Karang | 🦀 Yuyu Kangkang | Yuyu Kangkang |
+| 🌸 Taman Sakura | Ibu Sekar Wangi | 🎋 Rumpun Bambu | 👹 Buto Ijo | Buto Ijo |
+| 🗼 Mercusuar | Nahkoda Bayu | ⚓ Dasar Mercusuar | 🗿 Malin Batu | Malin Batu |
+| 🌾 Sawah | Mbah Sri | 🏚️ Lumbung Bayangan | 🐗 Raja Celeng | Raja Celeng |
+| 🏛️ Reruntuhan | Resi Candra | 🏺 Candi Seribu Arca | 🏛️ Raja Arca | Raja Arca |
+| 🌟 Bintang | Bu Kejora | 🌌 Langit Gelap | 🌑 Batara Kala | Batara Kala |
+
+**Cara bermain**
+- Bicara dengan **kepala suku** (tanda ❗ di atas kepalanya) → **Terima misi**. Ada 4 misi per pulau, dikerjakan **berurutan**. Tiap pulau punya jenis permainan sendiri: kumpul barang (ada yang berbatas waktu atau ada barang pengecoh), **antar pesan** ke warga atau kepala suku pulau lain, **cari harta** (petunjuk dingin ❄️ sampai panas 🔥), **injak lentera berurutan** (ada yang harus diingat), **balapan cincin**, **panah sasaran**, dan **tangkap makhluk yang lari**.
+- Setelah tugas selesai, kembali ke kepala suku untuk menjawab **1 sampai 3 soal pelajaran** (diambil dari bank soal level siswa; matematika dibuat acak). Perlu benar minimal dua pertiga; bila belum cukup, boleh mencoba lagi dengan soal baru.
+- Setelah **4 misi** selesai, **gerbang dungeon** di pulau itu terbuka. Di dalamnya: lantai 1 dan 2 berisi monster bertema pulau (kalahkan semuanya, lalu masuk gerbang biru), lantai 3 adalah **bos** dengan 3 fase. Serang dengan ⚔️ atau panah 🏹, dan **hindari lingkaran merah** di lantai. Hati terisi sedikit tiap naik lantai.
+- Bila hati habis, siswa **dibawa pulang** (tidak ada yang hilang) dan mengulang dari lantai 1. Dungeon tidak ada hubungannya dengan Pulau Tulang atau gua gelap.
+- Setelah bos kalah: **Pecahan Bintang Kejora**, **kostum bos terbuka** (bisa langsung dipakai, bisa dilihat teman), dan **prestasi pulau** tercatat. Bila semua 6 pulau selesai, siswa mendapat prestasi **✨ Cahaya Kembali**.
+- Siswa boleh membatalkan misi dan mulai lagi kapan saja dari kepala suku. Mengerjakan misi di pulau lain otomatis membatalkan misi lama (dengan konfirmasi).
+
+**Catatan guru**
+- Setelah misi 4 selesai, dungeon dan bos **boleh dimasuki lagi kapan saja** untuk latihan; kemajuan tidak pernah turun. Kemajuan tersimpan di server (per siswa) di dalam data koleksi, jadi ikut pindah bila siswa berganti perangkat.
+- **Pratinjau guru**: pakai `?tahap=6` di akhir alamat game agar keenam pulau langsung ada. Untuk mencoba dungeon lebih cepat, selesaikan misi 1 sampai 4 dulu.
+- Dungeon dibuat **di langit**, di luar peta biasa (bagian timur dunia), sehingga tidak mengubah ukuran dunia dan tidak terlihat dari luar. Siswa yang sedang di dalam dungeon tidak terlihat oleh pemain yang ada di luar dungeon.
+- Ceritanya (nama tokoh, legenda Nusantara, dialog) adalah **rancangan awal**. Teksnya ada di berkas `src/suku_data.js` dan mudah diganti bila ingin disesuaikan dengan pelajaran di sekolah.
+- Panah pinjaman selama misi panah dibatasi **10 anak panah**. Tidak ada pembaruan SQL yang diperlukan.
+
 ## Misi harian, ikan legendaris, dan item langka
 - **Misi harian** (ikon 📅 di kiri atas): 2 misi per hari. Misi 1 berupa misi pertanyaan, misi 2 berupa misi kumpul barang. Pelajarannya berbeda setiap hari dan misi 2 tidak pernah sama dengan misi 1. Tiap misi selesai memberi **+10 menit** waktu bermain (saldo tetap maksimal 60 menit). Hari berganti pukul 00.00 WIB.
 - **Spot ikan legendaris**: muncul acak sebagai **sinar merah muda yang lebar dan sangat tinggi** (terlihat dari jauh) dengan riak air dan percikan, sama untuk semua pemain, dan hanya beberapa menit. Di peta kecil tampak **bulatan merah muda berdenyut** (menjadi panah di tepi bila di luar jangkauan), di peta besar tampak bulatan besar bergambar 🐟. Peluang mendapat ikan legendaris sekitar **1%** tiap tarikan, jadi sangat langka.
@@ -168,7 +196,7 @@ NusaBlok **bertambah luas dengan sendirinya**. Pembaruannya sangat pelan: **kira
 
 ## Prestasi (achievement)
 
-Ada 40 prestasi di Buku Koleksi (tab 🏅), misalnya Langkah Pertama, Pelajar Rajin, Juara Level, Kolektor Bintang, Pengumpul Handal, Mata Elang, Murid Teladan, Pancingan Pertama, dan prestasi untuk tiap item langka. Prestasi hanya bertambah, tidak pernah hilang.
+Ada 47 prestasi di Buku Koleksi (tab 🏅), termasuk 6 prestasi pulau dan ✨ Cahaya Kembali, misalnya Langkah Pertama, Pelajar Rajin, Juara Level, Kolektor Bintang, Pengumpul Handal, Mata Elang, Murid Teladan, Pancingan Pertama, dan prestasi untuk tiap item langka. Prestasi hanya bertambah, tidak pernah hilang.
 
 ## Catatan teknis dan keamanan fitur ini
 
